@@ -2,744 +2,3067 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spaccio Turno A - v28 Cloud</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<title>Spaccio Turno A - v36 Atomic Sync & POS</title>
 <style>
-:root{--blue:#1769aa;--blue2:#0d47a1;--bg:#f4f7fb;--card:#fff;--text:#1e293b;--muted:#64748b;--line:#dbe3ee;--ok:#15803d}
-*{box-sizing:border-box} body{margin:0;font-family:Arial,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
-header{background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;padding:18px}
-header h1{margin:0;font-size:1.35rem}.wrap{max-width:980px;margin:auto;padding:18px}
-.screen{min-height:calc(100vh - 75px);display:flex;align-items:center;justify-content:center}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 4px 18px #0000000d}
-.auth{width:min(430px,100%)} h2{margin-top:0}
-input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:9px;font-size:1rem;margin:7px 0 13px}
-button{border:0;border-radius:10px;padding:12px 16px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
-button:hover{background:var(--blue2)}button.secondary{background:#e8f1fb;color:var(--blue2)}button.big{width:100%;padding:16px;font-size:1.15rem}
-.role-grid,.home-grid,.cat-grid,.products{display:grid;gap:12px}.role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.home-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-.products{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-.tile{min-height:90px}.balance-blue{background:#1976d2!important;color:#fff!important}.balance-blue:hover{background:#0d47a1!important}.product{background:#fff;border:1px solid var(--line);color:var(--text);text-align:left}.product small{display:block;color:var(--muted);margin-top:5px}
-.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
-.badge{background:#e8f1fb;color:var(--blue2);padding:6px 10px;border-radius:20px;font-weight:700}
-.cart-row,.order-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
-.total{font-size:1.35rem;font-weight:800;margin:15px 0}.muted{color:var(--muted)}
-.hidden{display:none!important}.bar-order{border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:12px;background:#fff}
-.status{display:inline-block;padding:5px 9px;border-radius:15px;background:#eef2f7;color:#475569;font-weight:700}
-.status.ok{background:#dcfce7;color:var(--ok)}
-.notice{padding:10px;background:#eef6ff;border-radius:9px;margin-bottom:12px}
-.pay-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.pay-btn{min-height:54px;font-size:1rem}.pay-btn:disabled{opacity:.45;cursor:not-allowed}
-@media(max-width:700px){.home-grid,.cat-grid,.role-grid{grid-template-columns:1fr}.wrap{padding:12px}}
-.account-block{margin-top:14px}.balance-positive{color:#15803d}.balance-negative{color:#b91c1c}.account-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.account-actions button:last-child{grid-column:1/-1}@media(max-width:650px){.account-actions{grid-template-columns:1fr}}
+:root {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-soft: #eff6ff;
+  --dark: #0f172a;
+  --dark-soft: #1e293b;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --ok: #10b981;
+  --ok-dark: #059669;
+  --ok-soft: #ecfdf5;
+  --warn: #f59e0b;
+  --warn-soft: #fffbeb;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-soft: #fef2f2;
+  --cat-coffee: #d97706;
+  --cat-coffee-bg: #fffbeb;
+  --cat-drink: #0284c7;
+  --cat-drink-bg: #f0f9ff;
+  --cat-snack: #ea580c;
+  --cat-snack-bg: #fff7ed;
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+
+button, input, select {
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+/* HEADER BAR */
+header {
+  background: var(--dark);
+  color: #fff;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.screen {
+  min-height: calc(100vh - 66px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+}
+
+.auth {
+  width: min(440px, 100%);
+}
+
+h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+input, select {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  font-size: 1.05rem;
+  background: #fff;
+  color: var(--text);
+  margin: 0 0 14px 0;
+  font-weight: 600;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 18px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.06s ease, background-color 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+button:hover {
+  background: var(--primary-dark);
+}
+
+button.secondary {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+button.secondary:hover {
+  background: #dbeafe;
+}
+
+button.ok-btn {
+  background: var(--ok);
+  color: #fff;
+}
+
+button.ok-btn:hover {
+  background: var(--ok-dark);
+}
+
+button.ghost {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  min-height: 42px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  border-radius: 11px;
+}
+
+button.ghost:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+button.danger:hover {
+  background: var(--danger-dark);
+}
+
+button.big {
+  width: 100%;
+  min-height: 58px;
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+}
+
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* BENTO TILES DASHBOARD */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tile {
+  min-height: 112px;
+  flex-direction: column;
+  text-align: center;
+  font-size: 1.05rem;
+  padding: 18px 14px;
+  background: #fff;
+  color: var(--dark);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  gap: 10px;
+}
+
+.tile:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+}
+
+.tile.primary-tile {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: 0;
+}
+
+.tile.balance-blue {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #fff;
+  border: 0;
+}
+
+.tile.danger-tile {
+  background: var(--danger-soft);
+  color: var(--danger-dark);
+  border-color: #fecaca;
+}
+
+.tile-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile.primary-tile .tile-icon-wrap,
+.tile.balance-blue .tile-icon-wrap {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+
+.tile.danger-tile .tile-icon-wrap {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+/* SPLIT SCREEN POS LAYOUT (TABLET HORIZONTAL) */
+.pos-split {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.pos-receipt-col {
+  position: sticky;
+  top: 76px;
+}
+
+/* PILLOLE CLIENTE & DIPENDENTI */
+.type-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.type-btn {
+  min-height: 54px;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 2px solid var(--border);
+  font-size: 1rem;
+}
+
+.type-btn.active {
+  background: var(--dark);
+  color: #fff;
+  border-color: var(--dark);
+}
+
+.emp-pill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  max-height: 195px;
+  overflow-y: auto;
+  padding: 4px 2px;
+  margin-bottom: 10px;
+}
+
+.emp-pill {
+  min-height: 46px;
+  padding: 8px 10px;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  justify-content: flex-start;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emp-pill.selected {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* CATEGORIE E CARD PRODOTTI CON ILLUSTRAZIONI SVG */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cat-btn {
+  min-height: 54px;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 2px solid var(--border);
+  font-size: 0.98rem;
+}
+
+.cat-btn.active[data-cat="Caffetteria"] {
+  background: var(--cat-coffee);
+  color: #fff;
+  border-color: var(--cat-coffee);
+}
+
+.cat-btn.active[data-cat="Bibite"] {
+  background: var(--cat-drink);
+  color: #fff;
+  border-color: var(--cat-drink);
+}
+
+.cat-btn.active[data-cat="Merendine e snack"] {
+  background: var(--cat-snack);
+  color: #fff;
+  border-color: var(--cat-snack);
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+  gap: 12px;
+}
+
+.product {
+  position: relative;
+  background: #fff;
+  border: 2px solid var(--border);
+  color: var(--text);
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 118px;
+  padding: 12px;
+  text-align: left;
+  border-radius: 16px;
+}
+
+.product:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.product.in-cart {
+  border-color: var(--primary);
+  background: #f8fbff;
+}
+
+.qty-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prod-illus {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.prod-illus.coffee { background: var(--cat-coffee-bg); color: var(--cat-coffee); }
+.prod-illus.drink { background: var(--cat-drink-bg); color: var(--cat-drink); }
+.prod-illus.snack { background: var(--cat-snack-bg); color: var(--cat-snack); }
+
+.product .p-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.product .p-price {
+  color: var(--dark);
+  font-weight: 900;
+  font-size: 1.08rem;
+  margin-top: 6px;
+}
+
+/* SCONTRINO DIGITALE & NUMPAD INTEGRATO */
+.receipt-card {
+  background: #fff;
+  border: 2px solid var(--dark);
+  border-radius: 20px;
+  padding: 18px;
+}
+
+.receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 2px dashed var(--border);
+  margin-bottom: 10px;
+}
+
+.cart-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.cart-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+}
+
+.qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qty-btn {
+  min-height: 42px;
+  min-width: 42px;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 1.25rem;
+}
+
+.total-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--dark);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin: 14px 0;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.pay-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pay-btn {
+  min-height: 58px;
+  font-size: 1.02rem;
+}
+
+/* CUSTOM POS NUMPAD (TASTIERINO NUMERICO INTEGRATO) */
+.numpad-wrapper {
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.numpad-display {
+  background: #fff;
+  border: 2px solid var(--dark);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 1.65rem;
+  font-weight: 900;
+  text-align: right;
+  margin-bottom: 10px;
+  color: var(--dark);
+  letter-spacing: -0.02em;
+}
+
+.quick-cash-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.quick-cash-btn {
+  min-height: 46px;
+  padding: 6px 2px;
+  background: #fff;
+  color: var(--dark);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.quick-cash-btn:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.num-key {
+  min-height: 54px;
+  background: #fff;
+  color: var(--dark);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.num-key:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.num-key.key-fn {
+  background: #e2e8f0;
+  color: var(--dark);
+  font-size: 1.05rem;
+}
+
+/* ALTRI COMPONENTI */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1.5px solid #bfdbfe;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stat-value {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: var(--dark);
+  letter-spacing: -0.03em;
+}
+
+.bar-order {
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.status.ok { background: var(--ok-soft); color: var(--ok-dark); }
+.status.neg { background: var(--danger-soft); color: var(--danger-dark); }
+
+.muted { color: var(--muted); font-size: 0.9rem; }
+.hidden { display: none !important; }
+.balance-positive { color: var(--ok-dark); }
+.balance-negative { color: var(--danger-dark); }
+
+/* TOAST & MODALS */
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(460px, calc(100% - 32px));
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--dark);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.98rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideUp 0.16s ease-out;
+}
+
+.toast.ok { background: #064e3b; border-left: 5px solid #10b981; }
+.toast.err { background: #7f1d1d; border-left: 5px solid #ef4444; }
+.toast.info { background: #1e3a8a; border-left: 5px solid #3b82f6; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 9000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px;
+  width: min(450px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+@media (max-width: 840px) {
+  .pos-split { grid-template-columns: 1fr; }
+  .pos-receipt-col { position: static; }
+}
+
+@media (max-width: 640px) {
+  .home-grid { grid-template-columns: repeat(2, 1fr); }
+  .cat-grid, .role-grid { grid-template-columns: 1fr; }
+  .wrap { padding: 12px; }
+}
 </style>
 </head>
 <body>
-<header style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-  <h1>☕ Spaccio Turno A</h1>
-  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+
+<header>
+  <div class="brand-group">
+    <button type="button" id="headerBackBtn" class="ghost hidden" style="background:var(--primary);font-weight:800" onclick="goBack()">← Indietro</button>
+    <div class="brand-logo" style="cursor:pointer" onclick="goHome()" title="Torna alla Home / Selezione Ruolo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+    </div>
+    <h1 style="cursor:pointer" onclick="goHome()" title="Torna alla Home / Selezione Ruolo">Spaccio Turno A</h1>
+  </div>
+  <div class="header-actions">
     <span id="cloudStatus" class="badge" style="background:#fff;color:#475569">⚪ Connessione...</span>
-    <button type="button" class="secondary" style="background:#fff;color:#0d47a1" onclick="manualSaveData()">SALVA DATI</button>
-    <button type="button" class="secondary" style="background:#fff;color:#0d47a1" onclick="exportJSON()">ESPORTA JSON</button>
-    <button type="button" class="secondary" style="background:#fff;color:#0d47a1" onclick="document.getElementById('importJSONFile').click()">IMPORTA JSON</button>
+    <button type="button" class="ghost" onclick="manualSaveData()">💾 Salva</button>
+    <button type="button" class="ghost" onclick="exportJSON()">⬇️ JSON</button>
+    <button type="button" class="ghost" onclick="document.getElementById('importJSONFile').click()">⬆️ Importa</button>
     <input id="importJSONFile" type="file" accept="application/json,.json" style="display:none" onchange="importJSON(event)">
   </div>
 </header>
 
 <section id="loginScreen" class="screen">
-<div class="card auth">
-<h2>Login</h2>
-<label>Username</label><input id="username" autocomplete="username">
-<label>Password</label><input id="password" type="password" autocomplete="current-password">
-<button class="big" onclick="login()">ACCEDI</button>
-<p id="loginError" class="muted"></p>
-</div>
+  <div class="card auth">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div class="brand-logo" style="width:46px;height:46px">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg>
+      </div>
+      <div>
+        <h2 style="margin:0">Accesso Cassa</h2>
+        <span class="muted">Spaccio Turno A · v36 POS</span>
+      </div>
+    </div>
+    <label>Username</label>
+    <input id="username" autocomplete="username" placeholder="nome.cognome (es. giampaolo.muratore)">
+    <label>Password</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    <button class="big" onclick="login()">ENTRA NELLO SPACCIO</button>
+    <p id="loginError" style="color:var(--danger);font-weight:700;margin-top:10px"></p>
+  </div>
 </section>
 
 <section id="roleScreen" class="screen hidden">
-<div class="card auth">
-<h2>Scegli il ruolo</h2>
-<div id="roleButtons" class="role-grid"></div><button class="secondary" style="width:100%;margin-top:14px" onclick="logout()">ESCI</button>
-</div>
-</section>
-
-<section id="firstPasswordScreen" class="screen hidden">
-<div class="card auth">
-<h2>Primo accesso</h2>
-<p>Per motivi di sicurezza devi cambiare la password prima di continuare.</p>
-<label>Nuova password</label><input id="firstNewPassword" type="password" autocomplete="new-password" placeholder="Inserisci una nuova password">
-<label>Conferma nuova password</label><input id="firstConfirmPassword" type="password" autocomplete="new-password" placeholder="Ripeti la nuova password">
-<button class="big" onclick="completeFirstPasswordChange()">CAMBIA PASSWORD E CONTINUA</button>
-<p id="firstPasswordError" class="muted"></p>
-</div>
+  <div class="card auth">
+    <h2>Seleziona Modalità</h2>
+    <p class="muted" style="margin-top:0;margin-bottom:16px">Scegli la postazione operativa.</p>
+    <div id="roleButtons" class="role-grid"></div>
+    <button class="secondary" style="width:100%;margin-top:14px" onclick="logout()">ESCI DALL'ACCOUNT</button>
+  </div>
 </section>
 
 <main id="app" class="wrap hidden"></main>
+<div id="toastContainer"></div>
+<div id="customModal" class="modal-backdrop hidden"></div>
 
 <script>
-const defaultEmployees = ["Berardi Andrea", "Bonesso Riccardo", "Brandoli Francesco", "Campedel Ramiro", "Capuano Eduardo", "Carrozza Paolo", "Casapinta Davide", "Catarci Leonardo", "Cervellati Federico", "Collesei Marco", "De Bari Daniele", "De Bellis Pasquale", "Favaro Alvise", "Fedrigo Andrea", "Grandelis Alessandro", "Mion Alessandro", "Musiu Gianluca", "Muratore Giampaolo", "Niero Simone", "Nordio Eros", "Paolone Michele", "Pelati Massimo", "Poletto Emanuele", "Puppa Luca", "Righetto Giacomo", "Rubin Marco", "Scaldelai Roberto", "Semenzato Daniele", "Sibilia Gianluca", "Stante Gabriele", "Zanin Umberto"];
-let employees=(JSON.parse(localStorage.getItem("spaccio_employees_v1")||"null")||defaultEmployees.slice()).sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"}));
-let products = [{"cat": "Caffetteria", "name": "Caffè / Macchiato", "price": 0.6}, {"cat": "Caffetteria", "name": "Macchiatone", "price": 0.7}, {"cat": "Caffetteria", "name": "Cappuccino", "price": 0.8}, {"cat": "Caffetteria", "name": "Orzo / Deca", "price": 0.6}, {"cat": "Caffetteria", "name": "Latte macchiato", "price": 0.8}, {"cat": "Caffetteria", "name": "Latte", "price": 0.6}, {"cat": "Bibite", "name": "Bibita lattina", "price": 1.0}, {"cat": "Bibite", "name": "Succo di frutta", "price": 0.6}, {"cat": "Bibite", "name": "Tè in bottiglia", "price": 1.0}, {"cat": "Bibite", "name": "Acqua ½ lt", "price": 0.5}, {"cat": "Merendine e snack", "name": "Brioches fresche", "price": 1.0}, {"cat": "Merendine e snack", "name": "Merendine confezionate", "price": 0.6}, {"cat": "Merendine e snack", "name": "Gelati", "price": 1.0}, {"cat": "Merendine e snack", "name": "Patatine / snack salati", "price": 0.6}];
-const defaultCredentials = {
-  "Niero Simone": ["dipendente", "Spaccio123A"]
+// --- LIBRERIA ICONE & ILLUSTRAZIONI VETTORIALI SVG (ZERO PESO, NITIDEZZA RETINA) ---
+const SVG_ICONS = {
+  plus: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  receipt: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>`,
+  wallet: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>`,
+  shield: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  coffee: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`,
+  user: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  users: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  lock: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  utensils: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`,
+  chart: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+  box: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+  trash: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  tag: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>`
 };
-// Da questa versione solo Niero Simone mantiene un account dipendente.
-// Tutte le altre credenziali dipendenti precedenti vengono eliminate dal browser.
-const storedCredentials=JSON.parse(localStorage.getItem("spaccio_credentials_v1")||"{}");
-let credentials={"Niero Simone":Array.isArray(storedCredentials["Niero Simone"])?storedCredentials["Niero Simone"]:["dipendente","Spaccio123A"]};
-localStorage.setItem("spaccio_credentials_v1",JSON.stringify(credentials));
-function usernameFromName(name){const parts=name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").split(/\s+/).filter(Boolean); return parts.length>=2 ? parts[parts.length-1]+"."+parts.slice(0,-1).join(".") : (parts[0]||"");}
-const FIRST_ACCESS_KEY="spaccio_first_access_v1";
-let firstAccess={"Niero Simone":true};
-localStorage.setItem(FIRST_ACCESS_KEY,JSON.stringify(firstAccess));
-function saveFirstAccess(){localStorage.setItem(FIRST_ACCESS_KEY,JSON.stringify(firstAccess));}
-function mustChangePassword(){return false;}
 
-let accounts = { admin:{password:"admin"} };
-function rebuildAccounts(){ accounts={admin:{password:"admin"}}; Object.entries(credentials).forEach(([employee,[username,password]])=>{ accounts[username]={password,employee}; }); }
-rebuildAccounts();
-let user=null, role=null;
-let cart=[];
-let editingOrderId=null;
-let orders=JSON.parse(localStorage.getItem("spaccio_orders_v1")||"[]");
-let nextId=Number(localStorage.getItem("spaccio_next_id_v1")||"1");
-const DAILY_ORDER_KEY="spaccio_daily_order_v1";
-function localDateKey(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`;}
-function localDateTime(iso){const d=new Date(iso);return d.toLocaleDateString("it-IT")+" · "+d.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});}
-function nextDailyOrderNumber(){const today=localDateKey();let state=JSON.parse(localStorage.getItem(DAILY_ORDER_KEY)||"null");if(!state||state.date!==today)state={date:today,last:0};state.last++;localStorage.setItem(DAILY_ORDER_KEY,JSON.stringify(state));return state.last;}
-function orderAccount(o){return o.createdByUsername||o.createdBy||"—";}
-let balances=JSON.parse(localStorage.getItem("spaccio_balances_v1")||"{}");
-let fondocassa=Number(localStorage.getItem("spaccio_fondocassa_v1"));
-let cassaforte=Number(localStorage.getItem("spaccio_cassaforte_v1"));
-let mealMovements=JSON.parse(localStorage.getItem("spaccio_meal_movements_v1")||"[]");
-
-// V19: nuova partenza pulita. Eseguito una sola volta per il nuovo file.
-if(localStorage.getItem("spaccio_clean_start_v3")!=="1"){
-  orders=[];
-  nextId=1;
-  balances={};
-  employees.forEach(n=>balances[n]=0);
-  mealMovements=[];
-  fondocassa=100;
-  localStorage.setItem("spaccio_orders_v1",JSON.stringify(orders));
-  localStorage.setItem("spaccio_next_id_v1",String(nextId));
-  localStorage.setItem("spaccio_balances_v1",JSON.stringify(balances));
-  localStorage.setItem("spaccio_meal_movements_v1",JSON.stringify(mealMovements));
-  localStorage.setItem("spaccio_fondocassa_v1","100");
-  localStorage.setItem("spaccio_clean_start_v3","1");
-}
-// Tutti i dipendenti, tranne Niero Simone, devono effettuare il primo accesso.
-employees.forEach(n=>{firstAccess[n]=(n==="Niero Simone");});
-saveFirstAccess();
-const stockItems=["CAFFE","ORZO","DECA","LATTE","COCA","TÈ","ACQUA","MERENDINE","GELATI","SNACK SALATI"];
-let stock=JSON.parse(localStorage.getItem("spaccio_stock_v1")||"null")||{};
-stockItems.forEach(n=>{if(typeof stock[n]!=="number") stock[n]=0});
-Object.keys(stock).forEach(n=>{if(!stockItems.includes(n)) delete stock[n]});
-if(!Number.isFinite(fondocassa)){ fondocassa=100; localStorage.setItem("spaccio_fondocassa_v1",String(fondocassa)); }
-if(!Number.isFinite(cassaforte)){ cassaforte=0; localStorage.setItem("spaccio_cassaforte_v1",String(cassaforte)); }
-if(localStorage.getItem("spaccio_balances_reset_v2")!=="1"){
-  balances={}; employees.forEach(n=>balances[n]=0);
-  localStorage.setItem("spaccio_balances_v1",JSON.stringify(balances));
-  localStorage.setItem("spaccio_balances_reset_v2","1");
-}else{ employees.forEach(n=>{if(typeof balances[n]!=="number") balances[n]=0}); }
-
-function euro(n){return "€ "+Number(n).toFixed(2).replace(".",",")}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function save(){
-  localStorage.setItem("spaccio_orders_v1",JSON.stringify(orders));
-  localStorage.setItem("spaccio_next_id_v1",String(nextId));
-  localStorage.setItem("spaccio_balances_v1",JSON.stringify(balances));
-  localStorage.setItem("spaccio_fondocassa_v1",String(fondocassa));
-  localStorage.setItem("spaccio_employees_v1",JSON.stringify(employees));
-  localStorage.setItem("spaccio_credentials_v1",JSON.stringify(credentials));
-  localStorage.setItem("spaccio_stock_v1",JSON.stringify(stock));
-  localStorage.setItem("spaccio_cassaforte_v1",String(cassaforte));
-  localStorage.setItem("spaccio_meal_movements_v1",JSON.stringify(mealMovements));
-  localStorage.setItem(FIRST_ACCESS_KEY,JSON.stringify(firstAccess));
-}
-async function manualSaveData(){
-  try{
-    save();
-    if(window.firebaseSaveData){
-      await window.firebaseSaveData(collectAllData());
-      alert("SALVATAGGIO COMPLETATO: dati salvati su questo browser e su Firebase Firestore.");
-    }else{
-      alert("Dati salvati in locale. Firebase non è ancora connesso: riprova tra qualche secondo.");
+function getProductIllustration(p) {
+  const n = p.name.toLowerCase();
+  if (p.cat === "Caffetteria") {
+    if (n.includes("cappuccino") || n.includes("latte")) {
+      return `<div class="prod-illus coffee"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 8h1a3 3 0 0 1 0 6h-1"/><path d="M4 8h14v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Z"/><path d="M6 5c1-1.5 3-1.5 4 0s3 1.5 4 0"/></svg></div>`;
     }
-  }catch(error){
-    console.error("Errore nel salvataggio:",error);
-    alert("ERRORE DI SALVATAGGIO: "+(error?.message||error)+". Verifica connessione e regole Firestore.");
+    return `<div class="prod-illus coffee"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 9h1a3 3 0 0 1 0 6h-1"/><path d="M4 9h13v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9Z"/><line x1="7" y1="3" x2="7" y2="6"/><line x1="11" y1="3" x2="11" y2="6"/></svg></div>`;
+  }
+  if (p.cat === "Bibite") {
+    if (n.includes("acqua") || n.includes("tè") || n.includes("succo") || n.includes("bottiglia")) {
+      return `<div class="prod-illus drink"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 2h4"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9l1-4Z"/><line x1="8" y1="13" x2="16" y2="13"/></svg></div>`;
+    }
+    return `<div class="prod-illus drink"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="4" width="12" height="16" rx="3"/><line x1="6" y1="9" x2="18" y2="9"/><path d="M10 2h4"/></svg></div>`;
+  }
+  if (n.includes("gelat")) {
+    return `<div class="prod-illus snack"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a5 5 0 0 1 5 5v7H7V7a5 5 0 0 1 5-5Z"/><line x1="12" y1="14" x2="12" y2="21"/></svg></div>`;
+  }
+  return `<div class="prod-illus snack"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 14c0-4.5 3.6-8 8-8s8 3.5 8 8v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2Z"/><path d="M8 11h.01"/><path d="M12 10h.01"/><path d="M16 11h.01"/></svg></div>`;
+}
+
+// --- NAVIGAZIONE INTERNA & INTERCETTAZIONE TASTO INDIETRO ANDROID ---
+let navStack = [];
+let currentScreenFn = null;
+
+function updateBackButton() {
+  const btn = document.getElementById("headerBackBtn");
+  if (!btn) return;
+  if (navStack.length > 0) btn.classList.remove("hidden");
+  else btn.classList.add("hidden");
+}
+
+function navigateTo(fn, pushHistory = true) {
+  if (currentScreenFn && currentScreenFn !== fn) navStack.push(currentScreenFn);
+  currentScreenFn = fn;
+  updateBackButton();
+  if (pushHistory) {
+    try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
+  }
+  fn();
+}
+
+function resetNav(fn) {
+  navStack = [];
+  currentScreenFn = fn;
+  updateBackButton();
+  try { window.history.replaceState({ spaccioNav: true }, ""); } catch (e) {}
+}
+
+function goBack() {
+  if (navStack.length > 0) {
+    const prev = navStack.pop();
+    currentScreenFn = prev;
+    updateBackButton();
+    prev();
+  } else if (role) {
+    backToRoleChoice();
   }
 }
-function collectAllData(){
-  return {
-    version:28, employees, products, credentials, firstAccess, orders, nextId, balances,
-    fondocassa, cassaforte, mealMovements, stock,
-    dailyOrderState:localStorage.getItem(DAILY_ORDER_KEY),
-    cleanStart:localStorage.getItem("spaccio_clean_start_v3"),
-    balancesReset:localStorage.getItem("spaccio_balances_reset_v2")
+
+window.addEventListener("popstate", () => {
+  if (user) {
+    if (navStack.length > 0) {
+      goBack();
+      try { window.history.pushState({ spaccioNav: true }, ""); } catch (err) {}
+    } else if (role) {
+      backToRoleChoice();
+      try { window.history.pushState({ spaccioNav: true }, ""); } catch (err) {}
+    }
+  }
+});
+
+// --- PERSISTENZA SESSIONE ---
+const SESSION_KEY = "spaccio_active_session_v1";
+function saveSession() {
+  if (user) localStorage.setItem(SESSION_KEY, JSON.stringify({ user, role }));
+  else localStorage.removeItem(SESSION_KEY);
+}
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved && saved.user && accounts[saved.user.username]) {
+      user = saved.user;
+      requestWakeLock();
+      document.getElementById("loginScreen").classList.add("hidden");
+      if (saved.role) {
+        role = saved.role;
+        renderHome();
+      } else {
+        document.getElementById("roleScreen").classList.remove("hidden");
+        renderRoleChoice();
+      }
+      try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
+    }
+  } catch (e) {}
+}
+
+// --- NOTIFICHE FLUIDE & MODALI ---
+function showToast(msg, type = "info") {
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  const icon = type === "ok" ? "✅" : type === "err" ? "⚠️" : "ℹ️";
+  el.innerHTML = `<span>${icon}</span><span>${esc(msg)}</span>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = "0";
+    el.style.transition = "opacity 0.2s";
+    setTimeout(() => el.remove(), 220);
+  }, 2500);
+}
+
+function showConfirmModal(title, message, onConfirm, isDanger = false) {
+  const modal = document.getElementById("customModal");
+  modal.innerHTML = `<div class="modal-box">
+    <h3>${esc(title)}</h3>
+    <p class="muted" style="margin:0">${esc(message)}</p>
+    <div class="modal-actions">
+      <button class="secondary" id="modalCancelBtn">ANNULLA</button>
+      <button class="${isDanger ? 'danger' : ''}" id="modalOkBtn">CONFERMA</button>
+    </div>
+  </div>`;
+  modal.classList.remove("hidden");
+  document.getElementById("modalCancelBtn").onclick = () => modal.classList.add("hidden");
+  document.getElementById("modalOkBtn").onclick = () => {
+    modal.classList.add("hidden");
+    onConfirm();
   };
 }
-function applyAllData(data){
-  if(!data || typeof data!=="object") throw new Error("Il JSON non contiene dati validi.");
-  if(Array.isArray(data.employees)) employees=data.employees.filter(x=>typeof x==="string").sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"}));
-  if(Array.isArray(data.orders)) orders=data.orders;
-  if(Array.isArray(data.products)) products=data.products;
-  if(Number.isFinite(Number(data.nextId))) nextId=Number(data.nextId);
-  if(data.balances && typeof data.balances==="object") balances=data.balances;
-  if(Number.isFinite(Number(data.fondocassa))) fondocassa=Number(data.fondocassa);
-  if(Number.isFinite(Number(data.cassaforte))) cassaforte=Number(data.cassaforte);
-  if(Array.isArray(data.mealMovements)) mealMovements=data.mealMovements;
-  if(data.stock && typeof data.stock==="object") stock=data.stock;
-  if(data.credentials && typeof data.credentials==="object") credentials=data.credentials;
-  if(data.firstAccess && typeof data.firstAccess==="object") firstAccess=data.firstAccess;
-  stockItems.forEach(n=>{if(typeof stock[n]!=="number")stock[n]=0});
-  Object.keys(stock).forEach(n=>{if(!stockItems.includes(n))delete stock[n]});
-  employees.forEach(n=>{if(typeof balances[n]!=="number")balances[n]=0});
-  rebuildAccounts();
-  if(data.dailyOrderState) localStorage.setItem(DAILY_ORDER_KEY,data.dailyOrderState);
-  save();
-  if(role) renderHome();
+
+function showPromptModal(title, placeholder, isPassword, onSubmit) {
+  const modal = document.getElementById("customModal");
+  modal.innerHTML = `<div class="modal-box">
+    <h3>${esc(title)}</h3>
+    <input id="modalPromptInput" type="${isPassword ? 'password' : 'text'}" placeholder="${esc(placeholder)}">
+    <div class="modal-actions">
+      <button class="secondary" id="modalCancelBtn">ANNULLA</button>
+      <button id="modalOkBtn">CONFERMA</button>
+    </div>
+  </div>`;
+  modal.classList.remove("hidden");
+  const inp = document.getElementById("modalPromptInput");
+  inp.focus();
+  inp.onkeydown = (e) => { if (e.key === "Enter") document.getElementById("modalOkBtn").click(); };
+  document.getElementById("modalCancelBtn").onclick = () => modal.classList.add("hidden");
+  document.getElementById("modalOkBtn").onclick = () => {
+    const val = inp.value;
+    modal.classList.add("hidden");
+    onSubmit(val);
+  };
 }
-function exportJSON(){
-  try{
-    save();
-    const blob=new Blob([JSON.stringify(collectAllData(),null,2)],{type:"application/json"});
-    const url=URL.createObjectURL(blob),a=document.createElement("a");
-    a.href=url;a.download="spaccio-turno-a-backup-"+localDateKey()+".json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
-  }catch(error){alert("Esportazione non riuscita: "+(error?.message||error));}
+
+// --- TASTIERINO NUMERICO POS CUSTOM (ZERO SEGNI CONFUSI, SOLO CIFRE POSITIVE) ---
+let numpadBuffer = "";
+function openNumpadModal(title, subtitle, initialValue, quickAmounts, confirmBtnColor, onConfirm) {
+  numpadBuffer = initialValue !== null && initialValue !== undefined ? String(initialValue) : "";
+  const modal = document.getElementById("customModal");
+  const quicks = Array.isArray(quickAmounts) ? quickAmounts : [];
+
+  function renderNumpad() {
+    const displayVal = numpadBuffer === "" ? "0" : numpadBuffer;
+    modal.innerHTML = `<div class="modal-box">
+      <h3 style="margin-bottom:4px">${esc(title)}</h3>
+      <p class="muted" style="margin:0 0 10px 0">${esc(subtitle)}</p>
+      <div class="numpad-display">${esc(displayVal)} €</div>
+      ${quicks.length ? `
+        <div style="display:grid;grid-template-columns:repeat(${quicks.length},1fr);gap:6px;margin-bottom:8px">
+          ${quicks.map(q => `<button type="button" class="quick-cash-btn" onclick="numpadQuick('${q.val}')">${esc(q.label)}</button>`).join("")}
+        </div>` : ""}
+      <div class="numpad-grid">
+        <button type="button" class="num-key" onclick="numpadPress('7')">7</button>
+        <button type="button" class="num-key" onclick="numpadPress('8')">8</button>
+        <button type="button" class="num-key" onclick="numpadPress('9')">9</button>
+        <button type="button" class="num-key" onclick="numpadPress('4')">4</button>
+        <button type="button" class="num-key" onclick="numpadPress('5')">5</button>
+        <button type="button" class="num-key" onclick="numpadPress('6')">6</button>
+        <button type="button" class="num-key" onclick="numpadPress('1')">1</button>
+        <button type="button" class="num-key" onclick="numpadPress('2')">2</button>
+        <button type="button" class="num-key" onclick="numpadPress('3')">3</button>
+        <button type="button" class="num-key key-fn" onclick="numpadPress('.')">,</button>
+        <button type="button" class="num-key" onclick="numpadPress('0')">0</button>
+        <button type="button" class="num-key key-fn" onclick="numpadPress('DEL')">⌫</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" onclick="document.getElementById('customModal').classList.add('hidden')">ANNULLA</button>
+        <button type="button" style="background:${confirmBtnColor || 'var(--ok)'}" onclick="numpadSubmit()">CONFERMA</button>
+      </div>
+    </div>`;
+  }
+
+  window.numpadPress = (k) => {
+    if (k === "DEL") {
+      numpadBuffer = numpadBuffer.slice(0, -1);
+    } else if (k === ".") {
+      if (!numpadBuffer.includes(".")) numpadBuffer = (numpadBuffer === "" ? "0." : numpadBuffer + ".");
+    } else {
+      if (numpadBuffer.includes(".") && numpadBuffer.split(".")[1].length >= 2) return;
+      numpadBuffer += k;
+    }
+    renderNumpad();
+  };
+  window.numpadQuick = (val) => { numpadBuffer = String(val); renderNumpad(); };
+  window.numpadSubmit = () => {
+    const val = Number(numpadBuffer);
+    modal.classList.add("hidden");
+    onConfirm(val);
+  };
+
+  modal.classList.remove("hidden");
+  renderNumpad();
 }
-async function importJSON(event){
-  const file=event.target.files?.[0]; if(!file)return;
-  try{
-    const data=JSON.parse(await file.text());
-    if(!confirm("Importare questo backup? I dati attuali verranno sostituiti e sincronizzati su Firestore."))return;
-    applyAllData(data);
-    if(!window.firebaseSaveData) throw new Error("Firebase non è ancora connesso.");
-    await window.firebaseSaveData(collectAllData());
-    alert("Backup importato e sincronizzato correttamente.");
-  }catch(error){console.error(error);alert("Importazione non riuscita: "+(error?.message||error));}
-  finally{event.target.value="";}
+
+// --- MODALE AGGIUNTA RAPIDA NUOVO PRODOTTO AL VOLO ---
+let newProdCat = "Bibite";
+let newProdPriceStr = "1.00";
+function openAddProductModal(onSavedCallback) {
+  newProdCat = activeCategory || "Bibite";
+  newProdPriceStr = "1.00";
+  const modal = document.getElementById("customModal");
+
+  function renderAddProdModal(keepName = "") {
+    const disp = newProdPriceStr === "" ? "0" : newProdPriceStr;
+    modal.innerHTML = `<div class="modal-box">
+      <h3 style="margin-bottom:4px">➕ Aggiungi Nuovo Prodotto</h3>
+      <p class="muted" style="margin:0 0 12px 0">Inserisci articolo arrivato in spaccio</p>
+
+      <label>1. Categoria</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+        <button type="button" class="cat-btn ${newProdCat === 'Caffetteria' ? 'active' : ''}" data-cat="Caffetteria" style="min-height:46px;font-size:0.86rem;padding:6px" onclick="setNewProdCat('Caffetteria')">☕ Caffè</button>
+        <button type="button" class="cat-btn ${newProdCat === 'Bibite' ? 'active' : ''}" data-cat="Bibite" style="min-height:46px;font-size:0.86rem;padding:6px" onclick="setNewProdCat('Bibite')">🥤 Bibite</button>
+        <button type="button" class="cat-btn ${newProdCat === 'Merendine e snack' ? 'active' : ''}" data-cat="Merendine e snack" style="min-height:46px;font-size:0.86rem;padding:6px" onclick="setNewProdCat('Merendine e snack')">🥐 Snack</button>
+      </div>
+
+      <label>2. Nome Prodotto</label>
+      <input id="newProdNameInput" placeholder="Es. Estathé Pesca / Patatine" value="${esc(keepName)}" style="margin-bottom:12px">
+
+      <label>3. Prezzo Unitario (€)</label>
+      <div class="numpad-display" style="margin-bottom:8px">${esc(disp)} €</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('0.50')">0,50 €</button>
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('0.60')">0,60 €</button>
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('0.80')">0,80 €</button>
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('1.00')">1,00 €</button>
+      </div>
+      <div class="numpad-grid">
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('7')">7</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('8')">8</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('9')">9</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('4')">4</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('5')">5</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('6')">6</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('1')">1</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('2')">2</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('3')">3</button>
+        <button type="button" class="num-key key-fn" style="min-height:46px" onclick="newProdPriceKey('.')">,</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('0')">0</button>
+        <button type="button" class="num-key key-fn" style="min-height:46px" onclick="newProdPriceKey('DEL')">⌫</button>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary" onclick="document.getElementById('customModal').classList.add('hidden')">ANNULLA</button>
+        <button type="button" class="ok-btn" onclick="submitNewProduct()">SALVA PRODOTTO</button>
+      </div>
+    </div>`;
+  }
+
+  window.setNewProdCat = (c) => {
+    const curName = document.getElementById("newProdNameInput")?.value || "";
+    newProdCat = c;
+    renderAddProdModal(curName);
+  };
+  window.newProdPriceQuick = (v) => {
+    const curName = document.getElementById("newProdNameInput")?.value || "";
+    newProdPriceStr = v;
+    renderAddProdModal(curName);
+  };
+  window.newProdPriceKey = (k) => {
+    const curName = document.getElementById("newProdNameInput")?.value || "";
+    if (k === "DEL") newProdPriceStr = newProdPriceStr.slice(0, -1);
+    else if (k === ".") {
+      if (!newProdPriceStr.includes(".")) newProdPriceStr = (newProdPriceStr === "" ? "0." : newProdPriceStr + ".");
+    } else {
+      if (newProdPriceStr.includes(".") && newProdPriceStr.split(".")[1].length >= 2) return;
+      newProdPriceStr += k;
+    }
+    renderAddProdModal(curName);
+  };
+  window.submitNewProduct = () => {
+    const name = (document.getElementById("newProdNameInput")?.value || "").trim();
+    const price = Number(newProdPriceStr);
+    if (!name) { showToast("Scrivi il nome del prodotto.", "err"); return; }
+    if (!Number.isFinite(price) || price <= 0) { showToast("Inserisci un prezzo valido maggiore di 0.", "err"); return; }
+    if (products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+      showToast("Esiste già un prodotto con questo nome.", "err");
+      return;
+    }
+    const prodObj = { cat: newProdCat, name, price };
+    products.push(prodObj);
+    activeCategory = newProdCat;
+    enqueueAtomicOp({ type: "ADD_PRODUCT", product: prodObj });
+    modal.classList.add("hidden");
+    showToast(`${name} (${euro(price)}) aggiunto in ${newProdCat}!`, "ok");
+    if (typeof onSavedCallback === "function") onSavedCallback();
+  };
+
+  modal.classList.remove("hidden");
+  renderAddProdModal("");
 }
-// Salvataggio automatico ogni 5 secondi per tutta la permanenza dell'app aperta.
-// Il salvataggio immediato su cambio scheda/chiusura riduce il rischio di perdere gli ultimi dati.
-let autosaveLastError = "";
-function autosave(){
-  try{
-    save();
-    autosaveLastError = "";
-    return true;
-  }catch(error){
-    autosaveLastError = String(error && error.message ? error.message : error);
-    console.error("Errore nel salvataggio automatico di Spaccio Turno A:", error);
-    return false;
+
+// --- SICUREZZA SHA-256 & WAKE LOCK ---
+async function sha256(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+const DEFAULT_ADMIN_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+const DEFAULT_SUPERADMIN_HASH = "2320e598a54b3fed4918ce8557db69deac82a6cadd27ef0c466575032faf4d59";
+const DEFAULT_EMP_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+
+async function verifyPassword(plainInput, storedSecret) {
+  if (!storedSecret) return false;
+  if (/^[a-f0-9]{64}$/i.test(storedSecret)) {
+    const h = await sha256(plainInput);
+    return h === storedSecret.toLowerCase();
+  }
+  return plainInput === storedSecret;
+}
+
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ("wakeLock" in navigator && document.visibilityState === "visible") {
+      wakeLock = await navigator.wakeLock.request("screen");
+    }
+  } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") requestWakeLock();
+});
+
+// --- STATO E DATI ---
+const defaultEmployees = ["Berardi Andrea", "Bonesso Riccardo", "Brandoli Francesco", "Campedel Ramiro", "Capuano Eduardo", "Carrozza Paolo", "Casapinta Davide", "Catarci Leonardo", "Cervellati Federico", "Collesei Marco", "De Bari Daniele", "De Bellis Pasquale", "Favaro Alvise", "Fedrigo Andrea", "Grandelis Alessandro", "Mion Alessandro", "Musiu Gianluca", "Muratore Giampaolo", "Niero Simone", "Nordio Eros", "Paolone Michele", "Pelati Massimo", "Poletto Emanuele", "Puppa Luca", "Righetto Giacomo", "Rubin Marco", "Scaldelai Roberto", "Semenzato Daniele", "Sibilia Gianluca", "Stante Gabriele", "Zanin Umberto"];
+let employees = (JSON.parse(localStorage.getItem("spaccio_employees_v1") || "null") || defaultEmployees.slice()).sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+
+const defaultProducts = [
+  { "cat": "Caffetteria", "name": "Caffè / Macchiato", "price": 0.6 },
+  { "cat": "Caffetteria", "name": "Macchiatone", "price": 0.7 },
+  { "cat": "Caffetteria", "name": "Cappuccino", "price": 0.8 },
+  { "cat": "Caffetteria", "name": "Orzo / Deca", "price": 0.6 },
+  { "cat": "Caffetteria", "name": "Latte macchiato", "price": 0.8 },
+  { "cat": "Caffetteria", "name": "Latte", "price": 0.6 },
+  { "cat": "Bibite", "name": "Bibita lattina", "price": 1.0 },
+  { "cat": "Bibite", "name": "Succo di frutta", "price": 0.6 },
+  { "cat": "Bibite", "name": "Tè in bottiglia", "price": 1.0 },
+  { "cat": "Bibite", "name": "Acqua ½ lt", "price": 0.5 },
+  { "cat": "Merendine e snack", "name": "Brioches fresche", "price": 1.0 },
+  { "cat": "Merendine e snack", "name": "Merendine confezionate", "price": 0.6 },
+  { "cat": "Merendine e snack", "name": "Gelati", "price": 1.0 },
+  { "cat": "Merendine e snack", "name": "Patatine / snack salati", "price": 0.6 }
+];
+let products = JSON.parse(localStorage.getItem("spaccio_products_v1") || "null") || defaultProducts.slice();
+
+const defaultPrivilegedList = [
+  "Niero Simone", "Casapinta Davide", "Favaro Alvise", "Mion Alessandro",
+  "Musiu Gianluca", "Muratore Giampaolo", "Poletto Emanuele", "Scaldelai Roberto"
+];
+
+function makeNomeCognomeUsername(fullName) {
+  const clean = String(fullName || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    // Employees are stored as "Cognome Nome" (e.g., "Muratore Giampaolo" -> "giampaolo.muratore")
+    const cognome = parts[0];
+    const nome = parts.slice(1).join("");
+    return `${nome}.${cognome}`;
+  }
+  return parts[0] || "utente";
+}
+
+let credentials = JSON.parse(localStorage.getItem("spaccio_credentials_v1") || "{}");
+let employeeRoles = JSON.parse(localStorage.getItem("spaccio_employee_roles_v1") || "null");
+
+if (!employeeRoles || typeof employeeRoles !== "object") {
+  employeeRoles = {};
+  employees.forEach(emp => {
+    employeeRoles[emp] = defaultPrivilegedList.includes(emp) ? "admin" : "consumer";
+  });
+  localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
+}
+
+function ensureAllEmployeeAccounts() {
+  let changed = false;
+  const usedUsernames = new Set(["admin"]);
+  // Reserve existing valid usernames
+  employees.forEach(emp => {
+    if (Array.isArray(credentials[emp]) && credentials[emp][0]) {
+      // Upgrade legacy "dipendente" username for Niero Simone to simone.niero while keeping password
+      if (emp === "Niero Simone" && credentials[emp][0] === "dipendente") {
+        credentials[emp][0] = "simone.niero";
+        changed = true;
+      }
+      usedUsernames.add(credentials[emp][0].toLowerCase());
+    }
+  });
+  employees.forEach(emp => {
+    if (!Array.isArray(credentials[emp]) || !credentials[emp][0]) {
+      let base = makeNomeCognomeUsername(emp);
+      let candidate = base;
+      let counter = 2;
+      while (usedUsernames.has(candidate)) {
+        candidate = `${base}${counter++}`;
+      }
+      usedUsernames.add(candidate);
+      credentials[emp] = [candidate, DEFAULT_EMP_HASH];
+      changed = true;
+    }
+    if (!employeeRoles[emp]) {
+      employeeRoles[emp] = defaultPrivilegedList.includes(emp) ? "admin" : "consumer";
+      changed = true;
+    }
+  });
+  if (changed) {
+    localStorage.setItem("spaccio_credentials_v1", JSON.stringify(credentials));
+  localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
+    localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
   }
 }
-// Salvataggio immediato appena tutti i dati sono stati caricati.
-autosave();
-const autosaveTimer = setInterval(autosave, 5000);
-document.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState === "hidden") autosave();
-});
-window.addEventListener("pagehide",autosave);
-window.addEventListener("beforeunload",autosave);
+ensureAllEmployeeAccounts();
 
-const privilegedEmployees = new Set([
-  "Niero Simone",
-  "Casapinta Davide",
-  "Favaro Alvise",
-  "Mion Alessandro",
-  "Musiu Gianluca",
-  "Muratore Giampaolo",
-  "Poletto Emanuele",
-  "Scaldelai Roberto"
-]);
-function renderRoleChoice(){
-  const box=document.getElementById("roleButtons");
-  const canManage = !user.employee || privilegedEmployees.has(user.employee);
-  box.innerHTML = canManage
-    ? `<button class="tile" onclick="selectRole('Amministratore')">Amministratore</button><button class="tile" onclick="selectRole('Cassiere')">Cassiere</button>`
-    : `<p class="muted">Nessun ruolo disponibile.</p>`;
+let accounts = { admin: { password: DEFAULT_ADMIN_HASH } };
+function rebuildAccounts() {
+  accounts = { admin: { password: DEFAULT_ADMIN_HASH } };
+  Object.entries(credentials).forEach(([employee, [username, password]]) => {
+    if (username) {
+      accounts[username.toLowerCase()] = { password, employee };
+    }
+  });
 }
-function login(){
-  const u=document.getElementById("username").value.trim().toLowerCase(), p=document.getElementById("password").value;
-  if(!accounts[u] || accounts[u].password!==p){document.getElementById("loginError").textContent="Username o password non validi.";return}
-  user={username:u,employee:accounts[u].employee||null};
+rebuildAccounts();
+
+let user = null, role = null;
+let cart = [];
+let editingOrderId = null;
+let selectedCustomerType = "employee";
+let selectedEmployeeName = "";
+let activeCategory = "Caffetteria";
+let cashInputStr = "";
+let showCashPad = false;
+
+let orders = JSON.parse(localStorage.getItem("spaccio_orders_v1") || "[]");
+let nextId = Number(localStorage.getItem("spaccio_next_id_v1") || "1");
+const DAILY_ORDER_KEY = "spaccio_daily_order_v1";
+
+function localDateKey(d = new Date()) {
+  const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0"), day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function localDateTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("it-IT") + " · " + d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+}
+function nextDailyOrderNumber() {
+  const today = localDateKey();
+  let state = JSON.parse(localStorage.getItem(DAILY_ORDER_KEY) || "null");
+  if (!state || state.date !== today) state = { date: today, last: 0 };
+  state.last++;
+  localStorage.setItem(DAILY_ORDER_KEY, JSON.stringify(state));
+  return state.last;
+}
+function orderAccount(o) {
+  const emp = o.createdByEmployee && o.createdByEmployee !== "—" ? o.createdByEmployee : "";
+  const usr = o.createdByUsername || o.createdBy || "—";
+  const r = o.createdByRole ? ` · ${o.createdByRole}` : "";
+  if (emp && emp.toLowerCase() !== usr.toLowerCase()) return `${emp} (@${usr}${r})`;
+  return `${usr}${r}`;
+}
+function formatOperatorAudit(uObj, roleOverride = null) {
+  const emp = uObj?.employee && uObj.employee !== "—" ? uObj.employee : "";
+  const usr = uObj?.username || "—";
+  const r = roleOverride || role || "";
+  const rPart = r ? ` · ${r}` : "";
+  if (emp && emp.toLowerCase() !== usr.toLowerCase()) return `${emp} (@${usr}${rPart})`;
+  return `${usr}${rPart}`;
+}
+
+let balances = JSON.parse(localStorage.getItem("spaccio_balances_v1") || "{}");
+let fondocassa = Number(localStorage.getItem("spaccio_fondocassa_v1"));
+let cassaforte = Number(localStorage.getItem("spaccio_cassaforte_v1"));
+let mealMovements = JSON.parse(localStorage.getItem("spaccio_meal_movements_v1") || "[]");
+let balanceMovements = JSON.parse(localStorage.getItem("spaccio_balance_movements_v1") || "[]");
+
+if (localStorage.getItem("spaccio_clean_start_v3") !== "1") {
+  orders = []; nextId = 1; balances = {}; employees.forEach(n => balances[n] = 0);
+  mealMovements = []; balanceMovements = []; fondocassa = 100;
+  localStorage.setItem("spaccio_orders_v1", JSON.stringify(orders));
+  localStorage.setItem("spaccio_next_id_v1", String(nextId));
+  localStorage.setItem("spaccio_balances_v1", JSON.stringify(balances));
+  localStorage.setItem("spaccio_meal_movements_v1", JSON.stringify(mealMovements));
+  localStorage.setItem("spaccio_balance_movements_v1", JSON.stringify(balanceMovements));
+  localStorage.setItem("spaccio_fondocassa_v1", "100");
+  localStorage.setItem("spaccio_clean_start_v3", "1");
+}
+
+const stockItems = ["CAFFE", "ORZO", "DECA", "LATTE", "COCA", "TÈ", "ACQUA", "MERENDINE", "GELATI", "SNACK SALATI"];
+let stock = JSON.parse(localStorage.getItem("spaccio_stock_v1") || "null") || {};
+stockItems.forEach(n => { if (typeof stock[n] !== "number") stock[n] = 0; });
+Object.keys(stock).forEach(n => { if (!stockItems.includes(n)) delete stock[n]; });
+if (!Number.isFinite(fondocassa)) { fondocassa = 100; localStorage.setItem("spaccio_fondocassa_v1", String(fondocassa)); }
+if (!Number.isFinite(cassaforte)) { cassaforte = 0; localStorage.setItem("spaccio_cassaforte_v1", String(cassaforte)); }
+if (localStorage.getItem("spaccio_balances_reset_v2") !== "1") {
+  balances = {}; employees.forEach(n => balances[n] = 0);
+  localStorage.setItem("spaccio_balances_v1", JSON.stringify(balances));
+  localStorage.setItem("spaccio_balances_reset_v2", "1");
+} else {
+  employees.forEach(n => { if (typeof balances[n] !== "number") balances[n] = 0; });
+}
+
+function euro(n) { return "€ " + Number(n).toFixed(2).replace(".", ","); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+// --- MOTORE DI SINCRONIZZAZIONE ATOMICA ANTI-CONFLITTO (FIRESTORE TRANSACTIONS) ---
+const PENDING_OPS_KEY = "spaccio_pending_ops_v1";
+let pendingOps = JSON.parse(localStorage.getItem(PENDING_OPS_KEY) || "[]");
+
+function savePendingOps() {
+  localStorage.setItem(PENDING_OPS_KEY, JSON.stringify(pendingOps));
+}
+
+// Applies a single atomic operation onto any target state object (used both inside Firestore runTransaction and locally)
+function applyAtomicOpToState(state, op) {
+  if (!state || typeof state !== "object") return state;
+  state.balances = state.balances && typeof state.balances === "object" ? { ...state.balances } : {};
+  state.orders = Array.isArray(state.orders) ? [...state.orders] : [];
+  state.balanceMovements = Array.isArray(state.balanceMovements) ? [...state.balanceMovements] : [];
+  state.mealMovements = Array.isArray(state.mealMovements) ? [...state.mealMovements] : [];
+  state.credentials = state.credentials && typeof state.credentials === "object" ? { ...state.credentials } : {};
+  state.employeeRoles = state.employeeRoles && typeof state.employeeRoles === "object" ? { ...state.employeeRoles } : {};
+  state.products = Array.isArray(state.products) ? [...state.products] : [];
+  state.employees = Array.isArray(state.employees) ? [...state.employees] : [];
+  state.stock = state.stock && typeof state.stock === "object" ? { ...state.stock } : {};
+
+  switch (op.type) {
+    case "NEW_ORDER": {
+      const ord = { ...op.order };
+      // Deduplicate if already committed
+      if (!state.orders.some(x => x.uid && ord.uid && x.uid === ord.uid)) {
+        const maxId = state.orders.reduce((m, x) => Math.max(m, Number(x.id) || 0), Number(state.nextId || 1) - 1);
+        ord.id = maxId + 1;
+        state.nextId = ord.id + 1;
+        state.orders.push(ord);
+        if (ord.payment === "subito") {
+          state.fondocassa = Number(state.fondocassa || 0) + Number(ord.total || 0);
+        } else if (ord.payment === "conto" && ord.customerType === "employee") {
+          state.balances[ord.customer] = Number(state.balances[ord.customer] || 0) - Number(ord.total || 0);
+        }
+      }
+      break;
+    }
+    case "EDIT_ORDER": {
+      const idx = state.orders.findIndex(x => x.id === op.orderId);
+      if (idx >= 0) {
+        const oldTotal = Number(state.orders[idx].total || 0);
+        state.orders[idx] = { ...state.orders[idx], ...op.patch };
+        state.fondocassa = Number(state.fondocassa || 0) + (Number(op.patch.total || 0) - oldTotal);
+      }
+      break;
+    }
+    case "BALANCE_DELTA": {
+      const mov = { ...op.movement };
+      if (!state.balanceMovements.some(x => x.id === mov.id)) {
+        const oldBal = Number(state.balances[op.employee] || 0);
+        const delta = Number(op.delta || 0);
+        if (oldBal < 0 && delta > 0) state.fondocassa = Number(state.fondocassa || 0) + delta;
+        if (oldBal > 0 && delta < 0) state.fondocassa = Number(state.fondocassa || 0) + delta;
+        state.balances[op.employee] = oldBal + delta;
+        state.balanceMovements.push(mov);
+      }
+      break;
+    }
+    case "MEAL_DEBIT": {
+      const now = op.date;
+      (op.entries || []).forEach(ent => {
+        if (!state.mealMovements.some(x => x.id === ent.id)) {
+          state.balances[ent.employee] = Number(state.balances[ent.employee] || 0) - Number(ent.amount || 0);
+          state.mealMovements.push(ent);
+        }
+      });
+      break;
+    }
+    case "UPDATE_CREDENTIAL": {
+      if (op.employee && Array.isArray(op.cred)) {
+        state.credentials[op.employee] = [...op.cred];
+      }
+      if (op.employee && op.roleLevel) {
+        state.employeeRoles[op.employee] = op.roleLevel;
+      }
+      break;
+    }
+    case "SET_FUND": {
+      state.fondocassa = Number(op.value || 0);
+      break;
+    }
+    case "SET_SAFE": {
+      state.cassaforte = Number(op.value || 0);
+      break;
+    }
+    case "SET_STOCK": {
+      state.stock = { ...state.stock, ...(op.stock || {}) };
+      break;
+    }
+    case "ADD_PRODUCT": {
+      if (op.product && !state.products.some(p => p.name.toLowerCase() === op.product.name.toLowerCase())) {
+        state.products.push({ ...op.product });
+      }
+      break;
+    }
+    case "REMOVE_PRODUCT": {
+      state.products = state.products.filter(p => p.name.toLowerCase() !== String(op.name || "").toLowerCase());
+      break;
+    }
+    case "ADD_EMPLOYEE": {
+      const n = op.name;
+      if (n && !state.employees.some(x => x.toLowerCase() === n.toLowerCase())) {
+        state.employees.push(n);
+        state.employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+        state.balances[n] = 0;
+        if (op.cred) state.credentials[n] = [...op.cred];
+        state.employeeRoles[n] = op.roleLevel || "consumer";
+      }
+      break;
+    }
+    case "RENAME_EMPLOYEE": {
+      const { oldName, newName } = op;
+      const idx = state.employees.indexOf(oldName);
+      if (idx >= 0) {
+        state.employees[idx] = newName;
+        state.employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+        if (oldName !== newName) {
+          state.balances[newName] = Number(state.balances[oldName] || 0);
+          delete state.balances[oldName];
+          if (state.credentials[oldName]) {
+            state.credentials[newName] = state.credentials[oldName];
+            delete state.credentials[oldName];
+          }
+          if (state.employeeRoles[oldName]) {
+            state.employeeRoles[newName] = state.employeeRoles[oldName];
+            delete state.employeeRoles[oldName];
+          }
+        }
+      }
+      break;
+    }
+    case "REMOVE_EMPLOYEE": {
+      const n = op.name;
+      state.employees = state.employees.filter(x => x !== n);
+      delete state.balances[n];
+      delete state.credentials[n];
+      delete state.employeeRoles[n];
+      break;
+    }
+    case "CLEAR_HISTORY": {
+      state.orders = [];
+      state.balanceMovements = [];
+      state.mealMovements = [];
+      break;
+    }
+  }
+  return state;
+}
+window.spaccioApplyAtomicOpToState = applyAtomicOpToState;
+
+function enqueueAtomicOp(op) {
+  op.opId = Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+  pendingOps.push(op);
+  savePendingOps();
+  saveLocalOnly();
+  flushAtomicOps();
+}
+
+let isFlushingOps = false;
+async function flushAtomicOps() {
+  if (isFlushingOps || pendingOps.length === 0) return;
+  if (!window.firebaseRunAtomicBatch) return;
+  isFlushingOps = true;
+  if (window.setCloudBadge) window.setCloudBadge("saving", `Sincronizzazione (${pendingOps.length})...`);
+  try {
+    const batch = pendingOps.slice();
+    await window.firebaseRunAtomicBatch(batch);
+    const committedIds = new Set(batch.map(x => x.opId));
+    pendingOps = pendingOps.filter(x => !committedIds.has(x.opId));
+    savePendingOps();
+    if (pendingOps.length > 0) {
+      isFlushingOps = false;
+      flushAtomicOps();
+      return;
+    }
+    if (window.setCloudBadge) window.setCloudBadge("ok", "Sincronizzato");
+  } catch (err) {
+    console.error("Transazione atomica in attesa (riproverà online):", err);
+    if (window.setCloudBadge) window.setCloudBadge("err", `In coda (${pendingOps.length})`);
+  } finally {
+    isFlushingOps = false;
+  }
+}
+window.flushAtomicOps = flushAtomicOps;
+
+function saveLocalOnly() {
+  localStorage.setItem("spaccio_orders_v1", JSON.stringify(orders));
+  localStorage.setItem("spaccio_next_id_v1", String(nextId));
+  localStorage.setItem("spaccio_balances_v1", JSON.stringify(balances));
+  localStorage.setItem("spaccio_fondocassa_v1", String(fondocassa));
+  localStorage.setItem("spaccio_employees_v1", JSON.stringify(employees));
+  localStorage.setItem("spaccio_products_v1", JSON.stringify(products));
+  localStorage.setItem("spaccio_credentials_v1", JSON.stringify(credentials));
+  localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
+  localStorage.setItem("spaccio_stock_v1", JSON.stringify(stock));
+  localStorage.setItem("spaccio_cassaforte_v1", String(cassaforte));
+  localStorage.setItem("spaccio_meal_movements_v1", JSON.stringify(mealMovements));
+  localStorage.setItem("spaccio_balance_movements_v1", JSON.stringify(balanceMovements));
+}
+
+function save() {
+  saveLocalOnly();
+  if (pendingOps.length > 0) flushAtomicOps();
+}
+
+async function manualSaveData() {
+  try {
+    saveLocalOnly();
+    if (pendingOps.length > 0 && window.firebaseRunAtomicBatch) {
+      await flushAtomicOps();
+      showToast("Operazioni in coda sincronizzate in modo atomico!", "ok");
+    } else if (window.firebaseSaveFullSnapshot) {
+      if (window.setCloudBadge) window.setCloudBadge("saving", "Salvataggio...");
+      await window.firebaseSaveFullSnapshot(collectAllData());
+      showToast("Dati salvati e sincronizzati in cloud!", "ok");
+    } else {
+      showToast("Dati salvati in locale (offline).", "info");
+    }
+  } catch (error) {
+    showToast("Errore salvataggio: " + (error?.message || error), "err");
+  }
+}
+
+function collectAllData() {
+  return {
+    version: 36, employees, products, credentials, employeeRoles, orders, nextId, balances,
+    fondocassa, cassaforte, mealMovements, balanceMovements, stock,
+    dailyOrderState: localStorage.getItem(DAILY_ORDER_KEY),
+    cleanStart: localStorage.getItem("spaccio_clean_start_v3"),
+    balancesReset: localStorage.getItem("spaccio_balances_reset_v2")
+  };
+}
+
+function applyAllData(data) {
+  if (!data || typeof data !== "object") throw new Error("JSON non valido.");
+  let merged = JSON.parse(JSON.stringify(data));
+  if (Array.isArray(pendingOps) && pendingOps.length > 0) {
+    pendingOps.forEach(op => { merged = applyAtomicOpToState(merged, op); });
+  }
+  if (Array.isArray(merged.employees)) employees = merged.employees.filter(x => typeof x === "string").sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+  if (Array.isArray(merged.orders)) orders = merged.orders;
+  if (Array.isArray(merged.products) && merged.products.length > 0) products = merged.products;
+  if (Number.isFinite(Number(merged.nextId))) nextId = Number(merged.nextId);
+  if (merged.balances && typeof merged.balances === "object") balances = merged.balances;
+  if (Number.isFinite(Number(merged.fondocassa))) fondocassa = Number(merged.fondocassa);
+  if (Number.isFinite(Number(merged.cassaforte))) cassaforte = Number(merged.cassaforte);
+  if (Array.isArray(merged.mealMovements)) mealMovements = merged.mealMovements;
+  if (Array.isArray(merged.balanceMovements)) balanceMovements = merged.balanceMovements;
+  if (merged.stock && typeof merged.stock === "object") stock = merged.stock;
+  if (merged.credentials && typeof merged.credentials === "object") credentials = merged.credentials;
+  if (merged.employeeRoles && typeof merged.employeeRoles === "object") employeeRoles = merged.employeeRoles;
+  ensureAllEmployeeAccounts();
+  stockItems.forEach(n => { if (typeof stock[n] !== "number") stock[n] = 0; });
+  Object.keys(stock).forEach(n => { if (!stockItems.includes(n)) delete stock[n]; });
+  employees.forEach(n => { if (typeof balances[n] !== "number") balances[n] = 0; });
+  rebuildAccounts();
+  if (merged.dailyOrderState) localStorage.setItem(DAILY_ORDER_KEY, merged.dailyOrderState);
+  saveLocalOnly();
+  // Smart live refresh without interrupting active typing or open POS receipt
+  const isTyping = document.activeElement && ["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName);
+  const modalOpen = !document.getElementById("customModal")?.classList.contains("hidden");
+  if (role && !document.getElementById("categoryProducts") && !isTyping && !modalOpen && typeof currentScreenFn === "function") {
+    currentScreenFn();
+  }
+}
+
+function exportJSON() {
+  try {
+    saveLocalOnly();
+    const blob = new Blob([JSON.stringify(collectAllData(), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = "spaccio-turno-a-backup-" + localDateKey() + ".json";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showToast("Backup JSON scaricato.", "ok");
+  } catch (error) {
+    showToast("Errore esportazione: " + (error?.message || error), "err");
+  }
+}
+
+function importJSON(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  showConfirmModal("Importa Backup", "I dati attuali verranno sostituiti con quelli del file selezionato. Continuare?", async () => {
+    try {
+      const data = JSON.parse(await file.text());
+      pendingOps = [];
+      savePendingOps();
+      applyAllData(data);
+      if (window.firebaseSaveFullSnapshot) {
+        if (window.setCloudBadge) window.setCloudBadge("saving", "Salvataggio...");
+        await window.firebaseSaveFullSnapshot(collectAllData());
+      }
+      showToast("Backup importato e sincronizzato!", "ok");
+    } catch (error) {
+      showToast("Errore importazione: " + (error?.message || error), "err");
+    } finally {
+      event.target.value = "";
+    }
+  }, true);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    saveLocalOnly();
+    if (pendingOps.length > 0) flushAtomicOps();
+  } else if (document.visibilityState === "visible") {
+    if (pendingOps.length > 0) flushAtomicOps();
+  }
+});
+
+// --- AUTENTICAZIONE E RUOLI (3 LIVELLI CONFIGURABILI DALL'ADMIN) ---
+function getUserPrivilegeLevel(uObj = user) {
+  if (!uObj || !uObj.employee) return "admin"; // Account tecnico 'admin'
+  return employeeRoles[uObj.employee] || "consumer";
+}
+
+function renderRoleChoice() {
+  const box = document.getElementById("roleButtons");
+  const level = getUserPrivilegeLevel(user);
+  const displayName = user.employee || user.username;
+  const roleSub = document.querySelector("#roleScreen p.muted");
+  if (roleSub) {
+    const levelLabel = level === "admin" ? "Amministratore + Cassiere" : level === "cashier" ? "Cassiere POS" : "Consumatore (Solo Conto Personale)";
+    roleSub.innerHTML = `Ciao <b>${esc(displayName)}</b> · Livello: <b>${levelLabel}</b>`;
+  }
+
+  if (level === "admin") {
+    box.innerHTML = `
+      <button class="tile" onclick="selectRole('Amministratore')"><div class="tile-icon-wrap">${SVG_ICONS.shield}</div><span>Amministratore</span></button>
+      <button class="tile primary-tile" onclick="selectRole('Cassiere')"><div class="tile-icon-wrap">${SVG_ICONS.coffee}</div><span>Cassiere POS</span></button>
+      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto</span></button>` : ""}
+    `;
+  } else if (level === "cashier") {
+    box.innerHTML = `
+      <button class="tile primary-tile" style="grid-column:1/-1" onclick="selectRole('Cassiere')"><div class="tile-icon-wrap">${SVG_ICONS.coffee}</div><span>Cassiere POS</span></button>
+      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto</span></button>` : ""}
+    `;
+  } else {
+    box.innerHTML = `
+      <button class="tile primary-tile" style="grid-column:1/-1" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.user}</div><span>Il Mio Saldo & Estratto Conto</span></button>
+    `;
+  }
+}
+
+async function login() {
+  const u = document.getElementById("username").value.trim().toLowerCase();
+  const p = document.getElementById("password").value;
+  const err = document.getElementById("loginError");
+  err.textContent = "";
+  if (!accounts[u] || !(await verifyPassword(p, accounts[u].password))) {
+    err.textContent = "Username o password non validi.";
+    return;
+  }
+  user = { username: u, employee: accounts[u].employee || null };
+  saveSession();
+  requestWakeLock();
+  try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("roleScreen").classList.remove("hidden");
   renderRoleChoice();
 }
-function completeFirstPasswordChange(){
-  const a=document.getElementById("firstNewPassword")?.value||"", b=document.getElementById("firstConfirmPassword")?.value||"";
-  const err=document.getElementById("firstPasswordError");
-  if(a.length<4){err.textContent="La password deve contenere almeno 4 caratteri.";return}
-  if(a!==b){err.textContent="Le password non coincidono.";return}
-  if(!user?.employee || !credentials[user.employee]){err.textContent="Account dipendente non disponibile.";return}
-  credentials[user.employee]=[credentials[user.employee][0],a];
-  firstAccess[user.employee]=true;
-  rebuildAccounts(); save(); saveFirstAccess();
-  document.getElementById("firstPasswordScreen").classList.add("hidden");
-  document.getElementById("roleScreen").classList.remove("hidden");
-  renderRoleChoice();
-}
 
-function logout(){
-  user=null; role=null; cart=[];
-  document.getElementById("app").innerHTML="";
+function logout() {
+  user = null; role = null; cart = []; navStack = []; currentScreenFn = null; updateBackButton(); saveSession();
+  document.getElementById("app").innerHTML = "";
   document.getElementById("app").classList.add("hidden");
   document.getElementById("roleScreen").classList.add("hidden");
-  document.getElementById("firstPasswordScreen").classList.add("hidden");
   document.getElementById("loginScreen").classList.remove("hidden");
-  document.getElementById("username").value="";
-  document.getElementById("password").value="";
-  document.getElementById("loginError").textContent="";
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("loginError").textContent = "";
 }
-function selectRole(r){
-  const canManage = !user?.employee || privilegedEmployees.has(user.employee);
-  if((r==="Amministratore"||r==="Cassiere") && !canManage){
-    alert("Questo account può accedere solamente al ruolo Dipendente.");
-    renderRoleChoice();
+
+function selectRole(r) {
+  const level = getUserPrivilegeLevel(user);
+  if (r === "Amministratore" && level !== "admin") {
+    showToast("Privilegi di Amministratore non abilitati per questo utente.", "err");
     return;
   }
-  role=r;
-  if(r==="Amministratore"){
-    const extra=prompt("Password aggiuntiva amministratore:");
-    if(extra!=="SpaccioA"){alert("Password amministratore non corretta.");return}
+  if (r === "Cassiere" && level !== "admin" && level !== "cashier") {
+    showToast("Privilegi di Cassiere non abilitati per questo utente.", "err");
+    return;
   }
+  if (r === "Amministratore") {
+    showPromptModal("Password Amministratore", "Inserisci password aggiuntiva", true, async (extra) => {
+      if (!extra || !(await verifyPassword(extra, DEFAULT_SUPERADMIN_HASH))) {
+        showToast("Password amministratore non corretta.", "err");
+        return;
+      }
+      role = r;
+      saveSession();
+      document.getElementById("roleScreen").classList.add("hidden");
+      renderHome();
+    });
+    return;
+  }
+  role = r;
+  saveSession();
   document.getElementById("roleScreen").classList.add("hidden");
   renderHome();
 }
-function renderHome(){
-  const app=document.getElementById("app");app.classList.remove("hidden");
-  if(role==="Cassiere") cashierHome();
-  else if(role==="Dipendente") employeeHome();
-  else adminHome();
+
+
+function goHome() {
+  if (!user) return;
+  if (!role) {
+    backToRoleChoice();
+    return;
+  }
+  // If role is active, reset navigation stack and go to the role's home screen
+  renderHome();
+  showToast("🏠 Torna alla Home", "info");
 }
-function backToRoleChoice(){
-  role=null;
-  cart=[];
-  document.getElementById("app").innerHTML="";
+
+function renderHome() {
+  const app = document.getElementById("app");
+  app.classList.remove("hidden");
+  if (role === "Cassiere") { resetNav(cashierHome); cashierHome(); }
+  else if (role === "Dipendente") { resetNav(employeeHome); employeeHome(); }
+  else { resetNav(adminHome); adminHome(); }
+}
+
+function backToRoleChoice() {
+  role = null; cart = []; navStack = []; currentScreenFn = null; updateBackButton(); saveSession();
+  document.getElementById("app").innerHTML = "";
   document.getElementById("app").classList.add("hidden");
   document.getElementById("roleScreen").classList.remove("hidden");
 }
-function shell(title,content){
-  document.getElementById("app").innerHTML=`<div class="topbar"><div><h2>${title}</h2><span class="badge">${role}</span></div><button class="secondary" onclick="backToRoleChoice()">CAMBIA RUOLO</button></div>${content}`;
+
+function shell(title, content) {
+  document.getElementById("app").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h2>${title}</h2>
+        <span class="badge">Postazione: ${role}</span>
+      </div>
+      <button class="secondary" onclick="backToRoleChoice()">🔄 Cambia Ruolo</button>
+    </div>
+    ${content}`;
 }
-function cashierHome(){
-  shell("Cassiere Home",`<div class="notice"><b>Fondocassa</b><div style="font-size:1.8rem;font-weight:800;margin-top:6px">${euro(fondocassa)}</div><div class="muted">Importo iniziale disponibile in cassa</div></div><div class="home-grid">
-    <button class="tile" onclick="newOrder()">Nuovo Ordine</button>
-    <button class="tile" onclick="historyView()">Storico</button>
-    <button class="tile balance-blue" onclick="employeeBalancesView()">SALDO DIPENDENTI</button>
-  </div>`);
+
+// --- AREA CASSIERE (BENTO DASHBOARD + SPLIT-SCREEN POS) ---
+function cashierHome() {
+  shell("Cassa Spaccio", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:800;text-transform:uppercase;font-size:0.78rem;letter-spacing:0.05em">Fondocassa Disponibile</div>
+        <div class="stat-value">${euro(fondocassa)}</div>
+      </div>
+      <span class="badge" style="background:#fff">Contante in cassetto</span>
+    </div>
+    <div class="home-grid">
+      <button class="tile primary-tile" onclick="navigateTo(() => newOrder())">
+        <div class="tile-icon-wrap">${SVG_ICONS.plus}</div>
+        <span>Nuovo Ordine</span>
+      </button>
+      <button class="tile" onclick="navigateTo(() => historyView('all', 'today'))">
+        <div class="tile-icon-wrap">${SVG_ICONS.receipt}</div>
+        <span>Registro Giornaliero</span>
+      </button>
+      <button class="tile balance-blue" onclick="navigateTo(() => employeeBalancesView())">
+        <div class="tile-icon-wrap">${SVG_ICONS.wallet}</div>
+        <span>Saldo Dipendenti</span>
+      </button>
+    </div>
+  `);
 }
-function newOrder(editId=null){
-  editingOrderId=editId;
-  cart=[];
-  if(editId!==null){
-    const existing=orders.find(o=>o.id===editId);
-    if(!existing){alert("Ordine non trovato.");return;}
-    cart=existing.items.map(x=>({...x}));
+
+function newOrder(editId = null) {
+  editingOrderId = editId;
+  cart = [];
+  showCashPad = false;
+  cashInputStr = "";
+  selectedCustomerType = "employee";
+  selectedEmployeeName = (user && user.employee) ? user.employee : employees[0];
+
+  if (editId !== null) {
+    const existing = orders.find(o => o.id === editId);
+    if (!existing) { showToast("Ordine non trovato.", "err"); return; }
+    cart = existing.items.map(x => ({ ...x }));
+    selectedCustomerType = existing.customerType;
+    if (existing.customerType === "employee") selectedEmployeeName = existing.customer;
   }
-  const existingOrder=editId!==null?orders.find(o=>o.id===editId):null;
-  shell(editId!==null?`Modifica Ordine #${existingOrder.number}`:"Nuovo Ordine",`<div class="card">
-    <h3>1. Tipo cliente</h3>
-    <select id="customerType" onchange="customerChanged()"><option value="">Seleziona...</option><option value="employee">Dipendente</option><option value="external">Cliente esterno</option></select>
-    <div id="customerBox"></div>
-    <div id="productsBox"></div>
-    <div id="cartBox"></div>
-  </div><button class="secondary" style="margin-top:14px" onclick="cancelNewOrder()">← TORNA AL MENU</button>`);
-  if(existingOrder){document.getElementById("customerType").value=existingOrder.customerType;customerChanged();}
-}
-function cancelNewOrder(){
-  cart=[];
-  editingOrderId=null;
-  cashierHome();
-}
-function customerChanged(){
-  const t=document.getElementById("customerType").value, box=document.getElementById("customerBox");
-  const existing=editingOrderId!==null?orders.find(o=>o.id===editingOrderId):null;
-  if(t==="employee"){
-    let opts=employees.slice().sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"})).map(n=>`<option ${((existing&&existing.customer===n)||(!existing&&user.employee===n))?"selected":""}>${esc(n)}</option>`).join("");
-    box.innerHTML=`<label>Dipendente</label><select id="customerName" onchange="renderProducts();refreshAccountBalance()">${opts}</select>`;
-  } else if(t==="external"){
-    box.innerHTML=`<label>Nome cliente (facoltativo)</label><input id="customerName" placeholder="Cliente esterno" value="${existing?esc(existing.customer):""}">`;
-  } else box.innerHTML="";
-  renderProducts();
-}
-function refreshAccountBalance(){
-  const box=document.getElementById("customerBox");
-  const name=document.getElementById("customerName")?.value;
-  if(!box || !name) return;
-  let info=document.getElementById("customerBalanceInfo");
-  if(!info){
-    info=document.createElement("div");
-    info.id="customerBalanceInfo";
-    info.className="muted";
-    info.style.margin="4px 0 10px";
-    box.appendChild(info);
-  }
-  const value=Number(balances[name]||0);
-  const state=value<0?"Debito":value>0?"Credito":"Saldo a zero";
-  info.textContent="Saldo attuale: "+euro(value)+" · "+state;
-}
-function renderProducts(){
-  const t=document.getElementById("customerType")?.value;if(!t)return;
-  document.getElementById("productsBox").innerHTML=`<h3>2. Prodotti</h3>
-  <div class="cat-grid">${["Caffetteria","Bibite","Merendine e snack"].map(c=>`<button class="secondary" onclick="showCategory('${c}')">${c}</button>`).join("")}</div>
-  <div id="categoryProducts" class="products" style="margin-top:12px"></div>`;
-  showCategory("Caffetteria");
+
+  const existingOrder = editId !== null ? orders.find(o => o.id === editId) : null;
+  shell(editId !== null ? `Modifica Ordine #${existingOrder.number}` : "Punto Vendita", `
+    <div class="pos-split">
+      <div>
+        <div class="card">
+          <h3>1. Cliente</h3>
+          <div class="type-switch">
+            <button type="button" id="btnTypeEmp" class="type-btn ${selectedCustomerType === 'employee' ? 'active' : ''}" onclick="setCustomerType('employee')">👤 Dipendente</button>
+            <button type="button" id="btnTypeExt" class="type-btn ${selectedCustomerType === 'external' ? 'active' : ''}" onclick="setCustomerType('external')">🚶 Esterno</button>
+          </div>
+          <div id="customerBox"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+            <h3 style="margin:0">2. Catalogo Prodotti</h3>
+            <button type="button" class="secondary" style="min-height:42px;padding:8px 14px;font-size:0.9rem" onclick="openAddProductModal(() => showCategory(activeCategory))">➕ Prodotto</button>
+          </div>
+          <div class="cat-grid">
+            <button type="button" class="cat-btn ${activeCategory === 'Caffetteria' ? 'active' : ''}" data-cat="Caffetteria" onclick="showCategory('Caffetteria')">☕ Caffetteria</button>
+            <button type="button" class="cat-btn ${activeCategory === 'Bibite' ? 'active' : ''}" data-cat="Bibite" onclick="showCategory('Bibite')">🥤 Bibite</button>
+            <button type="button" class="cat-btn ${activeCategory === 'Merendine e snack' ? 'active' : ''}" data-cat="Merendine e snack" onclick="showCategory('Merendine e snack')">🥐 Snack</button>
+          </div>
+          <div id="categoryProducts" class="products"></div>
+        </div>
+      </div>
+      <div class="pos-receipt-col" id="cartBox"></div>
+    </div>
+  `);
+  setCustomerType(selectedCustomerType);
+  showCategory(activeCategory);
   renderCart();
 }
-function showCategory(cat){
-  document.getElementById("categoryProducts").innerHTML=products.map((p,i)=>p.cat===cat?`<button class="product" onclick="addCart(${i})">${esc(p.name)}<small>${euro(p.price)}</small></button>`:"").join("");
-}
-function addCart(i){
-  const p=products[i], found=cart.find(x=>x.name===p.name);
-  if(found)found.qty++;else cart.push({name:p.name,price:p.price,qty:1});
+
+function setCustomerType(t) {
+  selectedCustomerType = t;
+  showCashPad = false;
+  document.getElementById("btnTypeEmp")?.classList.toggle("active", t === "employee");
+  document.getElementById("btnTypeExt")?.classList.toggle("active", t === "external");
+  const box = document.getElementById("customerBox");
+  const existing = editingOrderId !== null ? orders.find(o => o.id === editingOrderId) : null;
+
+  if (t === "employee") {
+    box.innerHTML = `
+      <input type="search" id="empOrderSearch" placeholder="🔍 Filtra collega con un tocco..." style="margin-bottom:8px;min-height:46px" oninput="filterOrderEmpPills(this.value)">
+      <div id="empPillGrid" class="emp-pill-grid"></div>
+      <div id="customerBalanceInfo"></div>`;
+    renderOrderEmpPills("");
+  } else {
+    box.innerHTML = `<label>Nome cliente (facoltativo)</label>
+      <input id="customerName" placeholder="Cliente esterno" value="${existing && existing.customerType === 'external' ? esc(existing.customer) : ""}" oninput="renderCart()">`;
+  }
   renderCart();
 }
-function removeCart(i){cart[i].qty--;if(cart[i].qty<=0)cart.splice(i,1);renderCart()}
-function renderCart(){
-  const box=document.getElementById("cartBox");if(!box)return;
-  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
-  box.innerHTML=`<h3>3. Carrello</h3>${cart.length?cart.map((x,i)=>`<div class="cart-row"><span>${esc(x.name)} × ${x.qty}</span><span>${euro(x.price*x.qty)} <button class="secondary" onclick="removeCart(${i})">−</button></span></div>`).join(""):"<p class='muted'>Carrello vuoto.</p>"}
-  <div class="total">Totale: ${euro(total)}</div>
-  <div class="pay-options" style="grid-template-columns:repeat(${document.getElementById("customerType")?.value==="employee"?2:1},1fr)">
-    <button class="pay-btn" ${!cart.length?"disabled":""} onclick="payment('subito')">PAGA SUBITO</button>
-    ${document.getElementById("customerType")?.value==="employee"?`<button class="pay-btn" ${!cart.length?"disabled":""} onclick="payment('conto')">METTI IN CONTO</button>`:""}
+
+function renderOrderEmpPills(filter) {
+  const grid = document.getElementById("empPillGrid");
+  if (!grid) return;
+  const q = filter.trim().toLowerCase();
+  const list = employees.filter(n => n.toLowerCase().includes(q));
+  grid.innerHTML = list.map(n => `
+    <button type="button" class="emp-pill ${selectedEmployeeName === n ? 'selected' : ''}" onclick='selectOrderEmployee(${JSON.stringify(n)})'>
+      ${esc(n)}
+    </button>`).join("");
+  refreshAccountBalance();
+}
+
+function filterOrderEmpPills(val) {
+  renderOrderEmpPills(val);
+}
+
+function selectOrderEmployee(name) {
+  selectedEmployeeName = name;
+  const q = document.getElementById("empOrderSearch")?.value || "";
+  renderOrderEmpPills(q);
+  renderCart();
+}
+
+function refreshAccountBalance() {
+  const info = document.getElementById("customerBalanceInfo");
+  if (!info || !selectedEmployeeName) return;
+  const value = Number(balances[selectedEmployeeName] || 0);
+  const badgeClass = value < 0 ? "neg" : value > 0 ? "ok" : "";
+  const state = value < 0 ? "Debito" : value > 0 ? "Credito" : "In pari";
+  info.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+    <b>${esc(selectedEmployeeName)}</b>
+    <span class="status ${badgeClass}">Saldo: ${euro(value)} (${state})</span>
   </div>`;
 }
-function payment(mode){
-  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
-  const box=document.getElementById("cartBox");
-  if(mode==="conto"){
-    const type=document.getElementById("customerType").value;
-    if(type!=="employee"){alert("METTI IN CONTO è disponibile solo per un dipendente.");return}
-    confirmOrder("conto");
+
+function showCategory(cat) {
+  activeCategory = cat;
+  document.querySelectorAll(".cat-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-cat") === cat);
+  });
+  const grid = document.getElementById("categoryProducts");
+  if (!grid) return;
+  grid.innerHTML = products.map((p, i) => {
+    if (p.cat !== cat) return "";
+    const inCartItem = cart.find(x => x.name === p.name);
+    const qty = inCartItem ? inCartItem.qty : 0;
+    return `<button type="button" class="product ${qty > 0 ? 'in-cart' : ''}" onclick="addCart(${i})">
+      ${qty > 0 ? `<span class="qty-badge">${qty}</span>` : ""}
+      ${getProductIllustration(p)}
+      <span class="p-name">${esc(p.name)}</span>
+      <span class="p-price">${euro(p.price)}</span>
+    </button>`;
+  }).join("");
+}
+
+function addCart(i) {
+  const p = products[i], found = cart.find(x => x.name === p.name);
+  if (found) found.qty++;
+  else cart.push({ name: p.name, price: p.price, qty: 1 });
+  showCategory(activeCategory);
+  renderCart();
+}
+
+function changeCartQty(i, delta) {
+  cart[i].qty += delta;
+  if (cart[i].qty <= 0) cart.splice(i, 1);
+  showCategory(activeCategory);
+  renderCart();
+}
+
+function renderCart() {
+  const box = document.getElementById("cartBox");
+  if (!box) return;
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const isEmp = selectedCustomerType === "employee";
+  const customerLabel = isEmp ? (selectedEmployeeName || "Dipendente") : (document.getElementById("customerName")?.value?.trim() || "Cliente esterno");
+
+  let cashSection = "";
+  if (showCashPad && cart.length > 0) {
+    const received = cashInputStr === "" ? total : Number(cashInputStr);
+    const diff = received - total;
+    cashSection = `
+      <div class="numpad-wrapper">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-weight:800;font-size:0.85rem;text-transform:uppercase;color:var(--muted)">Contanti Ricevuti</span>
+          <span style="font-weight:900;color:${diff >= 0 ? 'var(--ok-dark)' : 'var(--danger-dark)'}">
+            ${diff >= 0 ? `Resto: ${euro(diff)}` : `Mancano: ${euro(-diff)}`}
+          </span>
+        </div>
+        <div class="numpad-display">${euro(received)}</div>
+        <div class="quick-cash-grid">
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('${total.toFixed(2)}')">Esatto</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('1')">1 €</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('2')">2 €</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('5')">5 €</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('10')">10 €</button>
+        </div>
+        <div class="numpad-grid">
+          <button type="button" class="num-key" onclick="posPadKey('7')">7</button>
+          <button type="button" class="num-key" onclick="posPadKey('8')">8</button>
+          <button type="button" class="num-key" onclick="posPadKey('9')">9</button>
+          <button type="button" class="num-key" onclick="posPadKey('4')">4</button>
+          <button type="button" class="num-key" onclick="posPadKey('5')">5</button>
+          <button type="button" class="num-key" onclick="posPadKey('6')">6</button>
+          <button type="button" class="num-key" onclick="posPadKey('1')">1</button>
+          <button type="button" class="num-key" onclick="posPadKey('2')">2</button>
+          <button type="button" class="num-key" onclick="posPadKey('3')">3</button>
+          <button type="button" class="num-key key-fn" onclick="posPadKey('.')">,</button>
+          <button type="button" class="num-key" onclick="posPadKey('0')">0</button>
+          <button type="button" class="num-key key-fn" onclick="posPadKey('DEL')">⌫</button>
+        </div>
+        <button type="button" class="big ok-btn" style="margin-top:10px" onclick="confirmOrder('subito')">✅ CONFERMA INCASSO</button>
+      </div>`;
+  }
+
+  box.innerHTML = `<div class="receipt-card">
+    <div class="receipt-header">
+      <div>
+        <div class="muted" style="font-size:0.78rem;font-weight:800;text-transform:uppercase">Scontrino Corrente</div>
+        <b style="font-size:1.05rem">${esc(customerLabel)}</b>
+      </div>
+      ${cart.length ? `<button type="button" class="secondary" style="min-height:38px;padding:6px 10px;font-size:0.85rem" onclick="cart=[];showCashPad=false;showCategory(activeCategory);renderCart()">Svuota</button>` : ""}
+    </div>
+    <div class="cart-list">
+      ${cart.length ? cart.map((x, i) => `
+        <div class="cart-row">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.name)}</div>
+            <div class="muted">${euro(x.price)} cad.</div>
+          </div>
+          <div class="qty-controls">
+            <button type="button" class="secondary qty-btn" onclick="changeCartQty(${i}, -1)">−</button>
+            <span style="font-weight:900;min-width:24px;text-align:center">${x.qty}</span>
+            <button type="button" class="secondary qty-btn" onclick="changeCartQty(${i}, 1)">+</button>
+            <span style="font-weight:800;min-width:64px;text-align:right">${euro(x.price * x.qty)}</span>
+          </div>
+        </div>`).join("") : "<p class='muted' style='text-align:center;padding:24px 0'>Tocca i prodotti a sinistra per aggiungerli allo scontrino.</p>"}
+    </div>
+    <div class="total-bar">
+      <span>TOTALE</span>
+      <span>${euro(total)}</span>
+    </div>
+    <div class="pay-options" style="grid-template-columns:repeat(${isEmp ? 2 : 1}, 1fr)">
+      <button type="button" class="pay-btn" ${!cart.length ? "disabled" : ""} onclick="toggleCashPad()">💵 PAGA SUBITO</button>
+      ${isEmp ? `<button type="button" class="pay-btn secondary" ${!cart.length ? "disabled" : ""} onclick="confirmOrder('conto')">📒 IN CONTO</button>` : ""}
+    </div>
+    ${cashSection}
+  </div>`;
+}
+
+function toggleCashPad() {
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  showCashPad = !showCashPad;
+  cashInputStr = total.toFixed(2);
+  renderCart();
+}
+
+function setPosCash(val) {
+  cashInputStr = String(val);
+  renderCart();
+}
+
+function posPadKey(k) {
+  if (k === "DEL") {
+    cashInputStr = cashInputStr.slice(0, -1);
+  } else if (k === ".") {
+    if (!cashInputStr.includes(".")) cashInputStr = (cashInputStr === "" ? "0." : cashInputStr + ".");
+  } else {
+    if (cashInputStr.includes(".") && cashInputStr.split(".")[1].length >= 2) return;
+    cashInputStr += k;
+  }
+  renderCart();
+}
+
+function confirmOrder(mode) {
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const name = selectedCustomerType === "employee"
+    ? selectedEmployeeName
+    : (document.getElementById("customerName")?.value?.trim() || "Cliente esterno");
+
+  if (editingOrderId !== null) {
+    if (mode !== "subito") { showToast("Un ordine modificato va chiuso con PAGA SUBITO.", "err"); return; }
+    const o = orders.find(x => x.id === editingOrderId);
+    if (!o) { showToast("Ordine non trovato.", "err"); return; }
+    const cash = cashInputStr === "" ? total : Number(cashInputStr);
+    if (cash < total) { showToast("Contante ricevuto insufficiente.", "err"); return; }
+    const oldTotal = Number(o.total || 0);
+    const patch = {
+      customerType: selectedCustomerType, customer: name, items: cart.map(x => ({ ...x })),
+      total, cash, change: cash - total, paid: true, payment: "subito",
+      status: "Completato", paidAt: new Date().toISOString()
+    };
+    Object.assign(o, patch);
+    fondocassa += (total - oldTotal);
+    editingOrderId = null;
+    enqueueAtomicOp({ type: "EDIT_ORDER", orderId: o.id, patch });
+    showToast(`Ordine #${o.number} aggiornato!`, "ok");
+    renderHome();
     return;
   }
-  if(mode!=="subito"){return}
-  box.innerHTML+=`<div class="card"><h3>4. PAGA SUBITO</h3><label>Contanti ricevuti</label><input id="cash" type="number" step="0.01" min="${total}" oninput="calcChange(${total})"><div id="change" class="notice">Resto: ${euro(0)}</div><button onclick="confirmOrder('subito')">CONFERMA E PAGA</button></div>`;
+
+  let paid = false, cash = null, change = null, paymentLabel = "";
+  if (mode === "subito") {
+    cash = cashInputStr === "" ? total : Number(cashInputStr);
+    if (cash < total) { showToast("Contante ricevuto insufficiente.", "err"); return; }
+    paid = true; change = cash - total; paymentLabel = "Pagato subito";
+    fondocassa += total;
+  } else if (mode === "conto") {
+    if (selectedCustomerType !== "employee") { showToast("Solo per dipendenti.", "err"); return; }
+    balances[name] = (balances[name] || 0) - total;
+    paid = true;
+    paymentLabel = "Messo in conto";
+  }
+
+  const now = new Date().toISOString();
+  const order = {
+    id: nextId++, uid: Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+    date: now, dateKey: localDateKey(new Date()), number: nextDailyOrderNumber(),
+    customerType: selectedCustomerType, customer: name, items: cart.map(x => ({ ...x })),
+    total, cash, change, paid, payment: mode, status: "Completato",
+    createdByUsername: user?.username || "—", createdByEmployee: user?.employee || "—", createdByRole: role || "Cassiere"
+  };
+  orders.push(order);
+  enqueueAtomicOp({ type: "NEW_ORDER", order });
+  showToast(`Ordine #${order.number} registrato (${paymentLabel})`, "ok");
+  renderHome();
 }
 
-function showAccountBlock(){
-  const box=document.getElementById("cartBox");
-  const name=document.getElementById("customerName")?.value||employees[0];
-  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
-  box.innerHTML+=`<div class="card account-block"><h3>4. METTI IN CONTO</h3>
-    <p>Dipendente: <b>${esc(name)}</b></p>
-    <p>Totale ordine: <b>${euro(total)}</b></p>
-    <p class="muted">Il saldo del dipendente verrà aggiornato automaticamente usando esattamente il totale del carrello.</p>
-    <div class="account-actions"><button onclick="confirmOrder('conto')">CONFERMA COMANDA E METTI IN CONTO</button></div>
-  </div>`;
+// --- SALDO DIPENDENTI: TASTI SEPARATI "VERSA / SALDA" (VERDE) E "ADDEBITA" (ROSSO) ---
+function applyEmployeeBalanceChange(name, delta, customNote = null) {
+  const oldBalance = Number(balances[name] || 0);
+  const newBalance = oldBalance + delta;
+  if (oldBalance < 0 && delta > 0) fondocassa += delta;
+  if (oldBalance > 0 && delta < 0) fondocassa += delta;
+  balances[name] = newBalance;
+
+  const mov = {
+    id: Date.now() + Math.random(),
+    date: new Date().toISOString(),
+    employee: name,
+    amount: delta,
+    note: customNote || (delta > 0 ? "Versamento / Saldo conto" : "Addebito manuale"),
+    by: formatOperatorAudit(user),
+    byUsername: user?.username || "—",
+    byRole: role || "—"
+  };
+  balanceMovements.push(mov);
+  enqueueAtomicOp({ type: "BALANCE_DELTA", employee: name, delta, movement: mov });
 }
 
-function calcChange(total){const v=Number(document.getElementById("cash").value||0);document.getElementById("change").textContent="Resto: "+euro(Math.max(0,v-total))}
-function confirmOrder(mode){
-  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
-  if(mode!=="subito" && mode!=="conto"){alert("PAGA DOPO non è più disponibile.");return}
-  if(editingOrderId!==null){
-    if(mode!=="subito"){alert("Un ordine modificato deve essere chiuso con PAGA SUBITO.");return}
-    const o=orders.find(x=>x.id===editingOrderId);
-    if(!o){alert("Ordine non trovato.");return}
-    const cash=Number(document.getElementById("cash")?.value||0);
-    if(cash<total){alert("Il contante ricevuto è insufficiente.");return}
-    const type=document.getElementById("customerType").value, name=document.getElementById("customerName")?.value||"Cliente esterno";
-    const oldTotal=Number(o.total||0);
-    o.customerType=type;o.customer=name;o.items=cart.map(x=>({...x}));o.total=total;o.cash=cash;o.change=cash-total;o.paid=true;o.payment="subito";o.status="Completato";o.paidAt=new Date().toISOString();
-    fondocassa += (total-oldTotal);editingOrderId=null;save();alert("Ordine #"+o.number+" modificato e pagato subito.");cashierHome();return;
-  }
-  const type=document.getElementById("customerType").value, name=document.getElementById("customerName")?.value||"Cliente esterno";
-  let paid=false,cash=null,change=null,paymentLabel="";
-  if(mode==="subito"){
-    cash=Number(document.getElementById("cash")?.value||0);
-    if(cash<total){alert("Il contante ricevuto è insufficiente.");return}
-    paid=true;change=cash-total;paymentLabel="Pagato subito";
-    // Il fondocassa aumenta del valore effettivamente incassato dalla vendita.
-    fondocassa+=total;
-  }else if(mode==="conto"){
-    if(type!=="employee"){alert("METTI IN CONTO è disponibile solo per un dipendente.");return}
-    balances[name]=(balances[name]||0)-total;
-    paid=true;
-    paymentLabel="Messo in conto";
-  }
-  const now=new Date().toISOString();
-  const order={id:nextId++,date:now,dateKey:localDateKey(new Date()),number:nextDailyOrderNumber(),customerType:type,customer:name,items:cart.map(x=>({...x})),total,cash,change,paid,payment:mode,status:"Completato",createdByUsername:user?.username||"—",createdByEmployee:user?.employee||"—",createdByRole:role||"Cassiere"};
-  orders.push(order);save();alert("Ordine #"+order.number+" registrato: "+paymentLabel+".");cashierHome();
+function filterEmployeeCards(query) {
+  const q = query.trim().toLowerCase();
+  document.querySelectorAll(".emp-balance-card").forEach(card => {
+    const name = card.getAttribute("data-name") || "";
+    card.classList.toggle("hidden", !name.includes(q));
+  });
 }
-function employeeBalancesView(){
-  const rows=employees.slice().sort((a,b)=>a.localeCompare(b,'it',{sensitivity:'base'})).map(name=>`<div class="bar-order">
-    <b>${esc(name)}</b>
-    <span class="${(balances[name]||0)<0?"balance-negative":"balance-positive"}" style="float:right;font-weight:800">${euro(balances[name]||0)}</span>
-    <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
-      <input id="bal_${encodeURIComponent(name)}" type="text" inputmode="decimal" placeholder="+10 oppure -10" style="flex:1">
-      <button onclick='editEmployeeBalance(${JSON.stringify(name)})'>APPLICA</button>
+
+function openDepositNumpad(name, isAdmin = false) {
+  const cur = Number(balances[name] || 0);
+  const debt = cur < 0 ? Math.abs(cur) : 0;
+  const suggested = debt > 0 ? debt.toFixed(2) : "10";
+  const quicks = [];
+  if (debt > 0) quicks.push({ label: `Salda (${euro(debt)})`, val: debt.toFixed(2) });
+  quicks.push({ label: "5 €", val: "5" }, { label: "10 €", val: "10" }, { label: "20 €", val: "20" });
+
+  openNumpadModal(
+    `💵 Versa / Salda: ${name}`,
+    `Saldo attuale: ${euro(cur)} · Digita i soldi consegnati dal collega`,
+    suggested,
+    quicks,
+    "var(--ok)",
+    (amount) => {
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showToast("Inserisci un importo maggiore di zero.", "err");
+        return;
+      }
+      applyEmployeeBalanceChange(name, +amount, "Versamento / Saldo conto");
+      showToast(`Aggiunti ${euro(amount)} al saldo di ${name}!`, "ok");
+      if (isAdmin) adminEmployeeBalancesView();
+      else employeeBalancesView();
+    }
+  );
+}
+
+function openDebitNumpad(name, isAdmin = false) {
+  const cur = Number(balances[name] || 0);
+  const quicks = [
+    { label: "1 €", val: "1" },
+    { label: "2 €", val: "2" },
+    { label: "5 €", val: "5" },
+    { label: "10 €", val: "10" }
+  ];
+
+  openNumpadModal(
+    `➖ Addebita: ${name}`,
+    `Saldo attuale: ${euro(cur)} · Digita l'importo da scalare`,
+    "",
+    quicks,
+    "var(--danger)",
+    (amount) => {
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showToast("Inserisci un importo maggiore di zero.", "err");
+        return;
+      }
+      applyEmployeeBalanceChange(name, -amount, "Addebito manuale");
+      showToast(`Addebitati ${euro(amount)} a ${name}.`, "info");
+      if (isAdmin) adminEmployeeBalancesView();
+      else employeeBalancesView();
+    }
+  );
+}
+
+function employeeBalancesView() {
+  const rows = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" })).map(name => {
+    const bal = Number(balances[name] || 0);
+    return `<div class="bar-order emp-balance-card" data-name="${esc(name.toLowerCase())}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <b style="font-size:1.05rem">${esc(name)}</b>
+        <div class="${bal < 0 ? "balance-negative" : "balance-positive"}" style="font-size:1.25rem;font-weight:900">${euro(bal)}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="ok-btn" onclick='openDepositNumpad(${JSON.stringify(name)}, false)'>💵 VERSA / SALDA</button>
+        <button type="button" class="danger" onclick='openDebitNumpad(${JSON.stringify(name)}, false)'>➖ ADDEBITA</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  shell("Saldo Dipendenti", `
+    <div class="card">
+      <h3>Gestione Saldi Dipendenti</h3>
+      <p class="muted" style="margin-top:0">Usa il tasto verde per registrare i soldi versati dal collega, oppure il tasto rosso per scalare un addebito.</p>
+      <input type="search" placeholder="🔍 Cerca dipendente per nome..." oninput="filterEmployeeCards(this.value)">
+      ${rows}
     </div>
-  </div>`).join('');
-  shell("Saldo Dipendenti",`<div class="card"><h3>Saldi aggiornati</h3>
-    <p class="muted">Per modificare un saldo inserisci solo una variazione con <b>+</b> o <b>-</b>, ad esempio <b>+10</b> oppure <b>-10</b>.</p>
-    ${rows}
-  </div><button class="secondary" style="margin-top:14px" onclick="cashierHome()">← TORNA AL MENU</button>`);
-}
-function applyEmployeeBalanceChange(name,delta){
-  const oldBalance=Number(balances[name]||0);
-  const newBalance=oldBalance+delta;
-  // Saldo negativo = debito: una variazione positiva incassa denaro fino a chiudere il debito.
-  if(oldBalance<0 && delta>0){
-    fondocassa += delta;
-  }
-  // Saldo positivo = credito: una variazione negativa può rappresentare un rimborso in contanti.
-  if(oldBalance>0 && delta<0){
-    fondocassa += delta;
-  }
-  balances[name]=newBalance;
-  save();
-}
-function editEmployeeBalance(name){
-  const id="bal_"+encodeURIComponent(name);
-  const input=document.getElementById(id);
-  const value=input?.value||"";
-  const delta=Number(String(value).replace(',','.').trim());
-  if(!Number.isFinite(delta)||delta===0){alert("Inserisci una variazione valida, ad esempio +10 o -10.");return}
-  applyEmployeeBalanceChange(name,delta);
-  employeeBalancesView();
-}
-function employeeBalanceEdit(name){
-  const safe=esc(name);
-  const balance=balances[name]||0;
-  shell("Saldo dipendente",`<div class="card"><h3>💶 ${safe}</h3><div class="notice"><b>SALDO ATTUALE</b><div id="employeeEditBalance" style="font-size:2rem;font-weight:800;margin-top:8px">${euro(balance)}</div><div class="muted">Negativo = debito · Positivo = credito</div></div><label>Importo da modificare<input id="employeeBalanceAmount" type="number" step="0.01" min="0" placeholder="Es. 5,00"></label><div class="account-actions"><button onclick="adjustEmployeeBalance(${JSON.stringify(name)},1)">AUMENTA DEBITO</button><button class="secondary" onclick="adjustEmployeeBalance(${JSON.stringify(name)},-1)">DIMINUISCI DEBITO</button></div><button class="secondary" style="margin-top:14px" onclick="employeeBalancesView()">← TORNA AI SALDI</button></div>`);
-}
-function adjustEmployeeBalance(name,direction){
-  const amount=Number(document.getElementById("employeeBalanceAmount")?.value||0);
-  if(!Number.isFinite(amount)||amount<=0){alert("Inserisci un importo valido.");return}
-  applyEmployeeBalanceChange(name,direction===1?-amount:amount);
-  employeeBalanceEdit(name);
+  `);
 }
 
+// --- STORICO PAGINATO ---
+function itemsText(o) { return o.items.map(x => `${x.name} × ${x.qty}`).join(", "); }
 
-function updateChange(id){
-  const o=orders.find(x=>x.id===id), input=document.getElementById("cash-"+id), box=document.getElementById("change-"+id);
-  if(!o||!input||!box)return;
-  const cash=Number(input.value||0), change=cash-o.total;
-  box.innerHTML=change>=0?`<b>Resto da dare: ${euro(change)}</b>`:`<b>Contanti insufficienti: mancano ${euro(-change)}</b>`;
+let auditFilterType = "all"; // 'all' | 'orders' | 'deposits' | 'debits'
+let auditFilterPeriod = "today"; // 'today' | 'all'
+let auditSearchQuery = "";
+
+function buildAuditEntries() {
+  const entries = [];
+
+  orders.forEach(o => {
+    const isCash = o.payment === "subito";
+    entries.push({
+      id: "ord_" + o.id,
+      date: o.date || "",
+      dateKey: o.dateKey || (o.date ? localDateKey(new Date(o.date)) : ""),
+      category: "orders",
+      subType: isCash ? "order_cash" : "order_account",
+      badgeText: isCash ? "💵 Ordine Pagato Subito" : "📒 Ordine in Conto",
+      badgeClass: isCash ? "ok" : "",
+      title: `Ordine #${o.number} · ${o.customer}`,
+      detail: itemsText(o),
+      amount: Number(o.total || 0),
+      sign: isCash ? "+" : "-",
+      amountClass: isCash ? "balance-positive" : "balance-negative",
+      operator: orderAccount(o),
+      searchBlob: `${o.number} ${o.customer} ${itemsText(o)} ${orderAccount(o)}`.toLowerCase()
+    });
+  });
+
+  balanceMovements.forEach(b => {
+    const amt = Number(b.amount || 0);
+    const isDeposit = amt >= 0;
+    const op = b.by || "—";
+    entries.push({
+      id: "bal_" + b.id,
+      date: b.date || "",
+      dateKey: b.date ? localDateKey(new Date(b.date)) : "",
+      category: isDeposit ? "deposits" : "debits",
+      subType: isDeposit ? "deposit" : "manual_debit",
+      badgeText: isDeposit ? "🟢 Versamento / Saldo" : "🔴 Addebito Manuale",
+      badgeClass: isDeposit ? "ok" : "neg",
+      title: `${b.employee}`,
+      detail: b.note || (isDeposit ? "Versamento / Saldo conto" : "Addebito manuale"),
+      amount: Math.abs(amt),
+      sign: isDeposit ? "+" : "-",
+      amountClass: isDeposit ? "balance-positive" : "balance-negative",
+      operator: op,
+      searchBlob: `${b.employee} ${b.note || ""} ${op}`.toLowerCase()
+    });
+  });
+
+  mealMovements.forEach(m => {
+    const amt = Number(m.amount || 0);
+    const op = m.by || "Amministratore";
+    entries.push({
+      id: "meal_" + m.id,
+      date: m.date || "",
+      dateKey: m.date ? localDateKey(new Date(m.date)) : "",
+      category: "debits",
+      subType: "meal_debit",
+      badgeText: "🍽️ Addebito Pasto Turno",
+      badgeClass: "neg",
+      title: `${m.employee}`,
+      detail: m.type || "Pranzo/Cena con il turno",
+      amount: Math.abs(amt),
+      sign: "-",
+      amountClass: "balance-negative",
+      operator: op,
+      searchBlob: `${m.employee} pranzo cena turno ${op}`.toLowerCase()
+    });
+  });
+
+  return entries.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
-function collect(id){
-  const o=orders.find(x=>x.id===id), input=document.getElementById("cash-"+id), cash=Number(input?.value||0);
-  if(!o||o.paid)return;
-  if(!isFinite(cash)||cash<o.total){alert("Il contante ricevuto è insufficiente.");return}
-  o.paid=true;o.cash=cash;o.change=cash-o.total;o.paidAt=new Date().toISOString();o.status="Completato";
-  fondocassa+=o.total;
-  save();collectList();
+
+function setAuditFilter(type) {
+  auditFilterType = type;
+  historyView(auditFilterType, auditFilterPeriod, 40);
 }
-function itemsText(o){return o.items.map(x=>`${x.name} × ${x.qty}`).join(", ")}
-function historyView(){
-  const list=orders.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const content=list.length?list.map(o=>`<div class="bar-order"><div><b>Ordine #${o.number}</b> <span class="status ${o.paid?"ok":""}">${o.paid?"Pagato":"Da incassare"}</span></div><p><b>Data:</b> ${localDateTime(o.date)}<br><b>Account:</b> ${esc(orderAccount(o))}${o.createdByEmployee&&o.createdByEmployee!=="—"?" · "+esc(o.createdByEmployee):""}<br><b>Cliente:</b> ${esc(o.customer)}<br>${itemsText(o)}</p><b>${euro(o.total)}</b> · ${o.payment==="subito"?"Pagato subito":o.payment==="conto"?"Messo in conto":"Pagamento precedente"}${o.paidAt?` · Incassato: ${localDateTime(o.paidAt)}`:""}</div>`).join(""):"<div class='card'>Nessun ordine.</div>";
-  shell("Storico ordini",content+`<button class="secondary" style="margin-top:14px" onclick="${role==='Cassiere'?'cashierHome()':'adminHome()'}">← TORNA AL MENU'</button>`);
+
+function setAuditPeriod(period) {
+  auditFilterPeriod = period;
+  historyView(auditFilterType, auditFilterPeriod, 40);
 }
-function revenueView(){
-  const now=new Date(), startWeek=new Date(now); startWeek.setHours(0,0,0,0); const day=(startWeek.getDay()+6)%7; startWeek.setDate(startWeek.getDate()-day);
-  const startMonth=new Date(now.getFullYear(),now.getMonth(),1);
-  const end=new Date(now); end.setHours(23,59,59,999);
-  const incassato=o=>o.payment==="subito"?(o.paid?o.total:0):0;
-  const inPeriod=(o,start)=>{const d=new Date(o.paidAt||o.date); return d>=start&&d<=end;};
-  const week=orders.filter(o=>inPeriod(o,startWeek)); const month=orders.filter(o=>inPeriod(o,startMonth));
-  const sum=a=>a.reduce((s,o)=>s+incassato(o),0); const count=a=>a.filter(o=>incassato(o)>0).length;
-  shell("Incassi settimanali e mensili",`<div class="card"><h3>Incassi</h3><div class="notice"><b>Settimana corrente</b><div style="font-size:2rem;font-weight:800;margin-top:8px">${euro(sum(week))}</div><div class="muted">${count(week)} ordini incassati</div></div><div class="notice"><b>Mese corrente</b><div style="font-size:2rem;font-weight:800;margin-top:8px">${euro(sum(month))}</div><div class="muted">${count(month)} ordini incassati</div></div><p class="muted">Gli ordini "Messo in conto" rappresentano un movimento sul saldo del dipendente, non denaro entrato immediatamente in cassa.</p></div><button class="secondary" style="margin-top:14px" onclick="adminHome()">← TORNA AL MENU</button>`);
+
+function onAuditSearchInput(val) {
+  auditSearchQuery = val;
+  renderAuditList(40);
 }
-function employeeHome(){
-  const name=user.employee||"Dipendente";
-  const balance=balances[name]||0;
-  shell("Dipendente Home",`<div class="card">
-    <h3>${esc(name)}</h3>
-    <p class="muted">Scegli la sezione che vuoi visualizzare.</p>
-    <div class="home-grid" style="grid-template-columns:repeat(3,1fr)">
-      <button class="tile" onclick="employeeBalanceView()">💶<br>SALDO</button>
-      <button class="tile" onclick="employeeCredentialsView()">🔐<br>MODIFICA CREDENZIALI</button>
-      <button class="tile" onclick="employeeMovementsView()">📋<br>MOVIMENTI</button>
+
+function historyView(type = auditFilterType, period = auditFilterPeriod, limit = 40) {
+  auditFilterType = type;
+  auditFilterPeriod = period;
+
+  shell("Registro & Controllo Incrociato", `
+    <div class="card" style="padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="type-switch" style="margin:0;flex:1;min-width:240px">
+          <button type="button" class="type-btn ${auditFilterPeriod === 'today' ? 'active' : ''}" style="min-height:44px;font-size:0.92rem" onclick="setAuditPeriod('today')">📅 Solo Oggi</button>
+          <button type="button" class="type-btn ${auditFilterPeriod === 'all' ? 'active' : ''}" style="min-height:44px;font-size:0.92rem" onclick="setAuditPeriod('all')">🗂️ Tutto lo Storico</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px">
+        <button type="button" class="cat-btn ${auditFilterType === 'all' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'all' ? 'background:var(--dark);color:#fff;border-color:var(--dark)' : ''}" onclick="setAuditFilter('all')">Tutti</button>
+        <button type="button" class="cat-btn ${auditFilterType === 'orders' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'orders' ? 'background:var(--primary);color:#fff;border-color:var(--primary)' : ''}" onclick="setAuditFilter('orders')">☕ Ordini</button>
+        <button type="button" class="cat-btn ${auditFilterType === 'deposits' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'deposits' ? 'background:var(--ok);color:#fff;border-color:var(--ok)' : ''}" onclick="setAuditFilter('deposits')">🟢 Versamenti</button>
+        <button type="button" class="cat-btn ${auditFilterType === 'debits' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'debits' ? 'background:var(--danger);color:#fff;border-color:var(--danger)' : ''}" onclick="setAuditFilter('debits')">🔴 Addebiti</button>
+      </div>
+
+      <input type="search" id="auditSearchBox" placeholder="🔍 Filtra per dipendente, operatore collegato o prodotto..." value="${esc(auditSearchQuery)}" style="margin-bottom:0;min-height:46px" oninput="onAuditSearchInput(this.value)">
     </div>
-  </div>`);
+
+    <div id="auditSummaryBox"></div>
+    <div id="auditListContainer"></div>
+  `);
+
+  renderAuditList(limit);
 }
 
-function employeeBalanceView(){
-  const name=user.employee||"Dipendente";
-  const balance=balances[name]||0;
-  const state=balance<0?"Debito":balance>0?"Credito":"Saldo a zero";
-  shell("Saldo",`<div class="card">
-    <h3>💶 Saldo di ${esc(name)}</h3>
-    <div class="notice">
-      <b>SALDO ATTUALE</b>
-      <div style="font-size:2rem;font-weight:800;margin-top:8px">${euro(balance)}</div>
-      <div class="muted">${state} · Negativo = debito · Positivo = credito</div>
-    </div>
-    <button class="secondary" onclick="employeeHome()">← TORNA AL MENU</button>
-  </div>`);
-}
+function renderAuditList(limit = 40) {
+  const allEntries = buildAuditEntries();
+  const todayStr = localDateKey();
+  const q = auditSearchQuery.trim().toLowerCase();
 
-function employeeCredentialsView(){
-  const name=user.employee||"Dipendente";
-  shell("Modifica credenziali",`<div class="card">
-    <h3>🔐 Modifica credenziali</h3>
+  // Period filter first (for accurate period totals)
+  const periodEntries = allEntries.filter(e => auditFilterPeriod === "all" || e.dateKey === todayStr);
+
+  // Calculate cross-check summary KPIs for the selected period
+  const cashOrdersTotal = periodEntries.filter(e => e.subType === "order_cash").reduce((s, e) => s + e.amount, 0);
+  const accountOrdersTotal = periodEntries.filter(e => e.subType === "order_account").reduce((s, e) => s + e.amount, 0);
+  const depositsTotal = periodEntries.filter(e => e.subType === "deposit").reduce((s, e) => s + e.amount, 0);
+  const debitsTotal = periodEntries.filter(e => e.subType === "manual_debit" || e.subType === "meal_debit").reduce((s, e) => s + e.amount, 0);
+
+  const summaryBox = document.getElementById("auditSummaryBox");
+  if (summaryBox) {
+    const periodLabel = auditFilterPeriod === "today" ? "Riepilogo di Oggi" : "Riepilogo Globale";
+    summaryBox.innerHTML = `
+      <div class="stat-box" style="padding:14px 16px;gap:10px">
+        <div style="width:100%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #bfdbfe;padding-bottom:8px">
+          <span style="font-weight:800;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--primary-dark)">📊 ${periodLabel} · Controllo Incrociato</span>
+          <span class="badge" style="background:#fff">${periodEntries.length} operazioni</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;width:100%">
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">💵 Ordini Pagati Subito</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--ok-dark)">${euro(cashOrdersTotal)}</div>
+          </div>
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">🟢 Versamenti / Saldi</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--ok-dark)">${euro(depositsTotal)}</div>
+          </div>
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">📒 Ordini in Conto</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--dark)">${euro(accountOrdersTotal)}</div>
+          </div>
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">🔴 Addebiti / Pasti</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--danger-dark)">${euro(debitsTotal)}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Apply category & text search filters
+  const filtered = periodEntries.filter(e => {
+    if (auditFilterType !== "all" && e.category !== auditFilterType) return false;
+    if (q && !e.searchBlob.includes(q)) return false;
+    return true;
+  });
+
+  const visible = filtered.slice(0, limit);
+  const hasMore = filtered.length > limit;
+  const listContainer = document.getElementById("auditListContainer");
+  if (!listContainer) return;
+
+  const cardsHtml = visible.length ? visible.map(e => `
     <div class="bar-order">
-      <b>Username</b>
-      <div style="font-size:1.15rem;margin-top:5px">${esc(user.username)}</div>
-      <p class="muted">Lo username è personale e non modificabile.</p>
-      <label>Nuova password<input id="newEmpPassword" type="password" autocomplete="new-password" placeholder="Inserisci nuova password"></label>
-      <label>Conferma nuova password<input id="confirmEmpPassword" type="password" autocomplete="new-password" placeholder="Ripeti la nuova password"></label>
-      <button onclick="changeOwnPassword()">MODIFICA PASSWORD</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+        <span class="status ${e.badgeClass}">${e.badgeText}</span>
+        <span class="muted" style="font-weight:700;font-size:0.85rem">🕒 ${e.date ? localDateTime(e.date) : "—"}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">
+        <div>
+          <b style="font-size:1.05rem">${esc(e.title)}</b>
+          <div style="margin-top:2px;color:var(--text)">${esc(e.detail)}</div>
+        </div>
+        <div class="${e.amountClass}" style="font-size:1.2rem;font-weight:900;white-space:nowrap">
+          ${e.sign}${euro(e.amount)}
+        </div>
+      </div>
+      <div style="padding-top:6px;border-top:1px dashed var(--border);font-size:0.84rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span>👤 Registrato da: <b style="color:var(--dark)">${esc(e.operator)}</b></span>
+      </div>
+    </div>`).join("") : `<div class="card"><p class="muted" style="text-align:center;margin:12px 0">Nessuna operazione trovata con i filtri selezionati.</p></div>`;
+
+  listContainer.innerHTML = `
+    ${cardsHtml}
+    ${hasMore ? `<button type="button" class="secondary" style="width:100%;margin-bottom:10px" onclick="renderAuditList(${limit + 40})">Carica altre 40 operazioni (${filtered.length - limit} rimanenti)</button>` : ""}
+  `;
+}
+
+// --- AREA DIPENDENTE ---
+function employeeHome() {
+  const name = user.employee || "Dipendente";
+  shell("Area Dipendente", `
+    <div class="card">
+      <h3>Ciao, ${esc(name)}</h3>
+      <p class="muted" style="margin-top:0">Consulta il tuo saldo, l'estratto conto o cambia password.</p>
+      <div class="home-grid">
+        <button class="tile primary-tile" onclick="navigateTo(() => employeeBalanceView())"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo</span></button>
+        <button class="tile" onclick="navigateTo(() => employeeMovementsView())"><div class="tile-icon-wrap">${SVG_ICONS.receipt}</div><span>Movimenti</span></button>
+        <button class="tile" onclick="navigateTo(() => employeeCredentialsView())"><div class="tile-icon-wrap">${SVG_ICONS.lock}</div><span>Cambia Password</span></button>
+      </div>
     </div>
-    <button class="secondary" onclick="employeeHome()">← TORNA AL MENU</button>
-  </div>`);
+  `);
 }
 
-function employeeMovementsView(){
-  const name=user.employee||"Dipendente";
-  const movements=[
-    ...orders.filter(o=>o.customerType==="employee"&&o.customer===name&&o.payment==="conto")
-      .map(o=>({date:o.createdAt||o.date||"",html:`<div class="bar-order"><b>Ordine #${o.number}</b><p>${itemsText(o)}</p><span>${euro(-o.total)}</span> · Messo in conto</div>`})),
-    ...mealMovements.filter(m=>m.employee===name)
-      .map(m=>({date:m.date||"",html:`<div class="bar-order"><b>🍽️ Pranzo/Cena con il turno</b><p>${m.date?new Date(m.date).toLocaleString("it-IT"):""}</p><span>${euro(-m.amount)}</span> · Addebito</div>`}))
-  ].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-
-  shell("Movimenti",`<div class="card">
-    <h3>📋 Movimenti di ${esc(name)}</h3>
-    ${movements.map(x=>x.html).join("")||"<p class='muted'>Nessun movimento registrato.</p>"}
-    <button class="secondary" onclick="employeeHome()">← TORNA AL MENU</button>
-  </div>`);
-}
-
-function changeOwnPassword(){
-  const a=document.getElementById("newEmpPassword")?.value||"", b=document.getElementById("confirmEmpPassword")?.value||"";
-  if(a.length<4){alert("La password deve contenere almeno 4 caratteri.");return}
-  if(a!==b){alert("Le password non coincidono.");return}
-  if(!user.employee||!credentials[user.employee]){alert("Account dipendente non disponibile.");return}
-  credentials[user.employee]=[credentials[user.employee][0],a];
-  rebuildAccounts(); save(); alert("Password modificata con successo."); employeeHome();
-}
-function adminHome(){
-  shell("Amministratore Home",`<div class="card"><h3>Gestione amministratore</h3><p class="muted">Scegli la sezione da controllare.</p><div class="home-grid">
-    <button class="tile" onclick="adminFundView()">💶 VERIFICA FONDO CASSA</button>
-    <button class="tile" onclick="historyView()">🧾 STORICO ORDINI</button>
-    <button class="tile" onclick="revenueView()">📊 INCASSI SETTIMANALI / MENSILI</button>
-    <button class="tile" onclick="adminEmployeesView()">👥 GESTISCI DIPENDENTI</button>
-    <button class="tile" onclick="adminStockView()">📦 GESTISCI MAGAZZINO</button>
-    <button class="tile" onclick="adminSafeView()">🔐 CASSAFORTE SPACCIO</button>
-    <button class="tile balance-blue" onclick="adminEmployeeBalancesView()">SALDO DIPENDENTI</button>
-    <button class="tile" onclick="mealTurnoView()">🍽️ PRANZO/CENA CON IL TURNO</button>
-    <button class="tile" onclick="clearHistory()">🗑️ AZZERA STORICO ORDINI</button>
-  </div></div>`);
-}
-function adminEmployeeBalancesView(){
-  const rows=employees.slice().sort((a,b)=>a.localeCompare(b,'it',{sensitivity:'base'})).map(name=>`<div class="bar-order">
-    <b>${esc(name)}</b>
-    <span class="${(balances[name]||0)<0?"balance-negative":"balance-positive"}" style="float:right;font-weight:800">${euro(balances[name]||0)}</span>
-    <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
-      <input id="adminBal_${encodeURIComponent(name)}" type="text" inputmode="decimal" placeholder="+10 oppure -10" style="flex:1;min-width:130px">
-      <button onclick='editAdminEmployeeBalance(${JSON.stringify(name)})'>APPLICA</button>
-      <button style="background:#b91c1c" onclick='removeEmployee(${JSON.stringify(name)},"adminBalance")'>RIMUOVI</button>
+function employeeBalanceView() {
+  const name = user.employee || "Dipendente";
+  const balance = balances[name] || 0;
+  const state = balance < 0 ? "Debito da saldare" : balance > 0 ? "Credito disponibile" : "Saldo in pari";
+  shell("Il Mio Saldo", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">${esc(name)} · ${state}</div>
+        <div class="stat-value ${balance < 0 ? 'balance-negative' : 'balance-positive'}">${euro(balance)}</div>
+      </div>
     </div>
-  </div>`).join('');
-  shell("Saldo Dipendenti",`<div class="card"><h3>Saldi aggiornati</h3>
-    <p class="muted">L'amministratore può verificare tutti i saldi e modificarli inserendo solo una variazione con <b>+</b> o <b>-</b>, ad esempio <b>+10</b> oppure <b>-10</b>.</p>
-    ${rows}
-  </div><button class="secondary" style="margin-top:14px" onclick="adminHome()">← TORNA AL MENU</button>`);
+  `);
 }
-function editAdminEmployeeBalance(name){
-  const id="adminBal_"+encodeURIComponent(name);
-  const input=document.getElementById(id);
-  const value=input?.value||"";
-  const delta=Number(String(value).replace(',','.').trim());
-  if(!Number.isFinite(delta)||delta===0){alert("Inserisci una variazione valida, ad esempio +10 o -10.");return}
-  applyEmployeeBalanceChange(name,delta);
-  adminEmployeeBalancesView();
+
+function employeeCredentialsView() {
+  shell("Sicurezza Account", `
+    <div class="card">
+      <h3>Modifica Password</h3>
+      <p class="muted" style="margin-top:0">Username: <b>${esc(user.username)}</b></p>
+      <label>Nuova password</label>
+      <input id="newEmpPassword" type="password" autocomplete="new-password" placeholder="Minimo 4 caratteri">
+      <label>Conferma nuova password</label>
+      <input id="confirmEmpPassword" type="password" autocomplete="new-password" placeholder="Ripeti password">
+      <button class="big" onclick="changeOwnPassword()">SALVA NUOVA PASSWORD</button>
+    </div>
+  `);
 }
-function adminFundView(){
-  shell("Fondocassa",`<div class="card"><h3>Fondocassa</h3><div class="notice"><b>Valore attuale</b><div style="font-size:2rem;font-weight:800;margin-top:8px">${euro(fondocassa)}</div></div><label>Nuovo fondocassa</label><input id="fundInput" type="number" step="0.01" min="0" value="${fondocassa.toFixed(2)}"><button onclick="updateFund()">SALVA FONDOCASSA</button></div><button class="secondary" style="margin-top:14px" onclick="adminHome()">← TORNA AL MENU</button>`);
+
+async function changeOwnPassword() {
+  const a = document.getElementById("newEmpPassword")?.value || "";
+  const b = document.getElementById("confirmEmpPassword")?.value || "";
+  if (a.length < 4) { showToast("La password deve avere almeno 4 caratteri.", "err"); return; }
+  if (a !== b) { showToast("Le password non coincidono.", "err"); return; }
+  if (!user.employee || !credentials[user.employee]) { showToast("Account non disponibile.", "err"); return; }
+  const hashed = await sha256(a);
+  credentials[user.employee] = [credentials[user.employee][0], hashed];
+  rebuildAccounts();
+  enqueueAtomicOp({ type: "UPDATE_CREDENTIAL", employee: user.employee, cred: credentials[user.employee] });
+  showToast("Password aggiornata con successo!", "ok");
+  renderHome();
 }
-function adminEmployeesView(){
-  const list=employees.slice().sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"}));
-  const empRows=list.map((n,i)=>`<div class="bar-order"><div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end"><label>Dipendente<input id="empName_${i}" value="${esc(n)}"></label><div style="display:flex;gap:8px"><button class="secondary" onclick="saveEmployeeByName(${JSON.stringify(n)},${i})">SALVA</button><button onclick="removeEmployee(${JSON.stringify(n)})" style="background:#b91c1c">RIMUOVI</button></div></div><div class="muted" style="margin-top:6px">Saldo: ${euro(balances[n]||0)}</div></div>`).join("");
-  shell("Gestione dipendenti",`<div class="card"><p class="muted">I dipendenti non hanno più credenziali personali. Niero Simone mantiene esclusivamente il proprio accesso. Qui puoi modificare i nomi e visualizzare i saldi.</p>${empRows}<button style="margin-top:12px" onclick="addEmployee()">+ CREA NUOVO DIPENDENTE</button></div><button class="secondary" style="margin-top:14px" onclick="adminHome()">← TORNA AL MENU</button>`);
+
+function employeeMovementsView() {
+  const name = user.employee || "Dipendente";
+  const movements = [
+    ...orders.filter(o => o.customerType === "employee" && o.customer === name && o.payment === "conto")
+      .map(o => ({
+        date: o.date || "",
+        html: `<div class="bar-order">
+          <div style="display:flex;justify-content:space-between"><b>☕ Ordine #${o.number}</b><span class="balance-negative" style="font-weight:800">${euro(-o.total)}</span></div>
+          <div class="muted">${o.date ? localDateTime(o.date) : ""}</div>
+          <div style="margin-top:4px">${esc(itemsText(o))}</div>
+        </div>`
+      })),
+    ...mealMovements.filter(m => m.employee === name)
+      .map(m => ({
+        date: m.date || "",
+        html: `<div class="bar-order">
+          <div style="display:flex;justify-content:space-between"><b>🍽️ Pranzo/Cena con il turno</b><span class="balance-negative" style="font-weight:800">${euro(-m.amount)}</span></div>
+          <div class="muted">${m.date ? localDateTime(m.date) : ""}</div>
+        </div>`
+      })),
+    ...balanceMovements.filter(b => b.employee === name)
+      .map(b => ({
+        date: b.date || "",
+        html: `<div class="bar-order">
+          <div style="display:flex;justify-content:space-between"><b>💶 ${esc(b.note)}</b><span class="${b.amount >= 0 ? 'balance-positive' : 'balance-negative'}" style="font-weight:800">${b.amount >= 0 ? "+" : ""}${euro(b.amount)}</span></div>
+          <div class="muted">${b.date ? localDateTime(b.date) : ""} · Reg. da: ${esc(b.by || "—")}</div>
+        </div>`
+      }))
+  ].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+
+  shell("Estratto Conto", `
+    <div class="card">
+      <h3>Movimenti di ${esc(name)}</h3>
+      ${movements.map(x => x.html).join("") || "<p class='muted'>Nessun movimento registrato.</p>"}
+    </div>
+  `);
 }
-function saveEmployeeByName(oldName,i){
-  const name=document.getElementById("empName_"+i)?.value.trim();
-  if(!name){alert("Inserisci un nome valido.");return}
-  if(name!==oldName && employees.some(n=>n.toLowerCase()===name.toLowerCase())){alert("Nome già utilizzato.");return}
-  const idx=employees.indexOf(oldName);
-  if(idx<0){alert("Dipendente non trovato.");return}
-  employees[idx]=name;
-  employees.sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"}));
-  if(oldName!==name){balances[name]=balances[oldName]||0;delete balances[oldName];}
-  if(oldName==="Niero Simone" && name!=="Niero Simone"){
-    delete credentials[oldName];
+
+// --- AREA AMMINISTRATORE ---
+function adminHome() {
+  shell("Pannello Amministratore", `
+    <div class="home-grid">
+      <button class="tile" onclick="navigateTo(() => adminFundView())"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Fondo Cassa</span></button>
+      <button class="tile" onclick="navigateTo(() => adminSafeView())"><div class="tile-icon-wrap">${SVG_ICONS.lock}</div><span>Cassaforte</span></button>
+      <button class="tile balance-blue" onclick="navigateTo(() => adminEmployeeBalancesView())"><div class="tile-icon-wrap">${SVG_ICONS.users}</div><span>Saldo Dipendenti</span></button>
+      <button class="tile" onclick="navigateTo(() => adminProductsView())"><div class="tile-icon-wrap">${SVG_ICONS.tag}</div><span>Listino Prodotti</span></button>
+      <button class="tile" onclick="navigateTo(() => mealTurnoView())"><div class="tile-icon-wrap">${SVG_ICONS.utensils}</div><span>Pranzo/Cena Turno</span></button>
+      <button class="tile" onclick="navigateTo(() => historyView('all', 'today'))"><div class="tile-icon-wrap">${SVG_ICONS.receipt}</div><span>Registro & Controllo</span></button>
+      <button class="tile" onclick="navigateTo(() => revenueView())"><div class="tile-icon-wrap">${SVG_ICONS.chart}</div><span>Incassi</span></button>
+      <button class="tile" onclick="navigateTo(() => adminStockView())"><div class="tile-icon-wrap">${SVG_ICONS.box}</div><span>Magazzino</span></button>
+      <button class="tile" onclick="navigateTo(() => adminEmployeesView())"><div class="tile-icon-wrap">${SVG_ICONS.user}</div><span>Anagrafica</span></button>
+      <button class="tile danger-tile" onclick="clearHistory()"><div class="tile-icon-wrap">${SVG_ICONS.trash}</div><span>Azzera Storico</span></button>
+    </div>
+  `);
+}
+
+function adminProductsView() {
+  const rows = products.map((p, i) => `
+    <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px">
+        ${getProductIllustration(p)}
+        <div>
+          <b style="font-size:1.05rem">${esc(p.name)}</b>
+          <div class="muted">${esc(p.cat)} · <b>${euro(p.price)}</b></div>
+        </div>
+      </div>
+      <button type="button" class="danger" style="min-height:42px;padding:8px 12px" onclick="removeProduct(${i})">RIMUOVI</button>
+    </div>`).join("");
+
+  shell("Listino Prodotti", `
+    <div class="card">
+      <button class="big ok-btn" style="margin-bottom:16px" onclick="openAddProductModal(() => adminProductsView())">➕ AGGIUNGI NUOVO PRODOTTO</button>
+      ${rows}
+    </div>
+  `);
+}
+
+function removeProduct(index) {
+  const p = products[index];
+  if (!p) return;
+  showConfirmModal("Elimina Prodotto", `Rimuovere "${p.name}" dal listino dello spaccio?`, () => {
+    products.splice(index, 1);
+    enqueueAtomicOp({ type: "REMOVE_PRODUCT", name: p.name });
+    showToast(`${p.name} rimosso dal listino.`, "info");
+    adminProductsView();
+  }, true);
+}
+
+function revenueView() {
+  const now = new Date(), startWeek = new Date(now);
+  startWeek.setHours(0, 0, 0, 0);
+  const day = (startWeek.getDay() + 6) % 7;
+  startWeek.setDate(startWeek.getDate() - day);
+  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now); end.setHours(23, 59, 59, 999);
+  const incassato = o => o.payment === "subito" ? (o.paid ? o.total : 0) : 0;
+  const inPeriod = (o, start) => { const d = new Date(o.paidAt || o.date); return d >= start && d <= end; };
+  const week = orders.filter(o => inPeriod(o, startWeek));
+  const month = orders.filter(o => inPeriod(o, startMonth));
+  const sum = a => a.reduce((s, o) => s + incassato(o), 0);
+  const count = a => a.filter(o => incassato(o) > 0).length;
+
+  shell("Incassi Spaccio", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Settimana Corrente (${count(week)} ordini)</div>
+        <div class="stat-value">${euro(sum(week))}</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Mese Corrente (${count(month)} ordini)</div>
+        <div class="stat-value">${euro(sum(month))}</div>
+      </div>
+    </div>
+  `);
+}
+
+function adminEmployeeBalancesView() {
+  const rows = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" })).map(name => `
+    <div class="bar-order emp-balance-card" data-name="${esc(name.toLowerCase())}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div>
+        <b style="font-size:1.05rem">${esc(name)}</b>
+        <div class="${(balances[name] || 0) < 0 ? "balance-negative" : "balance-positive"}" style="font-size:1.25rem;font-weight:900">${euro(balances[name] || 0)}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="ok-btn" onclick='openDepositNumpad(${JSON.stringify(name)}, true)'>💵 VERSA / SALDA</button>
+        <button type="button" class="danger" onclick='openDebitNumpad(${JSON.stringify(name)}, true)'>➖ ADDEBITA</button>
+      </div>
+    </div>`).join("");
+
+  shell("Saldo Dipendenti (Admin)", `
+    <div class="card">
+      <h3>Verifica e Modifica Saldi</h3>
+      <input type="search" placeholder="🔍 Cerca dipendente..." oninput="filterEmployeeCards(this.value)">
+      ${rows}
+    </div>
+  `);
+}
+
+function adminFundView() {
+  shell("Fondo Cassa", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Fondocassa Attuale</div>
+        <div class="stat-value">${euro(fondocassa)}</div>
+      </div>
+      <button type="button" onclick="openFundNumpad()">🔢 IMPOSTA CON TASTIERINO</button>
+    </div>
+  `);
+}
+
+function openFundNumpad() {
+  openNumpadModal(
+    "Nuovo Fondocassa",
+    "Digita il contante presente nel cassetto",
+    fondocassa.toFixed(2),
+    [{ label: "50 €", val: "50" }, { label: "100 €", val: "100" }, { label: "150 €", val: "150" }],
+    "var(--primary)",
+    (val) => {
+      if (!Number.isFinite(val) || val < 0) { showToast("Importo non valido.", "err"); return; }
+      fondocassa = val;
+      enqueueAtomicOp({ type: "SET_FUND", value: val });
+      showToast("Fondocassa aggiornato!", "ok");
+      adminFundView();
+    }
+  );
+}
+
+function adminSafeView() {
+  shell("Cassaforte Spaccio", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Importo in Cassaforte</div>
+        <div class="stat-value">${euro(cassaforte)}</div>
+      </div>
+      <button type="button" onclick="openSafeNumpad()">🔢 IMPOSTA CON TASTIERINO</button>
+    </div>
+  `);
+}
+
+function openSafeNumpad() {
+  openNumpadModal(
+    "Aggiorna Cassaforte",
+    "Digita il totale custodito in cassaforte",
+    cassaforte.toFixed(2),
+    [{ label: "0 €", val: "0" }, { label: "100 €", val: "100" }, { label: "200 €", val: "200" }],
+    "var(--primary)",
+    (val) => {
+      if (!Number.isFinite(val) || val < 0) { showToast("Importo non valido.", "err"); return; }
+      cassaforte = val;
+      enqueueAtomicOp({ type: "SET_SAFE", value: val });
+      showToast("Cassaforte aggiornata!", "ok");
+      adminSafeView();
+    }
+  );
+}
+
+function filterAdminEmpCards(query) {
+  const q = query.trim().toLowerCase();
+  document.querySelectorAll(".admin-emp-card").forEach(card => {
+    const blob = card.getAttribute("data-search") || "";
+    card.classList.toggle("hidden", !blob.includes(q));
+  });
+}
+
+function getPrivilegeBadgeHtml(level) {
+  if (level === "admin") return `<span class="status" style="background:#dbeafe;color:#1e40af">🛡️ Amministratore + Cassiere</span>`;
+  if (level === "cashier") return `<span class="status ok">☕ Cassiere POS</span>`;
+  return `<span class="status">👤 Solo Consumatore</span>`;
+}
+
+function adminEmployeesView() {
+  ensureAllEmployeeAccounts();
+  const list = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+  const empRows = list.map((n, i) => {
+    const cred = credentials[n] || [makeNomeCognomeUsername(n), DEFAULT_EMP_HASH];
+    const uname = cred[0];
+    const level = employeeRoles[n] || "consumer";
+    const searchBlob = `${n} ${uname} ${level}`.toLowerCase();
+    return `
+    <div class="bar-order admin-emp-card" data-search="${esc(searchBlob)}">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="badge" style="background:#f1f5f9;color:var(--dark);font-family:monospace">@${esc(uname)}</span>
+          ${getPrivilegeBadgeHtml(level)}
+        </div>
+        <span class="muted">Saldo: <b class="${(balances[n] || 0) < 0 ? 'balance-negative' : 'balance-positive'}">${euro(balances[n] || 0)}</b></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="empName_${i}" value="${esc(n)}" style="margin:0;flex:1;min-width:190px">
+        <button type="button" class="secondary" onclick="saveEmployeeByName(${JSON.stringify(n)},${i})">SALVA NOME</button>
+        <button type="button" onclick="openManageAccessModal(${JSON.stringify(n)})">🔑 ACCESSO & RUOLO</button>
+        <button type="button" class="danger" onclick="removeEmployee(${JSON.stringify(n)})">RIMUOVI</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  shell("Anagrafica, Accessi & Ruoli", `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div>
+          <h3 style="margin:0">Gestione Colleghi Turno A (${list.length})</h3>
+          <p class="muted" style="margin:4px 0 0 0">Ogni collega accede dal telefono con <b>nome.cognome</b> (password iniziale: <b>1234</b>). Tocca <b>Accesso & Ruolo</b> per modificare privilegi o resettare la password.</p>
+        </div>
+      </div>
+      <button class="big ok-btn" style="margin-bottom:14px" onclick="addEmployee()">➕ AGGIUNGI NUOVO DIPENDENTE</button>
+      <input type="search" placeholder="🔍 Cerca per nome o username (es. giampaolo.muratore)..." oninput="filterAdminEmpCards(this.value)">
+      ${empRows}
+    </div>
+  `);
+}
+
+let tempRoleChoice = "consumer";
+function openManageAccessModal(empName) {
+  ensureAllEmployeeAccounts();
+  const cred = credentials[empName] || [makeNomeCognomeUsername(empName), DEFAULT_EMP_HASH];
+  const curUsername = cred[0];
+  tempRoleChoice = employeeRoles[empName] || "consumer";
+  const modal = document.getElementById("customModal");
+
+  function renderAccessModal(keepUname = curUsername, keepPwd = "") {
+    modal.innerHTML = `<div class="modal-box">
+      <h3 style="margin-bottom:4px">🔑 Accesso & Privilegi</h3>
+      <p class="muted" style="margin:0 0 14px 0"><b>${esc(empName)}</b></p>
+
+      <label>Username di accesso (nome.cognome)</label>
+      <input id="editEmpUsername" value="${esc(keepUname)}" placeholder="nome.cognome" style="font-family:monospace;margin-bottom:12px">
+
+      <label>Nuova Password (lascia vuoto per non cambiarla)</label>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input id="editEmpPassword" type="text" value="${esc(keepPwd)}" placeholder="Es. 1234" style="margin:0;flex:1">
+        <button type="button" class="secondary" style="white-space:nowrap" onclick="document.getElementById('editEmpPassword').value='1234'">Reset 1234</button>
+      </div>
+
+      <label>Livello di Privilegi</label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <button type="button" class="type-btn ${tempRoleChoice === 'consumer' ? 'active' : ''}" style="justify-content:flex-start;text-align:left;padding:12px 14px;min-height:58px" onclick="setTempEmpRole('consumer')">
+          <div>
+            <div style="font-weight:800">👤 Solo Consumatore (Standard)</div>
+            <div style="font-size:0.8rem;opacity:0.85;font-weight:500">Vede solo il proprio saldo, i propri ordini e cambia password</div>
+          </div>
+        </button>
+        <button type="button" class="type-btn ${tempRoleChoice === 'cashier' ? 'active' : ''}" style="justify-content:flex-start;text-align:left;padding:12px 14px;min-height:58px" onclick="setTempEmpRole('cashier')">
+          <div>
+            <div style="font-weight:800">☕ Cassiere POS + Conto Personale</div>
+            <div style="font-size:0.8rem;opacity:0.85;font-weight:500">Può stare al tablet in cassa, registrare ordini, versamenti e addebiti</div>
+          </div>
+        </button>
+        <button type="button" class="type-btn ${tempRoleChoice === 'admin' ? 'active' : ''}" style="justify-content:flex-start;text-align:left;padding:12px 14px;min-height:58px" onclick="setTempEmpRole('admin')">
+          <div>
+            <div style="font-weight:800">🛡️ Amministratore + Cassiere POS</div>
+            <div style="font-size:0.8rem;opacity:0.85;font-weight:500">Accesso completo (richiede anche password Admin)</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary" onclick="document.getElementById('customModal').classList.add('hidden')">ANNULLA</button>
+        <button type="button" class="ok-btn" onclick="saveEmployeeAccess(${JSON.stringify(empName)})">SALVA MODIFICHE</button>
+      </div>
+    </div>`;
   }
-  if(name==="Niero Simone") credentials[name]=credentials[name]||["dipendente","Spaccio123A"];
-  rebuildAccounts(); save(); saveFirstAccess(); alert("Dipendente aggiornato."); adminEmployeesView();
-}
-function addEmployee(){
-  const name=prompt("Nome e cognome del nuovo dipendente:"); if(!name||!name.trim()) return; const n=name.trim();
-  if(employees.some(x=>x.toLowerCase()===n.toLowerCase())){alert("Dipendente già presente.");return}
-  employees.push(n); employees.sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"})); balances[n]=0; save(); alert("Nuovo dipendente creato. Nessuna credenziale di accesso assegnata."); adminEmployeesView();
-}
-function removeEmployee(name,source="employees"){
-  if(!confirm("Vuoi rimuovere definitivamente il dipendente "+name+"? Il saldo associato verrà eliminato."))return;
-  employees=employees.filter(n=>n!==name).sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"}));
-  delete balances[name];
-  delete credentials[name];
-  delete firstAccess[name];
-  rebuildAccounts(); save(); saveFirstAccess();
-  if(source==="adminBalance") adminEmployeeBalancesView();
-  else adminEmployeesView();
+
+  window.setTempEmpRole = (r) => {
+    const uVal = document.getElementById("editEmpUsername")?.value || curUsername;
+    const pVal = document.getElementById("editEmpPassword")?.value || "";
+    tempRoleChoice = r;
+    renderAccessModal(uVal, pVal);
+  };
+
+  window.saveEmployeeAccess = async (targetName) => {
+    const newUname = (document.getElementById("editEmpUsername")?.value || "").trim().toLowerCase();
+    const newPwd = (document.getElementById("editEmpPassword")?.value || "").trim();
+
+    if (!newUname || newUname.length < 3) {
+      showToast("Inserisci uno username valido (minimo 3 caratteri).", "err");
+      return;
+    }
+    if (newUname === "admin") {
+      showToast("Lo username 'admin' è riservato al sistema.", "err");
+      return;
+    }
+    // Check uniqueness across other employees
+    const conflict = Object.entries(credentials).find(([emp, [u]]) => emp !== targetName && u.toLowerCase() === newUname);
+    if (conflict) {
+      showToast(`Username già assegnato a ${conflict[0]}.`, "err");
+      return;
+    }
+    if (newPwd && newPwd.length < 4) {
+      showToast("La password deve avere almeno 4 caratteri.", "err");
+      return;
+    }
+
+    const oldHash = credentials[targetName]?.[1] || DEFAULT_EMP_HASH;
+    const finalHash = newPwd ? await sha256(newPwd) : oldHash;
+    credentials[targetName] = [newUname, finalHash];
+    employeeRoles[targetName] = tempRoleChoice;
+
+    if (user && user.employee === targetName) {
+      user.username = newUname;
+      saveSession();
+    }
+
+    rebuildAccounts();
+    enqueueAtomicOp({ type: "UPDATE_CREDENTIAL", employee: targetName, cred: credentials[targetName], roleLevel: tempRoleChoice });
+    modal.classList.add("hidden");
+    showToast(`Credenziali e ruolo aggiornati per ${targetName}!`, "ok");
+    adminEmployeesView();
+  };
+
+  modal.classList.remove("hidden");
+  renderAccessModal();
 }
 
-function clearHistory(){
-  if(!orders.length){alert("Lo storico ordini è già vuoto.");return}
-  if(!confirm("ATTENZIONE: vuoi davvero azzerare completamente lo storico degli ordini? Questa operazione non può essere annullata."))return;
-  orders=[];save();alert("Storico ordini azzerato.");adminHome();
+function saveEmployeeByName(oldName, i) {
+  const name = document.getElementById("empName_" + i)?.value.trim();
+  if (!name) { showToast("Inserisci un nome valido.", "err"); return; }
+  if (name !== oldName && employees.some(n => n.toLowerCase() === name.toLowerCase())) {
+    showToast("Nome già presente.", "err"); return;
+  }
+  const idx = employees.indexOf(oldName);
+  if (idx < 0) return;
+  employees[idx] = name;
+  employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+  if (oldName !== name) {
+    balances[name] = balances[oldName] || 0;
+    delete balances[oldName];
+    if (credentials[oldName]) {
+      credentials[name] = credentials[oldName];
+      delete credentials[oldName];
+    }
+    if (employeeRoles[oldName]) {
+      employeeRoles[name] = employeeRoles[oldName];
+      delete employeeRoles[oldName];
+    }
+  }
+  ensureAllEmployeeAccounts();
+  rebuildAccounts();
+  enqueueAtomicOp({ type: "RENAME_EMPLOYEE", oldName, newName: name });
+  showToast("Nominativo aggiornato!", "ok");
+  adminEmployeesView();
 }
-function adminSafeView(){
-  shell("Cassaforte Spaccio",`<div class="card"><h3>🔐 Cassaforte Spaccio</h3>
-  <div class="notice"><b>Importo attuale</b><div style="font-size:2rem;font-weight:800;margin-top:8px">${euro(cassaforte)}</div></div>
-  <label>Importo cassaforte</label><input id="safeInput" type="number" step="0.01" min="0" value="${cassaforte.toFixed(2)}">
-  <button onclick="updateSafe()">SALVA IMPORTO</button></div>
-  <button class="secondary" style="margin-top:14px" onclick="adminHome()">← TORNA AL MENU</button>`);
+
+function addEmployee() {
+  showPromptModal("Nuovo Dipendente", "Cognome e Nome (es. Rossi Mario)", false, (raw) => {
+    const n = (raw || "").trim();
+    if (!n) return;
+    if (employees.some(x => x.toLowerCase() === n.toLowerCase())) {
+      showToast("Dipendente già in elenco.", "err"); return;
+    }
+    employees.push(n);
+    employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+    balances[n] = 0;
+    employeeRoles[n] = "consumer";
+    ensureAllEmployeeAccounts();
+    rebuildAccounts();
+    enqueueAtomicOp({ type: "ADD_EMPLOYEE", name: n, cred: credentials[n], roleLevel: "consumer" });
+    const generatedUname = credentials[n]?.[0] || makeNomeCognomeUsername(n);
+    showToast(`${n} aggiunto! Login: ${generatedUname} / 1234`, "ok");
+    adminEmployeesView();
+  });
 }
-function updateSafe(){
-  const value=Number(document.getElementById("safeInput")?.value);
-  if(!Number.isFinite(value)||value<0){alert("Inserisci un importo valido.");return}
-  cassaforte=value;save();alert("Cassaforte aggiornata a "+euro(cassaforte)+".");adminSafeView();
+
+function removeEmployee(name, source = "employees") {
+  showConfirmModal("Rimuovi Dipendente", `Eliminare definitivamente ${name}, le sue credenziali e il relativo saldo?`, () => {
+    employees = employees.filter(n => n !== name).sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+    delete balances[name];
+    delete credentials[name];
+    delete employeeRoles[name];
+    rebuildAccounts();
+    enqueueAtomicOp({ type: "REMOVE_EMPLOYEE", name });
+    showToast(`${name} rimosso.`, "info");
+    if (source === "adminBalance") adminEmployeeBalancesView();
+    else adminEmployeesView();
+  }, true);
 }
-function mealTurnoView(){
-  const rows=employees.slice().sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"})).map(e=>`<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer"><input type="checkbox" class="mealEmployeeCheck" value="${esc(e)}" style="width:auto;margin:0"><span>${esc(e)}</span></label>`).join("");
-  shell("Pranzo/Cena con il turno",`<div class="card"><h3>🍽️ Addebito pranzo/cena</h3><p class="muted">Spunta uno o più dipendenti. L'importo inserito verrà addebitato a ciascun dipendente selezionato.</p><div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0">${rows}</div><label>Importo da togliere a ciascun dipendente<input id="mealAmount" type="number" step="0.01" min="0" placeholder="Es. 10,00"></label><button onclick="confirmMealTurno()">CONFERMA PRANZO/CENA</button></div><button class="secondary" style="margin-top:14px" onclick="adminHome()">← TORNA AL MENU</button>`);
+
+function clearHistory() {
+  if (!orders.length && !balanceMovements.length && !mealMovements.length) {
+    showToast("Il registro è già vuoto.", "info");
+    return;
+  }
+  showConfirmModal("Azzera Registro e Storico", "Cancellare tutto lo storico di ordini, versamenti e addebiti? I saldi attuali dei dipendenti non verranno toccati.", () => {
+    orders = [];
+    balanceMovements = [];
+    mealMovements = [];
+    enqueueAtomicOp({ type: "CLEAR_HISTORY" });
+    showToast("Registro e storico azzerati.", "ok");
+    renderHome();
+  }, true);
 }
-function confirmMealTurno(){
-  const selected=[...document.querySelectorAll('.mealEmployeeCheck:checked')].map(x=>x.value), amount=Number(document.getElementById('mealAmount')?.value||0);
-  if(!selected.length){alert('Seleziona almeno un dipendente.');return} if(!Number.isFinite(amount)||amount<=0){alert('Inserisci un importo valido.');return}
-  const total=selected.length*amount; if(!confirm('Confermare '+euro(amount)+' per ciascuno dei '+selected.length+' dipendenti selezionati? Totale: '+euro(total)))return;
-  const now=new Date().toISOString(); selected.forEach(name=>{balances[name]=(balances[name]||0)-amount; mealMovements.push({id:Date.now()+Math.random(),date:now,employee:name,amount,type:'Pranzo/Cena con il turno'});});
-  save(); alert('Pranzo/cena registrato. Totale addebitato: '+euro(total)+'.'); adminHome();
+
+let mealQuotaVal = 10;
+function mealTurnoView() {
+  const rows = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" })).map(e => `
+    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;margin:0;color:var(--text);text-transform:none;letter-spacing:0">
+      <input type="checkbox" class="mealEmployeeCheck" value="${esc(e)}" style="width:24px;height:24px;min-height:24px;margin:0">
+      <span style="font-size:1.02rem;font-weight:600">${esc(e)}</span>
+    </label>`).join("");
+
+  shell("Pranzo / Cena Turno", `
+    <div class="card">
+      <h3>Addebito Pasto Collettivo</h3>
+      <p class="muted" style="margin-top:0">Spunta i partecipanti e imposta la quota col tastierino.</p>
+      <div style="border:2px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;max-height:330px;overflow-y:auto">${rows}</div>
+      <div class="stat-box" style="padding:12px 16px">
+        <div>
+          <div class="muted" style="font-weight:700">Quota Individuale</div>
+          <div style="font-size:1.5rem;font-weight:900" id="mealQuotaDisplay">${euro(mealQuotaVal)}</div>
+        </div>
+        <button type="button" class="secondary" onclick="openMealQuotaNumpad()">🔢 CAMBIA QUOTA</button>
+      </div>
+      <button class="big" onclick="confirmMealTurno()">CONFERMA ADDEBITO PASTO</button>
+    </div>
+  `);
 }
-function adminStockView(){
-  const rows=stockItems.map((n,i)=>`<div class="bar-order"><label><b>${esc(n)}</b><input id="stock_${i}" type="number" min="0" step="1" value="${Number(stock[n]||0)}"></label></div>`).join("");
-  shell("Gestisci magazzino",`<div class="card"><h3>📦 Giacenze magazzino</h3><p class="muted">Inserisci la quantità attuale per ogni articolo.</p>${rows}<button onclick="saveStock()">SALVA GIACENZE</button></div><button class="secondary" style="margin-top:14px" onclick="adminHome()">← TORNA AL MENU</button>`);
+
+function openMealQuotaNumpad() {
+  openNumpadModal(
+    "Quota Pasto",
+    "Inserisci la quota per singolo partecipante",
+    String(mealQuotaVal),
+    [{ label: "5 €", val: "5" }, { label: "10 €", val: "10" }, { label: "15 €", val: "15" }],
+    "var(--primary)",
+    (val) => {
+      if (!Number.isFinite(val) || val <= 0) { showToast("Inserisci un importo valido.", "err"); return; }
+      mealQuotaVal = val;
+      const disp = document.getElementById("mealQuotaDisplay");
+      if (disp) disp.textContent = euro(mealQuotaVal);
+    }
+  );
 }
-function saveStock(){
-  stockItems.forEach((n,i)=>{const v=Number(document.getElementById("stock_"+i).value); stock[n]=Number.isFinite(v)&&v>=0?Math.floor(v):0}); save(); alert("Giacenze di magazzino aggiornate."); adminStockView();
+
+function confirmMealTurno() {
+  const selected = [...document.querySelectorAll(".mealEmployeeCheck:checked")].map(x => x.value);
+  const amount = Number(mealQuotaVal || 0);
+  if (!selected.length) { showToast("Seleziona almeno un dipendente.", "err"); return; }
+  if (!Number.isFinite(amount) || amount <= 0) { showToast("Inserisci un importo valido.", "err"); return; }
+  const total = selected.length * amount;
+
+  showConfirmModal("Conferma Addebito", `Addebitare ${euro(amount)} a ${selected.length} dipendenti (Totale: ${euro(total)})?`, () => {
+    const now = new Date().toISOString();
+    const entries = [];
+    selected.forEach(name => {
+      balances[name] = (balances[name] || 0) - amount;
+      const ent = {
+        id: Date.now() + Math.random(),
+        date: now,
+        employee: name,
+        amount,
+        type: "Pranzo/Cena con il turno",
+        by: formatOperatorAudit(user),
+        byUsername: user?.username || "—",
+        byRole: role || "Amministratore"
+      };
+      mealMovements.push(ent);
+      entries.push(ent);
+    });
+    enqueueAtomicOp({ type: "MEAL_DEBIT", date: now, entries });
+    showToast(`Addebitati ${euro(total)} a ${selected.length} dipendenti!`, "ok");
+    renderHome();
+  });
 }
-function updateFund(){
-  const value=Number(document.getElementById("fundInput")?.value);
-  if(!Number.isFinite(value)||value<0){alert("Inserisci un importo valido.");return}
-  fondocassa=value;save();alert("Fondocassa aggiornato a "+euro(fondocassa)+".");adminHome();
+
+function adminStockView() {
+  const rows = stockItems.map((n, i) => `
+    <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <b style="font-size:1.05rem">${esc(n)}</b>
+      <div class="qty-controls">
+        <button type="button" class="secondary qty-btn" onclick="stepStock(${i}, -1)">−</button>
+        <span id="stockVal_${i}" style="font-weight:900;font-size:1.2rem;min-width:44px;text-align:center">${Number(stock[n] || 0)}</span>
+        <button type="button" class="secondary qty-btn" onclick="stepStock(${i}, 1)">+</button>
+      </div>
+    </div>`).join("");
+
+  shell("Giacenze Magazzino", `
+    <div class="card">
+      <h3>Inventario Spaccio</h3>
+      ${rows}
+      <button class="big" style="margin-top:8px" onclick="saveStock()">SALVA GIACENZE</button>
+    </div>
+  `);
+}
+
+function stepStock(i, delta) {
+  const n = stockItems[i];
+  stock[n] = Math.max(0, Number(stock[n] || 0) + delta);
+  const el = document.getElementById("stockVal_" + i);
+  if (el) el.textContent = stock[n];
+}
+
+function saveStock() {
+  enqueueAtomicOp({ type: "SET_STOCK", stock: { ...stock } });
+  showToast("Giacenze aggiornate!", "ok");
+  renderHome();
 }
 </script>
 
 <script>
-// Ponte tra il gestionale esistente e il modulo Firebase.
+restoreSession();
 window.spaccioCollectAllData = collectAllData;
 window.spaccioApplyAllData = applyAllData;
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, doc, getDoc, setDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBxPFBq-YKSu-je6RBRqudyei7-EsjWm4Y",
   authDomain: "spaccio-turno-a.firebaseapp.com",
@@ -748,44 +3071,87 @@ const firebaseConfig = {
   messagingSenderId: "43990223549",
   appId: "1:43990223549:web:1b5c14b90178451da645d4"
 };
-const statusEl=document.getElementById("cloudStatus");
-function setStatus(ok,label){
-  if(!statusEl)return;
-  statusEl.textContent=ok?"🟢 "+(label||"Sincronizzato"):"🔴 "+(label||"Offline");
-  statusEl.style.color=ok?"#166534":"#b91c1c";
-  statusEl.style.background=ok?"#dcfce7":"#fee2e2";
-}
-try{
-  const app=initializeApp(firebaseConfig), db=getFirestore(app);
-  const dataRef=doc(db,"gestionale","dati_spaccio");
-  let applyingRemote=false, firstSnapshot=true;
-  window.firebaseSaveData=async(data)=>{
-    if(!navigator.onLine) throw new Error("Dispositivo offline: Firestore non raggiungibile.");
-    await setDoc(dataRef,{...data,updatedAt:new Date().toISOString()});
-    setStatus(true,"Sincronizzato");
-  };
-  window.addEventListener("online",()=>setStatus(true,"Online"));
-  window.addEventListener("offline",()=>setStatus(false,"Offline"));
-  const initial=await getDoc(dataRef);
-  if(!initial.exists()){
-    await setDoc(dataRef,{...window.spaccioCollectAllData(),updatedAt:new Date().toISOString()});
-    setStatus(true,"Primo salvataggio");
+
+const statusEl = document.getElementById("cloudStatus");
+function setStatus(state, label) {
+  if (!statusEl) return;
+  if (state === "ok" || state === true) {
+    statusEl.textContent = "🟢 " + (label || "Sincronizzato");
+    statusEl.style.color = "#166534";
+    statusEl.style.background = "#dcfce7";
+  } else if (state === "saving") {
+    statusEl.textContent = "🟡 " + (label || "Salvataggio...");
+    statusEl.style.color = "#854d0e";
+    statusEl.style.background = "#fef9c3";
+  } else {
+    statusEl.textContent = "🔴 " + (label || "Offline (in coda)");
+    statusEl.style.color = "#b91c1c";
+    statusEl.style.background = "#fee2e2";
   }
-  onSnapshot(dataRef,(snap)=>{
-    if(!snap.exists())return;
-    const remote=snap.data();
-    if(applyingRemote)return;
-    applyingRemote=true;
-    try{
-      const {updatedAt,...payload}=remote;
+}
+window.setCloudBadge = setStatus;
+window.isApplyingRemoteData = false;
+
+try {
+  const app = initializeApp(firebaseConfig);
+  const db = initializeFirestore(app, { localCache: persistentLocalCache() });
+  const dataRef = doc(db, "gestionale", "dati_spaccio");
+
+  // Full snapshot overwrite (used only for explicit JSON import or initial seed)
+  window.firebaseSaveFullSnapshot = async (data) => {
+    await setDoc(dataRef, { ...data, updatedAt: new Date().toISOString() });
+    if (navigator.onLine) setStatus("ok", "Sincronizzato");
+    else setStatus("err", "Offline (in coda)");
+  };
+
+  // Conflict-free atomic transaction: reads latest cloud state, applies queued operations cleanly, retries automatically on concurrent writes
+  window.firebaseRunAtomicBatch = async (opsBatch) => {
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(dataRef);
+      let baseState = snap.exists() ? snap.data() : window.spaccioCollectAllData();
+      opsBatch.forEach(op => {
+        baseState = window.spaccioApplyAtomicOpToState(baseState, op);
+      });
+      tx.set(dataRef, { ...baseState, updatedAt: new Date().toISOString() });
+    });
+  };
+
+  window.addEventListener("online", () => {
+    setStatus("ok", "Sincronizzato");
+    if (window.flushAtomicOps) window.flushAtomicOps();
+  });
+  window.addEventListener("offline", () => setStatus("err", "Offline (in coda)"));
+
+  const initial = await getDoc(dataRef);
+  if (!initial.exists()) {
+    await setDoc(dataRef, { ...window.spaccioCollectAllData(), updatedAt: new Date().toISOString() });
+    setStatus("ok", "Sincronizzato");
+  } else if (window.flushAtomicOps) {
+    window.flushAtomicOps();
+  }
+
+  onSnapshot(dataRef, (snap) => {
+    if (!snap.exists()) return;
+    const remote = snap.data();
+    if (window.isApplyingRemoteData) return;
+    window.isApplyingRemoteData = true;
+    try {
+      const { updatedAt, ...payload } = remote;
       window.spaccioApplyAllData(payload);
-      setStatus(true,"Sincronizzato");
-    }catch(err){console.error("Errore applicazione dati Firestore:",err);setStatus(false,"Errore dati");}
-    finally{applyingRemote=false;firstSnapshot=false;}
-  },(error)=>{console.error("Firestore onSnapshot:",error);setStatus(false,"Offline / errore");});
-}catch(error){
-  console.error("Inizializzazione Firebase non riuscita:",error);
-  setStatus(false,"Offline");
+      setStatus(navigator.onLine ? "ok" : "err", navigator.onLine ? "Sincronizzato" : "Offline (in coda)");
+    } catch (err) {
+      console.error("Errore dati Firestore:", err);
+      setStatus("err", "Errore dati");
+    } finally {
+      window.isApplyingRemoteData = false;
+    }
+  }, (error) => {
+    console.error("Firestore onSnapshot:", error);
+    setStatus("err", "Offline / errore");
+  });
+} catch (error) {
+  console.error("Init Firebase:", error);
+  setStatus("err", "Offline");
 }
 </script>
 </body>
