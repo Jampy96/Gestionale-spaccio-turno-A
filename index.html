@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0f172a">
-<title>Spaccio Turno A - v38 POS & Contabilità Gruppi</title>
+<title>Spaccio Turno A - v39 POS, Sync & Navigazione</title>
 <style>
 :root {
   --bg: #f1f5f9;
@@ -861,7 +861,7 @@ button:disabled {
 
 <header>
   <div class="brand-group">
-    <button type="button" id="headerBackBtn" class="ghost hidden" style="background:var(--primary);font-weight:800" onclick="goBack()">← Indietro</button>
+    <button type="button" id="headerBackBtn" class="ghost hidden" style="background:var(--primary);font-weight:800;min-height:44px;padding:8px 14px" onclick="goBack()">← Indietro</button>
     <div class="brand-logo" style="cursor:pointer" onclick="goHome()" title="Torna alla Home / Selezione Ruolo">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
     </div>
@@ -884,7 +884,7 @@ button:disabled {
       </div>
       <div>
         <h2 style="margin:0">Accesso Cassa</h2>
-        <span class="muted">Spaccio Turno A · v38 POS</span>
+        <span class="muted">Spaccio Turno A · v39 POS</span>
       </div>
     </div>
     <label>Username</label>
@@ -948,15 +948,34 @@ function getProductIllustration(p) {
   return `<div class="prod-illus snack"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 14c0-4.5 3.6-8 8-8s8 3.5 8 8v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2Z"/><path d="M8 11h.01"/><path d="M12 10h.01"/><path d="M16 11h.01"/></svg></div>`;
 }
 
-// --- NAVIGAZIONE INTERNA ---
+// --- NAVIGAZIONE INTERNA & PULSANTE INDIETRO SEMPRE PRESENTE ---
 let navStack = [];
 let currentScreenFn = null;
 
 function updateBackButton() {
   const btn = document.getElementById("headerBackBtn");
   if (!btn) return;
-  if (navStack.length > 0) btn.classList.remove("hidden");
-  else btn.classList.add("hidden");
+  if (!user) {
+    btn.classList.add("hidden");
+    return;
+  }
+  btn.classList.remove("hidden");
+  if (navStack.length > 0) {
+    btn.innerHTML = "← Indietro";
+    btn.style.background = "var(--primary)";
+  } else if (role) {
+    const level = getUserPrivilegeLevel(user);
+    if (level === "consumer") {
+      btn.innerHTML = "← Esci";
+      btn.style.background = "rgba(255,255,255,0.16)";
+    } else {
+      btn.innerHTML = "← Cambia Ruolo";
+      btn.style.background = "var(--primary)";
+    }
+  } else {
+    btn.innerHTML = "← Esci";
+    btn.style.background = "rgba(255,255,255,0.16)";
+  }
 }
 
 function navigateTo(fn, pushHistory = true) {
@@ -967,6 +986,7 @@ function navigateTo(fn, pushHistory = true) {
     try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
   }
   fn();
+  window.scrollTo({ top: 0, behavior: "instant" });
 }
 
 function resetNav(fn) {
@@ -982,8 +1002,16 @@ function goBack() {
     currentScreenFn = prev;
     updateBackButton();
     prev();
+    window.scrollTo({ top: 0, behavior: "instant" });
   } else if (role) {
-    backToRoleChoice();
+    const level = getUserPrivilegeLevel(user);
+    if (level === "consumer") {
+      logout();
+    } else {
+      backToRoleChoice();
+    }
+  } else if (user) {
+    logout();
   }
 }
 
@@ -993,8 +1021,11 @@ window.addEventListener("popstate", () => {
       goBack();
       try { window.history.pushState({ spaccioNav: true }, ""); } catch (err) {}
     } else if (role) {
-      backToRoleChoice();
-      try { window.history.pushState({ spaccioNav: true }, ""); } catch (err) {}
+      const level = getUserPrivilegeLevel(user);
+      if (level !== "consumer") {
+        backToRoleChoice();
+        try { window.history.pushState({ spaccioNav: true }, ""); } catch (err) {}
+      }
     }
   }
 });
@@ -1012,14 +1043,27 @@ function restoreSession() {
     const saved = JSON.parse(raw);
     if (saved && saved.user && accounts[saved.user.username]) {
       user = saved.user;
+      if (user.employee) {
+        user.employee = resolveCanonicalEmployeeName(user.employee) || user.employee;
+      }
       requestWakeLock();
       document.getElementById("loginScreen").classList.add("hidden");
+      const level = getUserPrivilegeLevel(user);
       if (saved.role) {
-        role = saved.role;
+        if (saved.role === "Amministratore" && level !== "admin") role = null;
+        else if (saved.role === "Cassiere" && level !== "admin" && level !== "cashier") role = null;
+        else role = saved.role;
+      }
+      if (!role && level === "consumer") {
+        role = "Dipendente";
+      }
+      if (role) {
+        saveSession();
         renderHome();
       } else {
         document.getElementById("roleScreen").classList.remove("hidden");
         renderRoleChoice();
+        updateBackButton();
       }
       try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
     }
@@ -1376,12 +1420,66 @@ function ensureAllEmployeeAccounts() {
 }
 ensureAllEmployeeAccounts();
 
+function normalizePersonKey(str) {
+  return String(str || "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort()
+    .join(" ");
+}
+
+function resolveCanonicalEmployeeName(rawName) {
+  if (!rawName) return null;
+  if (employees.includes(rawName)) return rawName;
+  const low = String(rawName).trim().toLowerCase();
+  const exactCi = employees.find(e => e.toLowerCase() === low);
+  if (exactCi) return exactCi;
+  const targetNorm = normalizePersonKey(rawName);
+  if (targetNorm) {
+    const permMatch = employees.find(e => normalizePersonKey(e) === targetNorm);
+    if (permMatch) return permMatch;
+  }
+  return null;
+}
+
+function getEmployeeBalance(empName) {
+  if (!empName) return 0;
+  if (typeof balances[empName] === "number" && !Number.isNaN(balances[empName])) {
+    return balances[empName];
+  }
+  const canonical = resolveCanonicalEmployeeName(empName);
+  if (canonical && typeof balances[canonical] === "number") {
+    return balances[canonical];
+  }
+  const targetNorm = normalizePersonKey(empName);
+  for (const [k, v] of Object.entries(balances)) {
+    if (normalizePersonKey(k) === targetNorm && typeof v === "number") return v;
+  }
+  return 0;
+}
+
 let accounts = { admin: { password: DEFAULT_ADMIN_HASH } };
 function rebuildAccounts() {
   accounts = { admin: { password: DEFAULT_ADMIN_HASH } };
   Object.entries(credentials).forEach(([employee, [username, password]]) => {
     if (username) {
-      accounts[username.toLowerCase()] = { password, employee };
+      const canonical = resolveCanonicalEmployeeName(employee) || employee;
+      const uLower = username.toLowerCase();
+      accounts[uLower] = { password, employee: canonical };
+      // Also register reversed/dot-separated name aliases if not colliding (e.g. stante.gabriele / gabriele.stante / nome cognome)
+      const parts = uLower.split(".");
+      if (parts.length === 2) {
+        const reversed = `${parts[1]}.${parts[0]}`;
+        if (!accounts[reversed]) accounts[reversed] = { password, employee: canonical };
+      }
+      const normSpaces = canonical.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+      if (normSpaces && !accounts[normSpaces]) {
+        accounts[normSpaces] = { password, employee: canonical };
+      }
     }
   });
 }
@@ -1755,7 +1853,7 @@ async function manualSaveData() {
 
 function collectAllData() {
   return {
-    version: 38, employees, employeeGroups, products, credentials, employeeRoles, orders, nextId, balances,
+    version: 39, employees, employeeGroups, products, credentials, employeeRoles, orders, nextId, balances,
     fondocassa, cassaforte, mealMovements, balanceMovements, stock,
     dailyOrderState: localStorage.getItem(DAILY_ORDER_KEY),
     cleanStart: "1",
@@ -1789,9 +1887,19 @@ function applyAllData(data) {
   rebuildAccounts();
   if (merged.dailyOrderState) localStorage.setItem(DAILY_ORDER_KEY, merged.dailyOrderState);
   saveLocalOnly();
+
+  // Keep active user synced with latest cloud employee name & privileges
+  if (user && user.username && accounts[user.username]) {
+    user.employee = accounts[user.username].employee || user.employee;
+    saveSession();
+  }
+
   const isTyping = document.activeElement && ["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName);
   const modalOpen = !document.getElementById("customModal")?.classList.contains("hidden");
-  if (role && !document.getElementById("categoryProducts") && !isTyping && !modalOpen && typeof currentScreenFn === "function") {
+  if (!role && user && !document.getElementById("roleScreen")?.classList.contains("hidden")) {
+    renderRoleChoice();
+    updateBackButton();
+  } else if (role && !document.getElementById("categoryProducts") && !isTyping && !modalOpen && typeof currentScreenFn === "function") {
     currentScreenFn();
   }
 }
@@ -1840,10 +1948,13 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-// --- AUTENTICAZIONE E RUOLI ---
+// --- AUTENTICAZIONE E RUOLI (FLUSSO RAPIDO SENZA BLOCCHI) ---
+let adminUnlockedInSession = false;
+
 function getUserPrivilegeLevel(uObj = user) {
   if (!uObj || !uObj.employee) return "admin";
-  return employeeRoles[uObj.employee] || "consumer";
+  const canonical = resolveCanonicalEmployeeName(uObj.employee) || uObj.employee;
+  return employeeRoles[canonical] || "consumer";
 }
 
 function renderRoleChoice() {
@@ -1858,42 +1969,69 @@ function renderRoleChoice() {
 
   if (level === "admin") {
     box.innerHTML = `
-      <button class="tile" onclick="selectRole('Amministratore')"><div class="tile-icon-wrap">${SVG_ICONS.shield}</div><span>Amministratore</span></button>
       <button class="tile primary-tile" onclick="selectRole('Cassiere')"><div class="tile-icon-wrap">${SVG_ICONS.coffee}</div><span>Cassiere POS</span></button>
-      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto</span></button>` : ""}
+      <button class="tile" onclick="selectRole('Amministratore')"><div class="tile-icon-wrap">${SVG_ICONS.shield}</div><span>Amministratore</span></button>
+      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto (${euro(getEmployeeBalance(user.employee))})</span></button>` : ""}
     `;
   } else if (level === "cashier") {
     box.innerHTML = `
       <button class="tile primary-tile" style="grid-column:1/-1" onclick="selectRole('Cassiere')"><div class="tile-icon-wrap">${SVG_ICONS.coffee}</div><span>Cassiere POS</span></button>
-      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto</span></button>` : ""}
+      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto (${euro(getEmployeeBalance(user.employee))})</span></button>` : ""}
     `;
   } else {
     box.innerHTML = `
-      <button class="tile primary-tile" style="grid-column:1/-1" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.user}</div><span>Il Mio Saldo & Estratto Conto</span></button>
+      <button class="tile primary-tile" style="grid-column:1/-1" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.user}</div><span>Il Mio Saldo & Estratto Conto (${euro(getEmployeeBalance(user.employee))})</span></button>
     `;
   }
 }
 
 async function login() {
-  const u = document.getElementById("username").value.trim().toLowerCase();
+  const rawU = document.getElementById("username").value.trim().toLowerCase();
   const p = document.getElementById("password").value;
   const err = document.getElementById("loginError");
   err.textContent = "";
-  if (!accounts[u] || !(await verifyPassword(p, accounts[u].password))) {
+
+  // Support both "nome.cognome", "cognome.nome", "Nome Cognome" and "Cognome"
+  let matchedKey = accounts[rawU] ? rawU : null;
+  if (!matchedKey && rawU.includes(" ")) {
+    const dotVersion = rawU.split(/\s+/).join(".");
+    if (accounts[dotVersion]) matchedKey = dotVersion;
+  }
+
+  if (!matchedKey || !(await verifyPassword(p, accounts[matchedKey].password))) {
     err.textContent = "Username o password non validi.";
     return;
   }
-  user = { username: u, employee: accounts[u].employee || null };
-  saveSession();
+
+  // Ensure cloud sync is flushed/fresh if online
+  if (window.flushAtomicOps) window.flushAtomicOps();
+
+  const canonicalEmp = accounts[matchedKey].employee ? (resolveCanonicalEmployeeName(accounts[matchedKey].employee) || accounts[matchedKey].employee) : null;
+  user = { username: matchedKey, employee: canonicalEmp };
+  adminUnlockedInSession = false;
   requestWakeLock();
   try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
   document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("roleScreen").classList.remove("hidden");
-  renderRoleChoice();
+
+  const level = getUserPrivilegeLevel(user);
+  if (level === "consumer") {
+    // Direct entry for normal users without intermediate role-choice screen
+    role = "Dipendente";
+    saveSession();
+    document.getElementById("roleScreen").classList.add("hidden");
+    renderHome();
+  } else {
+    role = null;
+    saveSession();
+    document.getElementById("app").classList.add("hidden");
+    document.getElementById("roleScreen").classList.remove("hidden");
+    renderRoleChoice();
+    updateBackButton();
+  }
 }
 
 function logout() {
-  user = null; role = null; cart = []; navStack = []; currentScreenFn = null; updateBackButton(); saveSession();
+  user = null; role = null; adminUnlockedInSession = false; cart = []; navStack = []; currentScreenFn = null; updateBackButton(); saveSession();
   document.getElementById("app").innerHTML = "";
   document.getElementById("app").classList.add("hidden");
   document.getElementById("roleScreen").classList.add("hidden");
@@ -1913,12 +2051,13 @@ function selectRole(r) {
     showToast("Privilegi di Cassiere non abilitati per questo utente.", "err");
     return;
   }
-  if (r === "Amministratore") {
+  if (r === "Amministratore" && !adminUnlockedInSession) {
     showPromptModal("Password Amministratore", "Inserisci password aggiuntiva", true, async (extra) => {
       if (!extra || !(await verifyPassword(extra, DEFAULT_SUPERADMIN_HASH))) {
         showToast("Password amministratore non corretta.", "err");
         return;
       }
+      adminUnlockedInSession = true;
       role = r;
       saveSession();
       document.getElementById("roleScreen").classList.add("hidden");
@@ -1935,15 +2074,25 @@ function selectRole(r) {
 function goHome() {
   if (!user) return;
   if (!role) {
-    backToRoleChoice();
+    const level = getUserPrivilegeLevel(user);
+    if (level === "consumer") {
+      role = "Dipendente";
+      saveSession();
+      document.getElementById("roleScreen").classList.add("hidden");
+      renderHome();
+    } else {
+      backToRoleChoice();
+    }
     return;
   }
   renderHome();
-  showToast("🏠 Torna alla Home", "info");
+  showToast("🏠 Home " + role, "info");
 }
 
 function renderHome() {
   const app = document.getElementById("app");
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("roleScreen").classList.add("hidden");
   app.classList.remove("hidden");
   if (role === "Cassiere") { resetNav(cashierHome); cashierHome(); }
   else if (role === "Dipendente") { resetNav(employeeHome); employeeHome(); }
@@ -1951,20 +2100,43 @@ function renderHome() {
 }
 
 function backToRoleChoice() {
-  role = null; cart = []; navStack = []; currentScreenFn = null; updateBackButton(); saveSession();
+  const level = getUserPrivilegeLevel(user);
+  if (level === "consumer") {
+    logout();
+    return;
+  }
+  role = null; cart = []; navStack = []; currentScreenFn = null; saveSession();
   document.getElementById("app").innerHTML = "";
   document.getElementById("app").classList.add("hidden");
   document.getElementById("roleScreen").classList.remove("hidden");
+  renderRoleChoice();
+  updateBackButton();
 }
 
 function shell(title, content) {
+  const level = getUserPrivilegeLevel(user);
+  const canSwitch = level === "admin" || level === "cashier";
+  let quickSwitchHtml = "";
+  if (canSwitch) {
+    quickSwitchHtml = `
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        ${role !== "Cassiere" ? `<button type="button" class="secondary" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="selectRole('Cassiere')">☕ Cassiere POS</button>` : ""}
+        ${level === "admin" && role !== "Amministratore" ? `<button type="button" class="secondary" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="selectRole('Amministratore')">🛡️ Admin</button>` : ""}
+        ${user?.employee && role !== "Dipendente" ? `<button type="button" class="secondary" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="selectRole('Dipendente')">👤 Mio Conto</button>` : ""}
+        <button type="button" class="danger" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="logout()">Esci</button>
+      </div>
+    `;
+  } else {
+    quickSwitchHtml = `<button type="button" class="danger" style="min-height:42px;padding:8px 14px;font-size:0.9rem" onclick="logout()">Esci</button>`;
+  }
+
   document.getElementById("app").innerHTML = `
     <div class="topbar">
       <div>
         <h2>${title}</h2>
-        <span class="badge">Postazione: ${role}</span>
+        <span class="badge">Postazione: ${role}${user?.employee ? " · " + esc(user.employee) : ""}</span>
       </div>
-      <button class="secondary" onclick="backToRoleChoice()">🔄 Cambia Ruolo</button>
+      ${quickSwitchHtml}
     </div>
     ${content}`;
 }
@@ -2706,9 +2878,18 @@ function renderAuditList(limit = 40) {
 
 // --- AREA DIPENDENTE ---
 function employeeHome() {
-  const name = user.employee || "Dipendente";
+  const name = resolveCanonicalEmployeeName(user.employee) || user.employee || "Dipendente";
   const grp = getEmployeeGroup(name);
+  const balance = getEmployeeBalance(name);
+  const state = balance < 0 ? "Debito da saldare" : balance > 0 ? "Credito disponibile" : "Saldo in pari";
   shell("Area Dipendente", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:800;text-transform:uppercase;font-size:0.78rem;letter-spacing:0.04em">${esc(name)} · ${getGroupLabel(grp)} · ${state}</div>
+        <div class="stat-value ${balance < 0 ? 'balance-negative' : 'balance-positive'}">${euro(balance)}</div>
+      </div>
+      <span class="badge" style="background:#fff">${balance < 0 ? '🔴 A debito' : balance > 0 ? '🟢 A credito' : '⚪ In pari'}</span>
+    </div>
     <div class="card">
       <h3>Ciao, ${esc(name)} <span class="group-pill ${grp}">${getGroupLabel(grp)}</span></h3>
       <p class="muted" style="margin-top:0">Consulta il tuo saldo, l'estratto conto o cambia password.</p>
@@ -2722,8 +2903,8 @@ function employeeHome() {
 }
 
 function employeeBalanceView() {
-  const name = user.employee || "Dipendente";
-  const balance = balances[name] || 0;
+  const name = resolveCanonicalEmployeeName(user.employee) || user.employee || "Dipendente";
+  const balance = getEmployeeBalance(name);
   const state = balance < 0 ? "Debito da saldare" : balance > 0 ? "Credito disponibile" : "Saldo in pari";
   shell("Il Mio Saldo", `
     <div class="stat-box">
@@ -2764,7 +2945,7 @@ async function changeOwnPassword() {
 }
 
 function employeeMovementsView() {
-  const name = user.employee || "Dipendente";
+  const name = resolveCanonicalEmployeeName(user.employee) || user.employee || "Dipendente";
   const movements = [
     ...orders.filter(o => o.customerType === "employee" && o.customer === name && o.payment === "conto")
       .map(o => ({
@@ -3121,9 +3302,9 @@ function adminEmployeesView() {
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <input id="empName_${i}" value="${esc(n)}" style="margin:0;flex:1;min-width:190px">
-        <button type="button" class="secondary" onclick="saveEmployeeByName(${JSON.stringify(n)},${i})">SALVA NOME</button>
-        <button type="button" onclick="openManageAccessModal(${JSON.stringify(n)})">🔑 ACCESSO, GRUPPO & RUOLO</button>
-        <button type="button" class="danger" onclick="removeEmployee(${JSON.stringify(n)})">RIMUOVI</button>
+        <button type="button" class="secondary" data-emp="${esc(n)}" onclick="saveEmployeeFromBtn(this,${i})">SALVA NOME</button>
+        <button type="button" data-emp="${esc(n)}" onclick="openManageAccessModal(this.getAttribute('data-emp'))">🔑 ACCESSO, GRUPPO & RUOLO</button>
+        <button type="button" class="danger" data-emp="${esc(n)}" onclick="removeEmployee(this.getAttribute('data-emp'))">RIMUOVI</button>
       </div>
     </div>`;
   }).join("");
@@ -3197,7 +3378,7 @@ function openManageAccessModal(empName) {
 
       <div class="modal-actions">
         <button type="button" class="secondary" onclick="document.getElementById('customModal').classList.add('hidden')">ANNULLA</button>
-        <button type="button" class="ok-btn" onclick="saveEmployeeAccess(${JSON.stringify(empName)})">SALVA MODIFICHE</button>
+        <button type="button" class="ok-btn" data-emp="${esc(empName)}" onclick="saveEmployeeAccess(this.getAttribute('data-emp'))">SALVA MODIFICHE</button>
       </div>
     </div>`;
   }
@@ -3258,6 +3439,11 @@ function openManageAccessModal(empName) {
 
   modal.classList.remove("hidden");
   renderAccessModal();
+}
+
+function saveEmployeeFromBtn(btn, i) {
+  const oldName = btn.getAttribute("data-emp");
+  saveEmployeeByName(oldName, i);
 }
 
 function saveEmployeeByName(oldName, i) {
