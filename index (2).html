@@ -1,0 +1,3742 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<title>Spaccio Turno A - v39 POS, Sync & Navigazione</title>
+<style>
+:root {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-soft: #eff6ff;
+  --dark: #0f172a;
+  --dark-soft: #1e293b;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --ok: #10b981;
+  --ok-dark: #059669;
+  --ok-soft: #ecfdf5;
+  --warn: #f59e0b;
+  --warn-soft: #fffbeb;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-soft: #fef2f2;
+  --cat-coffee: #d97706;
+  --cat-coffee-bg: #fffbeb;
+  --cat-drink: #0284c7;
+  --cat-drink-bg: #f0f9ff;
+  --cat-snack: #ea580c;
+  --cat-snack-bg: #fff7ed;
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+
+button, input, select {
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+/* HEADER BAR */
+header {
+  background: var(--dark);
+  color: #fff;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.screen {
+  min-height: calc(100vh - 66px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+}
+
+.auth {
+  width: min(440px, 100%);
+}
+
+h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+input, select {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  font-size: 1.05rem;
+  background: #fff;
+  color: var(--text);
+  margin: 0 0 14px 0;
+  font-weight: 600;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 18px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.06s ease, background-color 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+button:hover {
+  background: var(--primary-dark);
+}
+
+button.secondary {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+button.secondary:hover {
+  background: #dbeafe;
+}
+
+button.ok-btn {
+  background: var(--ok);
+  color: #fff;
+}
+
+button.ok-btn:hover {
+  background: var(--ok-dark);
+}
+
+button.ghost {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  min-height: 42px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  border-radius: 11px;
+}
+
+button.ghost:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+button.danger:hover {
+  background: var(--danger-dark);
+}
+
+button.big {
+  width: 100%;
+  min-height: 58px;
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+}
+
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* BENTO TILES DASHBOARD */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tile {
+  min-height: 112px;
+  flex-direction: column;
+  text-align: center;
+  font-size: 1.05rem;
+  padding: 18px 14px;
+  background: #fff;
+  color: var(--dark);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  gap: 10px;
+}
+
+.tile:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+}
+
+.tile.primary-tile {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: 0;
+}
+
+.tile.balance-blue {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #fff;
+  border: 0;
+}
+
+.tile.danger-tile {
+  background: var(--danger-soft);
+  color: var(--danger-dark);
+  border-color: #fecaca;
+}
+
+.tile-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile.primary-tile .tile-icon-wrap,
+.tile.balance-blue .tile-icon-wrap {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+
+.tile.danger-tile .tile-icon-wrap {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+/* SPLIT SCREEN POS LAYOUT (TABLET HORIZONTAL) */
+.pos-split {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.pos-receipt-col {
+  position: sticky;
+  top: 76px;
+}
+
+/* PILLOLE CLIENTE & DIPENDENTI */
+.type-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.type-btn {
+  min-height: 54px;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 2px solid var(--border);
+  font-size: 1rem;
+}
+
+.type-btn.active {
+  background: var(--dark);
+  color: #fff;
+  border-color: var(--dark);
+}
+
+.emp-pill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  max-height: 195px;
+  overflow-y: auto;
+  padding: 4px 2px;
+  margin-bottom: 10px;
+}
+
+.emp-pill {
+  min-height: 46px;
+  padding: 8px 10px;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  justify-content: flex-start;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emp-pill.selected {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* CATEGORIE E CARD PRODOTTI CON ILLUSTRAZIONI SVG */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cat-btn {
+  min-height: 54px;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 2px solid var(--border);
+  font-size: 0.98rem;
+}
+
+.cat-btn.active[data-cat="Caffetteria"] {
+  background: var(--cat-coffee);
+  color: #fff;
+  border-color: var(--cat-coffee);
+}
+
+.cat-btn.active[data-cat="Bibite"] {
+  background: var(--cat-drink);
+  color: #fff;
+  border-color: var(--cat-drink);
+}
+
+.cat-btn.active[data-cat="Merendine e snack"] {
+  background: var(--cat-snack);
+  color: #fff;
+  border-color: var(--cat-snack);
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+  gap: 12px;
+}
+
+.product {
+  position: relative;
+  background: #fff;
+  border: 2px solid var(--border);
+  color: var(--text);
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 118px;
+  padding: 12px;
+  text-align: left;
+  border-radius: 16px;
+}
+
+.product:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.product.in-cart {
+  border-color: var(--primary);
+  background: #f8fbff;
+}
+
+.qty-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prod-illus {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.prod-illus.coffee { background: var(--cat-coffee-bg); color: var(--cat-coffee); }
+.prod-illus.drink { background: var(--cat-drink-bg); color: var(--cat-drink); }
+.prod-illus.snack { background: var(--cat-snack-bg); color: var(--cat-snack); }
+
+.product .p-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.product .p-price {
+  color: var(--dark);
+  font-weight: 900;
+  font-size: 1.08rem;
+  margin-top: 6px;
+}
+
+/* SCONTRINO DIGITALE & NUMPAD INTEGRATO */
+.receipt-card {
+  background: #fff;
+  border: 2px solid var(--dark);
+  border-radius: 20px;
+  padding: 18px;
+}
+
+.receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 2px dashed var(--border);
+  margin-bottom: 10px;
+}
+
+.cart-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.cart-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+}
+
+.qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qty-btn {
+  min-height: 42px;
+  min-width: 42px;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 1.25rem;
+}
+
+.total-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--dark);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin: 14px 0;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.pay-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pay-btn {
+  min-height: 58px;
+  font-size: 1.02rem;
+}
+
+/* CUSTOM POS NUMPAD */
+.numpad-wrapper {
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.numpad-display {
+  background: #fff;
+  border: 2px solid var(--dark);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 1.65rem;
+  font-weight: 900;
+  text-align: right;
+  margin-bottom: 10px;
+  color: var(--dark);
+  letter-spacing: -0.02em;
+}
+
+.quick-cash-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.quick-cash-btn {
+  min-height: 46px;
+  padding: 6px 2px;
+  background: #fff;
+  color: var(--dark);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.quick-cash-btn:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.num-key {
+  min-height: 54px;
+  background: #fff;
+  color: var(--dark);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.num-key:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.num-key.key-fn {
+  background: #e2e8f0;
+  color: var(--dark);
+  font-size: 1.05rem;
+}
+
+/* ALTRI COMPONENTI */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1.5px solid #bfdbfe;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stat-value {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: var(--dark);
+  letter-spacing: -0.03em;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.kpi-card.highlight-dark {
+  background: var(--dark);
+  color: #fff;
+  border-color: var(--dark);
+}
+
+.kpi-card.highlight-blue {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-color: #93c5fd;
+}
+
+.kpi-card.highlight-red {
+  background: var(--danger-soft);
+  border-color: #fecaca;
+}
+
+.kpi-card.highlight-green {
+  background: var(--ok-soft);
+  border-color: #a7f3d0;
+}
+
+.kpi-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}
+
+.kpi-num {
+  font-size: 1.55rem;
+  font-weight: 900;
+  margin-top: 4px;
+  letter-spacing: -0.02em;
+}
+
+.kpi-sub {
+  font-size: 0.82rem;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.group-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.group-pill.turno {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.group-pill.giornaliero {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.bar-order {
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.status.ok { background: var(--ok-soft); color: var(--ok-dark); }
+.status.neg { background: var(--danger-soft); color: var(--danger-dark); }
+
+.muted { color: var(--muted); font-size: 0.9rem; }
+.hidden { display: none !important; }
+.balance-positive { color: var(--ok-dark); }
+.balance-negative { color: var(--danger-dark); }
+
+/* TOAST & MODALS */
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(460px, calc(100% - 32px));
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--dark);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.98rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideUp 0.16s ease-out;
+}
+
+.toast.ok { background: #064e3b; border-left: 5px solid #10b981; }
+.toast.err { background: #7f1d1d; border-left: 5px solid #ef4444; }
+.toast.info { background: #1e3a8a; border-left: 5px solid #3b82f6; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 9000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px;
+  width: min(450px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+@media (max-width: 840px) {
+  .pos-split { grid-template-columns: 1fr; }
+  .pos-receipt-col { position: static; }
+}
+
+@media (max-width: 640px) {
+  .home-grid { grid-template-columns: repeat(2, 1fr); }
+  .cat-grid, .role-grid { grid-template-columns: 1fr; }
+  .wrap { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-group">
+    <button type="button" id="headerBackBtn" class="ghost hidden" style="background:var(--primary);font-weight:800;min-height:44px;padding:8px 14px" onclick="goBack()">← Indietro</button>
+    <div class="brand-logo" style="cursor:pointer" onclick="goHome()" title="Torna alla Home / Selezione Ruolo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+    </div>
+    <h1 style="cursor:pointer" onclick="goHome()" title="Torna alla Home / Selezione Ruolo">Spaccio Turno A</h1>
+  </div>
+  <div class="header-actions">
+    <span id="cloudStatus" class="badge" style="background:#fff;color:#475569">⚪ Connessione...</span>
+    <button type="button" class="ghost" onclick="manualSaveData()">💾 Salva</button>
+    <button type="button" class="ghost" onclick="exportJSON()">⬇️ JSON</button>
+    <button type="button" class="ghost" onclick="document.getElementById('importJSONFile').click()">⬆️ Importa</button>
+    <input id="importJSONFile" type="file" accept="application/json,.json" style="display:none" onchange="importJSON(event)">
+  </div>
+</header>
+
+<section id="loginScreen" class="screen">
+  <div class="card auth">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div class="brand-logo" style="width:46px;height:46px">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg>
+      </div>
+      <div>
+        <h2 style="margin:0">Accesso Cassa</h2>
+        <span class="muted">Spaccio Turno A · v39 POS</span>
+      </div>
+    </div>
+    <label>Username</label>
+    <input id="username" autocomplete="username" placeholder="nome.cognome (es. giampaolo.muratore)">
+    <label>Password</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    <button class="big" onclick="login()">ENTRA NELLO SPACCIO</button>
+    <p id="loginError" style="color:var(--danger);font-weight:700;margin-top:10px"></p>
+  </div>
+</section>
+
+<section id="roleScreen" class="screen hidden">
+  <div class="card auth">
+    <h2>Seleziona Modalità</h2>
+    <p class="muted" style="margin-top:0;margin-bottom:16px">Scegli la postazione operativa.</p>
+    <div id="roleButtons" class="role-grid"></div>
+    <button class="secondary" style="width:100%;margin-top:14px" onclick="logout()">ESCI DALL'ACCOUNT</button>
+  </div>
+</section>
+
+<main id="app" class="wrap hidden"></main>
+<div id="toastContainer"></div>
+<div id="customModal" class="modal-backdrop hidden"></div>
+
+<script>
+// --- LIBRERIA ICONE & ILLUSTRAZIONI VETTORIALI SVG ---
+const SVG_ICONS = {
+  plus: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  receipt: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>`,
+  wallet: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>`,
+  shield: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  coffee: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`,
+  user: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  users: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  lock: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  utensils: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`,
+  chart: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+  box: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+  trash: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  tag: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>`,
+  balance: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 7h18"/><path d="m6 7-3 7h6l-3-7Z"/><path d="m18 7-3 7h6l-3-7Z"/><line x1="8" y1="21" x2="16" y2="21"/></svg>`
+};
+
+function getProductIllustration(p) {
+  const n = p.name.toLowerCase();
+  if (p.cat === "Caffetteria") {
+    if (n.includes("cappuccino") || n.includes("latte")) {
+      return `<div class="prod-illus coffee"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 8h1a3 3 0 0 1 0 6h-1"/><path d="M4 8h14v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Z"/><path d="M6 5c1-1.5 3-1.5 4 0s3 1.5 4 0"/></svg></div>`;
+    }
+    return `<div class="prod-illus coffee"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 9h1a3 3 0 0 1 0 6h-1"/><path d="M4 9h13v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9Z"/><line x1="7" y1="3" x2="7" y2="6"/><line x1="11" y1="3" x2="11" y2="6"/></svg></div>`;
+  }
+  if (p.cat === "Bibite") {
+    if (n.includes("acqua") || n.includes("tè") || n.includes("succo") || n.includes("bottiglia")) {
+      return `<div class="prod-illus drink"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 2h4"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9l1-4Z"/><line x1="8" y1="13" x2="16" y2="13"/></svg></div>`;
+    }
+    return `<div class="prod-illus drink"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="4" width="12" height="16" rx="3"/><line x1="6" y1="9" x2="18" y2="9"/><path d="M10 2h4"/></svg></div>`;
+  }
+  if (n.includes("gelat")) {
+    return `<div class="prod-illus snack"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a5 5 0 0 1 5 5v7H7V7a5 5 0 0 1 5-5Z"/><line x1="12" y1="14" x2="12" y2="21"/></svg></div>`;
+  }
+  return `<div class="prod-illus snack"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 14c0-4.5 3.6-8 8-8s8 3.5 8 8v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2Z"/><path d="M8 11h.01"/><path d="M12 10h.01"/><path d="M16 11h.01"/></svg></div>`;
+}
+
+// --- NAVIGAZIONE INTERNA & PULSANTE INDIETRO SEMPRE PRESENTE ---
+let navStack = [];
+let currentScreenFn = null;
+
+function updateBackButton() {
+  const btn = document.getElementById("headerBackBtn");
+  if (!btn) return;
+  if (!user) {
+    btn.classList.add("hidden");
+    return;
+  }
+  btn.classList.remove("hidden");
+  if (navStack.length > 0) {
+    btn.innerHTML = "← Indietro";
+    btn.style.background = "var(--primary)";
+  } else if (role) {
+    const level = getUserPrivilegeLevel(user);
+    if (level === "consumer") {
+      btn.innerHTML = "← Esci";
+      btn.style.background = "rgba(255,255,255,0.16)";
+    } else {
+      btn.innerHTML = "← Cambia Ruolo";
+      btn.style.background = "var(--primary)";
+    }
+  } else {
+    btn.innerHTML = "← Esci";
+    btn.style.background = "rgba(255,255,255,0.16)";
+  }
+}
+
+function navigateTo(fn, pushHistory = true) {
+  if (currentScreenFn && currentScreenFn !== fn) navStack.push(currentScreenFn);
+  currentScreenFn = fn;
+  updateBackButton();
+  if (pushHistory) {
+    try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
+  }
+  fn();
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function resetNav(fn) {
+  navStack = [];
+  currentScreenFn = fn;
+  updateBackButton();
+  try { window.history.replaceState({ spaccioNav: true }, ""); } catch (e) {}
+}
+
+function goBack() {
+  if (navStack.length > 0) {
+    const prev = navStack.pop();
+    currentScreenFn = prev;
+    updateBackButton();
+    prev();
+    window.scrollTo({ top: 0, behavior: "instant" });
+  } else if (role) {
+    const level = getUserPrivilegeLevel(user);
+    if (level === "consumer") {
+      logout();
+    } else {
+      backToRoleChoice();
+    }
+  } else if (user) {
+    logout();
+  }
+}
+
+window.addEventListener("popstate", () => {
+  if (user) {
+    if (navStack.length > 0) {
+      goBack();
+      try { window.history.pushState({ spaccioNav: true }, ""); } catch (err) {}
+    } else if (role) {
+      const level = getUserPrivilegeLevel(user);
+      if (level !== "consumer") {
+        backToRoleChoice();
+        try { window.history.pushState({ spaccioNav: true }, ""); } catch (err) {}
+      }
+    }
+  }
+});
+
+// --- PERSISTENZA SESSIONE ---
+const SESSION_KEY = "spaccio_active_session_v1";
+function saveSession() {
+  if (user) localStorage.setItem(SESSION_KEY, JSON.stringify({ user, role }));
+  else localStorage.removeItem(SESSION_KEY);
+}
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved && saved.user && accounts[saved.user.username]) {
+      user = saved.user;
+      if (user.employee) {
+        user.employee = resolveCanonicalEmployeeName(user.employee) || user.employee;
+      }
+      requestWakeLock();
+      document.getElementById("loginScreen").classList.add("hidden");
+      const level = getUserPrivilegeLevel(user);
+      if (saved.role) {
+        if (saved.role === "Amministratore" && level !== "admin") role = null;
+        else if (saved.role === "Cassiere" && level !== "admin" && level !== "cashier") role = null;
+        else role = saved.role;
+      }
+      if (!role && level === "consumer") {
+        role = "Dipendente";
+      }
+      if (role) {
+        saveSession();
+        renderHome();
+      } else {
+        document.getElementById("roleScreen").classList.remove("hidden");
+        renderRoleChoice();
+        updateBackButton();
+      }
+      try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
+    }
+  } catch (e) {}
+}
+
+// --- NOTIFICHE FLUIDE & MODALI ---
+function showToast(msg, type = "info") {
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  const icon = type === "ok" ? "✅" : type === "err" ? "⚠️" : "ℹ️";
+  el.innerHTML = `<span>${icon}</span><span>${esc(msg)}</span>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = "0";
+    el.style.transition = "opacity 0.2s";
+    setTimeout(() => el.remove(), 220);
+  }, 2500);
+}
+
+function showConfirmModal(title, message, onConfirm, isDanger = false) {
+  const modal = document.getElementById("customModal");
+  modal.innerHTML = `<div class="modal-box">
+    <h3>${esc(title)}</h3>
+    <p class="muted" style="margin:0">${esc(message)}</p>
+    <div class="modal-actions">
+      <button class="secondary" id="modalCancelBtn">ANNULLA</button>
+      <button class="${isDanger ? 'danger' : ''}" id="modalOkBtn">CONFERMA</button>
+    </div>
+  </div>`;
+  modal.classList.remove("hidden");
+  document.getElementById("modalCancelBtn").onclick = () => modal.classList.add("hidden");
+  document.getElementById("modalOkBtn").onclick = () => {
+    modal.classList.add("hidden");
+    onConfirm();
+  };
+}
+
+function showPromptModal(title, placeholder, isPassword, onSubmit) {
+  const modal = document.getElementById("customModal");
+  modal.innerHTML = `<div class="modal-box">
+    <h3>${esc(title)}</h3>
+    <input id="modalPromptInput" type="${isPassword ? 'password' : 'text'}" placeholder="${esc(placeholder)}">
+    <div class="modal-actions">
+      <button class="secondary" id="modalCancelBtn">ANNULLA</button>
+      <button id="modalOkBtn">CONFERMA</button>
+    </div>
+  </div>`;
+  modal.classList.remove("hidden");
+  const inp = document.getElementById("modalPromptInput");
+  inp.focus();
+  inp.onkeydown = (e) => { if (e.key === "Enter") document.getElementById("modalOkBtn").click(); };
+  document.getElementById("modalCancelBtn").onclick = () => modal.classList.add("hidden");
+  document.getElementById("modalOkBtn").onclick = () => {
+    const val = inp.value;
+    modal.classList.add("hidden");
+    onSubmit(val);
+  };
+}
+
+// --- TASTIERINO NUMERICO POS CUSTOM ---
+let numpadBuffer = "";
+function openNumpadModal(title, subtitle, initialValue, quickAmounts, confirmBtnColor, onConfirm) {
+  numpadBuffer = initialValue !== null && initialValue !== undefined ? String(initialValue) : "";
+  const modal = document.getElementById("customModal");
+  const quicks = Array.isArray(quickAmounts) ? quickAmounts : [];
+
+  function renderNumpad() {
+    const displayVal = numpadBuffer === "" ? "0" : numpadBuffer;
+    modal.innerHTML = `<div class="modal-box">
+      <h3 style="margin-bottom:4px">${esc(title)}</h3>
+      <p class="muted" style="margin:0 0 10px 0">${esc(subtitle)}</p>
+      <div class="numpad-display">${esc(displayVal)} €</div>
+      ${quicks.length ? `
+        <div style="display:grid;grid-template-columns:repeat(${quicks.length},1fr);gap:6px;margin-bottom:8px">
+          ${quicks.map(q => `<button type="button" class="quick-cash-btn" onclick="numpadQuick('${q.val}')">${esc(q.label)}</button>`).join("")}
+        </div>` : ""}
+      <div class="numpad-grid">
+        <button type="button" class="num-key" onclick="numpadPress('7')">7</button>
+        <button type="button" class="num-key" onclick="numpadPress('8')">8</button>
+        <button type="button" class="num-key" onclick="numpadPress('9')">9</button>
+        <button type="button" class="num-key" onclick="numpadPress('4')">4</button>
+        <button type="button" class="num-key" onclick="numpadPress('5')">5</button>
+        <button type="button" class="num-key" onclick="numpadPress('6')">6</button>
+        <button type="button" class="num-key" onclick="numpadPress('1')">1</button>
+        <button type="button" class="num-key" onclick="numpadPress('2')">2</button>
+        <button type="button" class="num-key" onclick="numpadPress('3')">3</button>
+        <button type="button" class="num-key key-fn" onclick="numpadPress('.')">,</button>
+        <button type="button" class="num-key" onclick="numpadPress('0')">0</button>
+        <button type="button" class="num-key key-fn" onclick="numpadPress('DEL')">⌫</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" onclick="document.getElementById('customModal').classList.add('hidden')">ANNULLA</button>
+        <button type="button" style="background:${confirmBtnColor || 'var(--ok)'}" onclick="numpadSubmit()">CONFERMA</button>
+      </div>
+    </div>`;
+  }
+
+  window.numpadPress = (k) => {
+    if (k === "DEL") {
+      numpadBuffer = numpadBuffer.slice(0, -1);
+    } else if (k === ".") {
+      if (!numpadBuffer.includes(".")) numpadBuffer = (numpadBuffer === "" ? "0." : numpadBuffer + ".");
+    } else {
+      if (numpadBuffer.includes(".") && numpadBuffer.split(".")[1].length >= 2) return;
+      numpadBuffer += k;
+    }
+    renderNumpad();
+  };
+  window.numpadQuick = (val) => { numpadBuffer = String(val); renderNumpad(); };
+  window.numpadSubmit = () => {
+    const val = Number(numpadBuffer);
+    modal.classList.add("hidden");
+    onConfirm(val);
+  };
+
+  modal.classList.remove("hidden");
+  renderNumpad();
+}
+
+// --- MODALE AGGIUNTA RAPIDA NUOVO PRODOTTO ---
+let newProdCat = "Bibite";
+let newProdPriceStr = "1.00";
+function openAddProductModal(onSavedCallback) {
+  newProdCat = activeCategory || "Bibite";
+  newProdPriceStr = "1.00";
+  const modal = document.getElementById("customModal");
+
+  function renderAddProdModal(keepName = "") {
+    const disp = newProdPriceStr === "" ? "0" : newProdPriceStr;
+    modal.innerHTML = `<div class="modal-box">
+      <h3 style="margin-bottom:4px">➕ Aggiungi Nuovo Prodotto</h3>
+      <p class="muted" style="margin:0 0 12px 0">Inserisci articolo arrivato in spaccio</p>
+
+      <label>1. Categoria</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+        <button type="button" class="cat-btn ${newProdCat === 'Caffetteria' ? 'active' : ''}" data-cat="Caffetteria" style="min-height:46px;font-size:0.86rem;padding:6px" onclick="setNewProdCat('Caffetteria')">☕ Caffè</button>
+        <button type="button" class="cat-btn ${newProdCat === 'Bibite' ? 'active' : ''}" data-cat="Bibite" style="min-height:46px;font-size:0.86rem;padding:6px" onclick="setNewProdCat('Bibite')">🥤 Bibite</button>
+        <button type="button" class="cat-btn ${newProdCat === 'Merendine e snack' ? 'active' : ''}" data-cat="Merendine e snack" style="min-height:46px;font-size:0.86rem;padding:6px" onclick="setNewProdCat('Merendine e snack')">🥐 Snack</button>
+      </div>
+
+      <label>2. Nome Prodotto</label>
+      <input id="newProdNameInput" placeholder="Es. Estathé Pesca / Patatine" value="${esc(keepName)}" style="margin-bottom:12px">
+
+      <label>3. Prezzo Unitario (€)</label>
+      <div class="numpad-display" style="margin-bottom:8px">${esc(disp)} €</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('0.50')">0,50 €</button>
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('0.60')">0,60 €</button>
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('0.80')">0,80 €</button>
+        <button type="button" class="quick-cash-btn" onclick="newProdPriceQuick('1.00')">1,00 €</button>
+      </div>
+      <div class="numpad-grid">
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('7')">7</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('8')">8</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('9')">9</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('4')">4</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('5')">5</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('6')">6</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('1')">1</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('2')">2</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('3')">3</button>
+        <button type="button" class="num-key key-fn" style="min-height:46px" onclick="newProdPriceKey('.')">,</button>
+        <button type="button" class="num-key" style="min-height:46px" onclick="newProdPriceKey('0')">0</button>
+        <button type="button" class="num-key key-fn" style="min-height:46px" onclick="newProdPriceKey('DEL')">⌫</button>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary" onclick="document.getElementById('customModal').classList.add('hidden')">ANNULLA</button>
+        <button type="button" class="ok-btn" onclick="submitNewProduct()">SALVA PRODOTTO</button>
+      </div>
+    </div>`;
+  }
+
+  window.setNewProdCat = (c) => {
+    const curName = document.getElementById("newProdNameInput")?.value || "";
+    newProdCat = c;
+    renderAddProdModal(curName);
+  };
+  window.newProdPriceQuick = (v) => {
+    const curName = document.getElementById("newProdNameInput")?.value || "";
+    newProdPriceStr = v;
+    renderAddProdModal(curName);
+  };
+  window.newProdPriceKey = (k) => {
+    const curName = document.getElementById("newProdNameInput")?.value || "";
+    if (k === "DEL") newProdPriceStr = newProdPriceStr.slice(0, -1);
+    else if (k === ".") {
+      if (!newProdPriceStr.includes(".")) newProdPriceStr = (newProdPriceStr === "" ? "0." : newProdPriceStr + ".");
+    } else {
+      if (newProdPriceStr.includes(".") && newProdPriceStr.split(".")[1].length >= 2) return;
+      newProdPriceStr += k;
+    }
+    renderAddProdModal(curName);
+  };
+  window.submitNewProduct = () => {
+    const name = (document.getElementById("newProdNameInput")?.value || "").trim();
+    const price = Number(newProdPriceStr);
+    if (!name) { showToast("Scrivi il nome del prodotto.", "err"); return; }
+    if (!Number.isFinite(price) || price <= 0) { showToast("Inserisci un prezzo valido maggiore di 0.", "err"); return; }
+    if (products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+      showToast("Esiste già un prodotto con questo nome.", "err");
+      return;
+    }
+    const prodObj = { cat: newProdCat, name, price };
+    products.push(prodObj);
+    activeCategory = newProdCat;
+    enqueueAtomicOp({ type: "ADD_PRODUCT", product: prodObj });
+    modal.classList.add("hidden");
+    showToast(`${name} (${euro(price)}) aggiunto in ${newProdCat}!`, "ok");
+    if (typeof onSavedCallback === "function") onSavedCallback();
+  };
+
+  modal.classList.remove("hidden");
+  renderAddProdModal("");
+}
+
+// --- SICUREZZA SHA-256 & WAKE LOCK ---
+async function sha256(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+const DEFAULT_ADMIN_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+const DEFAULT_SUPERADMIN_HASH = "2320e598a54b3fed4918ce8557db69deac82a6cadd27ef0c466575032faf4d59";
+const DEFAULT_EMP_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+
+async function verifyPassword(plainInput, storedSecret) {
+  if (!storedSecret) return false;
+  if (/^[a-f0-9]{64}$/i.test(storedSecret)) {
+    const h = await sha256(plainInput);
+    return h === storedSecret.toLowerCase();
+  }
+  return plainInput === storedSecret;
+}
+
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ("wakeLock" in navigator && document.visibilityState === "visible") {
+      wakeLock = await navigator.wakeLock.request("screen");
+    }
+  } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") requestWakeLock();
+});
+
+// --- STATO INIZIALE DA JSON v37_2 (76 DIPENDENTI: TURNO A + GIORNALIERI) ---
+const SEED_V38_DATA = {"version": 37, "employees": ["Beraldo", "Bertolini", "Bonatti", "Bonesso", "Borile", "Campedel", "Canciani", "Caprioli", "Capuano", "Carbone", "Carraro", "Casapinta", "Cervellati", "Collesei", "Comandante", "Contesso", "Dabalà", "De Acetis", "De Gennaro", "De Martino", "Di Domenico", "Di Lorenzo", "Favaro", "Ferraro", "Filippone", "Fiore", "Galzignato", "Gambato", "Grandelis", "Grison", "Infante", "Ippolito", "Mantovan", "Marin", "Masin", "Melaranci", "Minghetti", "Mion", "Muneretto", "Muratore Giampaolo", "Musiu", "Musolino", "Nazzari", "Niero Simone", "Nordio", "Panutti", "Paolone", "Parisi", "Pelati", "Perdonò", "Pesce", "Piccoli", "Piombi", "Pizzuti", "Poletto", "Polo", "Puppa", "Ricciarelli", "Rossi", "Rubin", "Santanonio", "Scaldelai", "Scarpa", "Semenzato", "Serena", "Sifanno", "Simeone", "Spina", "Stante", "Teodori", "Tosatto", "Tumino", "Vitti", "Zanin", "Zaros", "Zennaro"], "employeeGroups": {"Beraldo": "giornaliero", "Bertolini": "giornaliero", "Bonatti": "giornaliero", "Bonesso": "turno", "Borile": "giornaliero", "Campedel": "turno", "Canciani": "giornaliero", "Caprioli": "giornaliero", "Capuano": "turno", "Carbone": "giornaliero", "Carraro": "giornaliero", "Casapinta": "turno", "Cervellati": "turno", "Collesei": "turno", "Comandante": "giornaliero", "Contesso": "giornaliero", "Dabalà": "giornaliero", "De Acetis": "turno", "De Gennaro": "turno", "De Martino": "turno", "Di Domenico": "giornaliero", "Di Lorenzo": "turno", "Favaro": "turno", "Ferraro": "giornaliero", "Filippone": "giornaliero", "Fiore": "giornaliero", "Galzignato": "giornaliero", "Gambato": "giornaliero", "Grandelis": "turno", "Grison": "giornaliero", "Infante": "turno", "Ippolito": "giornaliero", "Mantovan": "giornaliero", "Marin": "turno", "Masin": "giornaliero", "Melaranci": "turno", "Minghetti": "giornaliero", "Mion": "turno", "Muneretto": "giornaliero", "Muratore Giampaolo": "turno", "Musiu": "turno", "Musolino": "giornaliero", "Nazzari": "turno", "Niero Simone": "turno", "Nordio": "turno", "Panutti": "giornaliero", "Paolone": "turno", "Parisi": "giornaliero", "Pelati": "turno", "Perdonò": "giornaliero", "Pesce": "giornaliero", "Piccoli": "giornaliero", "Piombi": "giornaliero", "Pizzuti": "giornaliero", "Poletto": "turno", "Polo": "giornaliero", "Puppa": "turno", "Ricciarelli": "turno", "Rossi": "giornaliero", "Rubin": "turno", "Santanonio": "turno", "Scaldelai": "turno", "Scarpa": "giornaliero", "Semenzato": "turno", "Serena": "giornaliero", "Sifanno": "giornaliero", "Simeone": "giornaliero", "Spina": "giornaliero", "Stante": "turno", "Teodori": "turno", "Tosatto": "giornaliero", "Tumino": "giornaliero", "Vitti": "turno", "Zanin": "turno", "Zaros": "giornaliero", "Zennaro": "giornaliero"}, "employeeRoles": {"Beraldo": "consumer", "Bertolini": "consumer", "Bonatti": "consumer", "Bonesso": "consumer", "Borile": "consumer", "Campedel": "consumer", "Canciani": "consumer", "Caprioli": "consumer", "Capuano": "consumer", "Carbone": "consumer", "Carraro": "consumer", "Casapinta": "admin", "Cervellati": "consumer", "Collesei": "consumer", "Comandante": "consumer", "Contesso": "consumer", "Dabalà": "consumer", "De Acetis": "consumer", "De Gennaro": "consumer", "De Martino": "consumer", "Di Domenico": "consumer", "Di Lorenzo": "consumer", "Favaro": "admin", "Ferraro": "consumer", "Filippone": "consumer", "Fiore": "consumer", "Galzignato": "consumer", "Gambato": "consumer", "Grandelis": "consumer", "Grison": "consumer", "Infante": "consumer", "Ippolito": "consumer", "Mantovan": "consumer", "Marin": "consumer", "Masin": "consumer", "Melaranci": "consumer", "Minghetti": "consumer", "Mion": "admin", "Muneretto": "consumer", "Muratore Giampaolo": "admin", "Musiu": "admin", "Musolino": "consumer", "Nazzari": "consumer", "Niero Simone": "admin", "Nordio": "consumer", "Panutti": "consumer", "Paolone": "consumer", "Parisi": "consumer", "Pelati": "consumer", "Perdonò": "consumer", "Pesce": "consumer", "Piccoli": "consumer", "Piombi": "consumer", "Pizzuti": "consumer", "Poletto": "admin", "Polo": "consumer", "Puppa": "consumer", "Ricciarelli": "consumer", "Rossi": "consumer", "Rubin": "consumer", "Santanonio": "consumer", "Scaldelai": "admin", "Scarpa": "consumer", "Semenzato": "consumer", "Serena": "consumer", "Sifanno": "consumer", "Simeone": "consumer", "Spina": "consumer", "Stante": "consumer", "Teodori": "consumer", "Tosatto": "consumer", "Tumino": "consumer", "Vitti": "consumer", "Zanin": "consumer", "Zaros": "consumer", "Zennaro": "consumer"}, "balances": {"Bonesso": -4.0, "Campedel": -7.6, "Capuano": -18.4, "Casapinta": -4.2, "Cervellati": -1.6, "Collesei": -4.6, "De Acetis": -4.8, "De Gennaro": 0.0, "De Martino": 0.0, "Di Lorenzo": -1.2, "Favaro": -0.6, "Grandelis": -7.1, "Infante": 0.0, "Marin": 0.0, "Melaranci": -4.2, "Mion": -1.0, "Muratore Giampaolo": -6.55, "Musiu": -1.8, "Nazzari": 0.0, "Niero Simone": -7.2, "Nordio": 0.0, "Paolone": 0.4, "Pelati": 0.0, "Poletto": -12.6, "Puppa": -14.3, "Ricciarelli": 20.6, "Rubin": -13.2, "Santanonio": -5.3, "Scaldelai": -12.7, "Semenzato": -13.4, "Stante": -9.0, "Teodori": 0.0, "Vitti": 0.0, "Zanin": -2.7, "Beraldo": -2.2, "Bertolini": 0.0, "Bonatti": 0.0, "Borile": -8.8, "Canciani": -2.2, "Caprioli": 0.0, "Carbone": 0.0, "Carraro": 0.0, "Comandante": 0.0, "Contesso": 0.0, "Dabalà": 0.0, "Di Domenico": -6.8, "Ferraro": -3.0, "Filippone": 1.2, "Fiore": -9.0, "Galzignato": -2.4, "Gambato": -17.8, "Grison": 0.0, "Ippolito": -14.8, "Mantovan": 0.0, "Masin": -5.3, "Minghetti": -5.3, "Muneretto": -1.0, "Musolino": 0.0, "Panutti": 0.0, "Parisi": -12.0, "Perdonò": -12.0, "Pesce": -2.2, "Piccoli": -1.8, "Piombi": 0.0, "Pizzuti": -4.5, "Polo": 0.0, "Rossi": -2.4, "Scarpa": -10.2, "Serena": 0.0, "Sifanno": -20.7, "Simeone": 0.0, "Spina": -3.0, "Tosatto": -2.4, "Tumino": 0.0, "Zaros": -1.6, "Zennaro": -13.6}, "orders": [], "nextId": 1, "fondocassa": 100, "cassaforte": 0, "mealMovements": [], "balanceMovements": [], "cleanStart": "1", "balancesReset": "1"};
+
+const defaultEmployees = SEED_V38_DATA.employees.slice();
+let employees = (JSON.parse(localStorage.getItem("spaccio_employees_v1") || "null") || defaultEmployees.slice()).sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+
+let employeeGroups = JSON.parse(localStorage.getItem("spaccio_employee_groups_v1") || "null");
+if (!employeeGroups || typeof employeeGroups !== "object") {
+  employeeGroups = { ...SEED_V38_DATA.employeeGroups };
+  localStorage.setItem("spaccio_employee_groups_v1", JSON.stringify(employeeGroups));
+}
+
+const defaultProducts = [
+  { "cat": "Caffetteria", "name": "Caffè / Macchiato", "price": 0.6 },
+  { "cat": "Caffetteria", "name": "Macchiatone", "price": 0.7 },
+  { "cat": "Caffetteria", "name": "Cappuccino", "price": 0.8 },
+  { "cat": "Caffetteria", "name": "Orzo / Deca", "price": 0.6 },
+  { "cat": "Caffetteria", "name": "Latte macchiato", "price": 0.8 },
+  { "cat": "Caffetteria", "name": "Latte", "price": 0.6 },
+  { "cat": "Bibite", "name": "Bibita lattina", "price": 1.0 },
+  { "cat": "Bibite", "name": "Succo di frutta", "price": 0.6 },
+  { "cat": "Bibite", "name": "Tè in bottiglia", "price": 1.0 },
+  { "cat": "Bibite", "name": "Acqua ½ lt", "price": 0.5 },
+  { "cat": "Merendine e snack", "name": "Brioches fresche", "price": 1.0 },
+  { "cat": "Merendine e snack", "name": "Merendine confezionate", "price": 0.6 },
+  { "cat": "Merendine e snack", "name": "Gelati", "price": 1.0 },
+  { "cat": "Merendine e snack", "name": "Patatine / snack salati", "price": 0.6 }
+];
+let products = JSON.parse(localStorage.getItem("spaccio_products_v1") || "null") || defaultProducts.slice();
+
+const defaultPrivilegedList = [
+  "Niero Simone", "Casapinta", "Favaro", "Mion",
+  "Musiu", "Muratore Giampaolo", "Poletto", "Scaldelai"
+];
+
+function makeNomeCognomeUsername(fullName) {
+  const clean = String(fullName || "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    const cognome = parts[0];
+    const nome = parts.slice(1).join("");
+    return `${nome}.${cognome}`;
+  }
+  return parts[0] || "utente";
+}
+
+let credentials = JSON.parse(localStorage.getItem("spaccio_credentials_v1") || "{}");
+let employeeRoles = JSON.parse(localStorage.getItem("spaccio_employee_roles_v1") || "null");
+
+if (!employeeRoles || typeof employeeRoles !== "object") {
+  employeeRoles = { ...SEED_V38_DATA.employeeRoles };
+  localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
+}
+
+function getEmployeeGroup(emp) {
+  return employeeGroups[emp] === "giornaliero" ? "giornaliero" : "turno";
+}
+
+function getGroupLabel(grp) {
+  return grp === "giornaliero" ? "Giornaliero" : "Turno A";
+}
+
+function ensureAllEmployeeAccounts() {
+  let changed = false;
+  const usedUsernames = new Set(["admin"]);
+  employees.forEach(emp => {
+    if (Array.isArray(credentials[emp]) && credentials[emp][0]) {
+      if (emp === "Niero Simone" && credentials[emp][0] === "dipendente") {
+        credentials[emp][0] = "simone.niero";
+        changed = true;
+      }
+      usedUsernames.add(credentials[emp][0].toLowerCase());
+    }
+  });
+  employees.forEach(emp => {
+    if (!Array.isArray(credentials[emp]) || !credentials[emp][0]) {
+      let base = makeNomeCognomeUsername(emp);
+      let candidate = base;
+      let counter = 2;
+      while (usedUsernames.has(candidate)) {
+        candidate = `${base}${counter++}`;
+      }
+      usedUsernames.add(candidate);
+      credentials[emp] = [candidate, DEFAULT_EMP_HASH];
+      changed = true;
+    }
+    if (!employeeRoles[emp]) {
+      employeeRoles[emp] = SEED_V38_DATA.employeeRoles[emp] || (defaultPrivilegedList.includes(emp) ? "admin" : "consumer");
+      changed = true;
+    }
+    if (!employeeGroups[emp]) {
+      employeeGroups[emp] = SEED_V38_DATA.employeeGroups[emp] || "turno";
+      changed = true;
+    }
+  });
+  if (changed) {
+    localStorage.setItem("spaccio_credentials_v1", JSON.stringify(credentials));
+    localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
+    localStorage.setItem("spaccio_employee_groups_v1", JSON.stringify(employeeGroups));
+  }
+}
+ensureAllEmployeeAccounts();
+
+function normalizePersonKey(str) {
+  return String(str || "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort()
+    .join(" ");
+}
+
+function resolveCanonicalEmployeeName(rawName) {
+  if (!rawName) return null;
+  if (employees.includes(rawName)) return rawName;
+  const low = String(rawName).trim().toLowerCase();
+  const exactCi = employees.find(e => e.toLowerCase() === low);
+  if (exactCi) return exactCi;
+  const targetNorm = normalizePersonKey(rawName);
+  if (targetNorm) {
+    const permMatch = employees.find(e => normalizePersonKey(e) === targetNorm);
+    if (permMatch) return permMatch;
+  }
+  return null;
+}
+
+function getEmployeeBalance(empName) {
+  if (!empName) return 0;
+  if (typeof balances[empName] === "number" && !Number.isNaN(balances[empName])) {
+    return balances[empName];
+  }
+  const canonical = resolveCanonicalEmployeeName(empName);
+  if (canonical && typeof balances[canonical] === "number") {
+    return balances[canonical];
+  }
+  const targetNorm = normalizePersonKey(empName);
+  for (const [k, v] of Object.entries(balances)) {
+    if (normalizePersonKey(k) === targetNorm && typeof v === "number") return v;
+  }
+  return 0;
+}
+
+let accounts = { admin: { password: DEFAULT_ADMIN_HASH } };
+function rebuildAccounts() {
+  accounts = { admin: { password: DEFAULT_ADMIN_HASH } };
+  Object.entries(credentials).forEach(([employee, [username, password]]) => {
+    if (username) {
+      const canonical = resolveCanonicalEmployeeName(employee) || employee;
+      const uLower = username.toLowerCase();
+      accounts[uLower] = { password, employee: canonical };
+      // Also register reversed/dot-separated name aliases if not colliding (e.g. stante.gabriele / gabriele.stante / nome cognome)
+      const parts = uLower.split(".");
+      if (parts.length === 2) {
+        const reversed = `${parts[1]}.${parts[0]}`;
+        if (!accounts[reversed]) accounts[reversed] = { password, employee: canonical };
+      }
+      const normSpaces = canonical.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+      if (normSpaces && !accounts[normSpaces]) {
+        accounts[normSpaces] = { password, employee: canonical };
+      }
+    }
+  });
+}
+rebuildAccounts();
+
+let user = null, role = null;
+let cart = [];
+let editingOrderId = null;
+let selectedCustomerType = "employee";
+let selectedEmployeeName = "";
+let selectedGroupFilter = "all";
+let activeCategory = "Caffetteria";
+let cashInputStr = "";
+let showCashPad = false;
+
+let orders = JSON.parse(localStorage.getItem("spaccio_orders_v1") || "[]");
+let nextId = Number(localStorage.getItem("spaccio_next_id_v1") || "1");
+const DAILY_ORDER_KEY = "spaccio_daily_order_v1";
+
+function localDateKey(d = new Date()) {
+  const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0"), day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function localDateTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("it-IT") + " · " + d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+}
+function nextDailyOrderNumber() {
+  const today = localDateKey();
+  let state = JSON.parse(localStorage.getItem(DAILY_ORDER_KEY) || "null");
+  if (!state || state.date !== today) state = { date: today, last: 0 };
+  state.last++;
+  localStorage.setItem(DAILY_ORDER_KEY, JSON.stringify(state));
+  return state.last;
+}
+function orderAccount(o) {
+  const emp = o.createdByEmployee && o.createdByEmployee !== "—" ? o.createdByEmployee : "";
+  const usr = o.createdByUsername || o.createdBy || "—";
+  const r = o.createdByRole ? ` · ${o.createdByRole}` : "";
+  if (emp && emp.toLowerCase() !== usr.toLowerCase()) return `${emp} (@${usr}${r})`;
+  return `${usr}${r}`;
+}
+function formatOperatorAudit(uObj, roleOverride = null) {
+  const emp = uObj?.employee && uObj.employee !== "—" ? uObj.employee : "";
+  const usr = uObj?.username || "—";
+  const r = roleOverride || role || "";
+  const rPart = r ? ` · ${r}` : "";
+  if (emp && emp.toLowerCase() !== usr.toLowerCase()) return `${emp} (@${usr}${rPart})`;
+  return `${usr}${rPart}`;
+}
+
+let balances = JSON.parse(localStorage.getItem("spaccio_balances_v1") || "null");
+let fondocassa = Number(localStorage.getItem("spaccio_fondocassa_v1"));
+let cassaforte = Number(localStorage.getItem("spaccio_cassaforte_v1"));
+let mealMovements = JSON.parse(localStorage.getItem("spaccio_meal_movements_v1") || "[]");
+let balanceMovements = JSON.parse(localStorage.getItem("spaccio_balance_movements_v1") || "[]");
+
+if (localStorage.getItem("spaccio_seed_v38_applied") !== "1") {
+  employees = SEED_V38_DATA.employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+  employeeGroups = { ...SEED_V38_DATA.employeeGroups };
+  employeeRoles = { ...SEED_V38_DATA.employeeRoles };
+  balances = { ...SEED_V38_DATA.balances };
+  orders = SEED_V38_DATA.orders.slice();
+  nextId = SEED_V38_DATA.nextId || 1;
+  fondocassa = Number(SEED_V38_DATA.fondocassa ?? 100);
+  cassaforte = Number(SEED_V38_DATA.cassaforte ?? 0);
+  mealMovements = [];
+  balanceMovements = [];
+  credentials = {};
+  ensureAllEmployeeAccounts();
+  rebuildAccounts();
+  localStorage.setItem("spaccio_employees_v1", JSON.stringify(employees));
+  localStorage.setItem("spaccio_employee_groups_v1", JSON.stringify(employeeGroups));
+  localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
+  localStorage.setItem("spaccio_balances_v1", JSON.stringify(balances));
+  localStorage.setItem("spaccio_orders_v1", JSON.stringify(orders));
+  localStorage.setItem("spaccio_next_id_v1", String(nextId));
+  localStorage.setItem("spaccio_fondocassa_v1", String(fondocassa));
+  localStorage.setItem("spaccio_cassaforte_v1", String(cassaforte));
+  localStorage.setItem("spaccio_meal_movements_v1", JSON.stringify(mealMovements));
+  localStorage.setItem("spaccio_balance_movements_v1", JSON.stringify(balanceMovements));
+  localStorage.setItem("spaccio_seed_v38_applied", "1");
+}
+
+if (!balances || typeof balances !== "object") balances = { ...SEED_V38_DATA.balances };
+employees.forEach(n => { if (typeof balances[n] !== "number") balances[n] = 0; });
+
+const stockItems = ["CAFFE", "ORZO", "DECA", "LATTE", "COCA", "TÈ", "ACQUA", "MERENDINE", "GELATI", "SNACK SALATI"];
+let stock = JSON.parse(localStorage.getItem("spaccio_stock_v1") || "null") || {};
+stockItems.forEach(n => { if (typeof stock[n] !== "number") stock[n] = 0; });
+Object.keys(stock).forEach(n => { if (!stockItems.includes(n)) delete stock[n]; });
+if (!Number.isFinite(fondocassa)) { fondocassa = 100; localStorage.setItem("spaccio_fondocassa_v1", String(fondocassa)); }
+if (!Number.isFinite(cassaforte)) { cassaforte = 0; localStorage.setItem("spaccio_cassaforte_v1", String(cassaforte)); }
+
+function euro(n) { return "€ " + Number(n).toFixed(2).replace(".", ","); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+// --- MOTORE CONTABILE: CASSA, CASSAFORTE, CREDITI TURNO A & GIORNALIERI ---
+function computeAccountingSummary() {
+  let turnoDebit = 0, turnoCredit = 0, turnoCount = 0, turnoDebtors = 0;
+  let giornDebit = 0, giornCredit = 0, giornCount = 0, giornDebtors = 0;
+
+  employees.forEach(emp => {
+    const b = Number(balances[emp] || 0);
+    const grp = getEmployeeGroup(emp);
+    if (grp === "turno") {
+      turnoCount++;
+      if (b < 0) { turnoDebit += Math.abs(b); turnoDebtors++; }
+      else if (b > 0) { turnoCredit += b; }
+    } else {
+      giornCount++;
+      if (b < 0) { giornDebit += Math.abs(b); giornDebtors++; }
+      else if (b > 0) { giornCredit += b; }
+    }
+  });
+
+  const round2 = v => Math.round(v * 100) / 100;
+  turnoDebit = round2(turnoDebit);
+  turnoCredit = round2(turnoCredit);
+  giornDebit = round2(giornDebit);
+  giornCredit = round2(giornCredit);
+
+  const totalDebit = round2(turnoDebit + giornDebit);
+  const totalCredit = round2(turnoCredit + giornCredit);
+  const netReceivable = round2(totalDebit - totalCredit);
+  const cashAvailable = round2(Number(fondocassa || 0) + Number(cassaforte || 0));
+  const totalPatrimonio = round2(cashAvailable + netReceivable);
+
+  return {
+    turnoCount, turnoDebtors, turnoDebit, turnoCredit, turnoNet: round2(turnoDebit - turnoCredit),
+    giornCount, giornDebtors, giornDebit, giornCredit, giornNet: round2(giornDebit - giornCredit),
+    totalDebit, totalCredit, netReceivable,
+    fondocassa: round2(Number(fondocassa || 0)),
+    cassaforte: round2(Number(cassaforte || 0)),
+    cashAvailable,
+    totalPatrimonio
+  };
+}
+
+// --- MOTORE DI SINCRONIZZAZIONE ATOMICA ANTI-CONFLITTO ---
+const PENDING_OPS_KEY = "spaccio_pending_ops_v1";
+let pendingOps = JSON.parse(localStorage.getItem(PENDING_OPS_KEY) || "[]");
+
+function savePendingOps() {
+  localStorage.setItem(PENDING_OPS_KEY, JSON.stringify(pendingOps));
+}
+
+function applyAtomicOpToState(state, op) {
+  if (!state || typeof state !== "object") return state;
+  state.balances = state.balances && typeof state.balances === "object" ? { ...state.balances } : {};
+  state.orders = Array.isArray(state.orders) ? [...state.orders] : [];
+  state.balanceMovements = Array.isArray(state.balanceMovements) ? [...state.balanceMovements] : [];
+  state.mealMovements = Array.isArray(state.mealMovements) ? [...state.mealMovements] : [];
+  state.credentials = state.credentials && typeof state.credentials === "object" ? { ...state.credentials } : {};
+  state.employeeRoles = state.employeeRoles && typeof state.employeeRoles === "object" ? { ...state.employeeRoles } : {};
+  state.employeeGroups = state.employeeGroups && typeof state.employeeGroups === "object" ? { ...state.employeeGroups } : {};
+  state.products = Array.isArray(state.products) ? [...state.products] : [];
+  state.employees = Array.isArray(state.employees) ? [...state.employees] : [];
+  state.stock = state.stock && typeof state.stock === "object" ? { ...state.stock } : {};
+
+  switch (op.type) {
+    case "NEW_ORDER": {
+      const ord = { ...op.order };
+      if (!state.orders.some(x => x.uid && ord.uid && x.uid === ord.uid)) {
+        const maxId = state.orders.reduce((m, x) => Math.max(m, Number(x.id) || 0), Number(state.nextId || 1) - 1);
+        ord.id = maxId + 1;
+        state.nextId = ord.id + 1;
+        state.orders.push(ord);
+        if (ord.payment === "subito") {
+          state.fondocassa = Number(state.fondocassa || 0) + Number(ord.total || 0);
+        } else if (ord.payment === "conto" && ord.customerType === "employee") {
+          state.balances[ord.customer] = Number(state.balances[ord.customer] || 0) - Number(ord.total || 0);
+        }
+      }
+      break;
+    }
+    case "EDIT_ORDER": {
+      const idx = state.orders.findIndex(x => x.id === op.orderId);
+      if (idx >= 0) {
+        const oldTotal = Number(state.orders[idx].total || 0);
+        state.orders[idx] = { ...state.orders[idx], ...op.patch };
+        state.fondocassa = Number(state.fondocassa || 0) + (Number(op.patch.total || 0) - oldTotal);
+      }
+      break;
+    }
+    case "BALANCE_DELTA": {
+      const mov = { ...op.movement };
+      if (!state.balanceMovements.some(x => x.id === mov.id)) {
+        const oldBal = Number(state.balances[op.employee] || 0);
+        const delta = Number(op.delta || 0);
+        if (oldBal < 0 && delta > 0) state.fondocassa = Number(state.fondocassa || 0) + delta;
+        if (oldBal > 0 && delta < 0) state.fondocassa = Number(state.fondocassa || 0) + delta;
+        state.balances[op.employee] = oldBal + delta;
+        state.balanceMovements.push(mov);
+      }
+      break;
+    }
+    case "MEAL_DEBIT": {
+      (op.entries || []).forEach(ent => {
+        if (!state.mealMovements.some(x => x.id === ent.id)) {
+          state.balances[ent.employee] = Number(state.balances[ent.employee] || 0) - Number(ent.amount || 0);
+          state.mealMovements.push(ent);
+        }
+      });
+      break;
+    }
+    case "UPDATE_CREDENTIAL": {
+      if (op.employee && Array.isArray(op.cred)) {
+        state.credentials[op.employee] = [...op.cred];
+      }
+      if (op.employee && op.roleLevel) {
+        state.employeeRoles[op.employee] = op.roleLevel;
+      }
+      if (op.employee && op.groupLevel) {
+        state.employeeGroups[op.employee] = op.groupLevel;
+      }
+      break;
+    }
+    case "SET_FUND": {
+      state.fondocassa = Number(op.value || 0);
+      break;
+    }
+    case "SET_SAFE": {
+      state.cassaforte = Number(op.value || 0);
+      break;
+    }
+    case "SET_STOCK": {
+      state.stock = { ...state.stock, ...(op.stock || {}) };
+      break;
+    }
+    case "ADD_PRODUCT": {
+      if (op.product && !state.products.some(p => p.name.toLowerCase() === op.product.name.toLowerCase())) {
+        state.products.push({ ...op.product });
+      }
+      break;
+    }
+    case "REMOVE_PRODUCT": {
+      state.products = state.products.filter(p => p.name.toLowerCase() !== String(op.name || "").toLowerCase());
+      break;
+    }
+    case "ADD_EMPLOYEE": {
+      const n = op.name;
+      if (n && !state.employees.some(x => x.toLowerCase() === n.toLowerCase())) {
+        state.employees.push(n);
+        state.employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+        state.balances[n] = 0;
+        if (op.cred) state.credentials[n] = [...op.cred];
+        state.employeeRoles[n] = op.roleLevel || "consumer";
+        state.employeeGroups[n] = op.groupLevel || "turno";
+      }
+      break;
+    }
+    case "RENAME_EMPLOYEE": {
+      const { oldName, newName } = op;
+      const idx = state.employees.indexOf(oldName);
+      if (idx >= 0) {
+        state.employees[idx] = newName;
+        state.employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+        if (oldName !== newName) {
+          state.balances[newName] = Number(state.balances[oldName] || 0);
+          delete state.balances[oldName];
+          if (state.credentials[oldName]) {
+            state.credentials[newName] = state.credentials[oldName];
+            delete state.credentials[oldName];
+          }
+          if (state.employeeRoles[oldName]) {
+            state.employeeRoles[newName] = state.employeeRoles[oldName];
+            delete state.employeeRoles[oldName];
+          }
+          if (state.employeeGroups[oldName]) {
+            state.employeeGroups[newName] = state.employeeGroups[oldName];
+            delete state.employeeGroups[oldName];
+          }
+        }
+      }
+      break;
+    }
+    case "REMOVE_EMPLOYEE": {
+      const n = op.name;
+      state.employees = state.employees.filter(x => x !== n);
+      delete state.balances[n];
+      delete state.credentials[n];
+      delete state.employeeRoles[n];
+      delete state.employeeGroups[n];
+      break;
+    }
+    case "CLEAR_HISTORY": {
+      state.orders = [];
+      state.balanceMovements = [];
+      state.mealMovements = [];
+      break;
+    }
+  }
+  return state;
+}
+window.spaccioApplyAtomicOpToState = applyAtomicOpToState;
+
+function enqueueAtomicOp(op) {
+  op.opId = Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+  pendingOps.push(op);
+  savePendingOps();
+  saveLocalOnly();
+  flushAtomicOps();
+}
+
+let isFlushingOps = false;
+async function flushAtomicOps() {
+  if (isFlushingOps || pendingOps.length === 0) return;
+  if (!window.firebaseRunAtomicBatch) return;
+  isFlushingOps = true;
+  if (window.setCloudBadge) window.setCloudBadge("saving", `Sincronizzazione (${pendingOps.length})...`);
+  try {
+    const batch = pendingOps.slice();
+    await window.firebaseRunAtomicBatch(batch);
+    const committedIds = new Set(batch.map(x => x.opId));
+    pendingOps = pendingOps.filter(x => !committedIds.has(x.opId));
+    savePendingOps();
+    if (pendingOps.length > 0) {
+      isFlushingOps = false;
+      flushAtomicOps();
+      return;
+    }
+    if (window.setCloudBadge) window.setCloudBadge("ok", "Sincronizzato");
+  } catch (err) {
+    console.error("Transazione atomica in attesa:", err);
+    if (window.setCloudBadge) window.setCloudBadge("err", `In coda (${pendingOps.length})`);
+  } finally {
+    isFlushingOps = false;
+  }
+}
+window.flushAtomicOps = flushAtomicOps;
+
+function saveLocalOnly() {
+  localStorage.setItem("spaccio_orders_v1", JSON.stringify(orders));
+  localStorage.setItem("spaccio_next_id_v1", String(nextId));
+  localStorage.setItem("spaccio_balances_v1", JSON.stringify(balances));
+  localStorage.setItem("spaccio_fondocassa_v1", String(fondocassa));
+  localStorage.setItem("spaccio_employees_v1", JSON.stringify(employees));
+  localStorage.setItem("spaccio_employee_groups_v1", JSON.stringify(employeeGroups));
+  localStorage.setItem("spaccio_products_v1", JSON.stringify(products));
+  localStorage.setItem("spaccio_credentials_v1", JSON.stringify(credentials));
+  localStorage.setItem("spaccio_employee_roles_v1", JSON.stringify(employeeRoles));
+  localStorage.setItem("spaccio_stock_v1", JSON.stringify(stock));
+  localStorage.setItem("spaccio_cassaforte_v1", String(cassaforte));
+  localStorage.setItem("spaccio_meal_movements_v1", JSON.stringify(mealMovements));
+  localStorage.setItem("spaccio_balance_movements_v1", JSON.stringify(balanceMovements));
+}
+
+function save() {
+  saveLocalOnly();
+  if (pendingOps.length > 0) flushAtomicOps();
+}
+
+async function manualSaveData() {
+  try {
+    saveLocalOnly();
+    if (pendingOps.length > 0 && window.firebaseRunAtomicBatch) {
+      await flushAtomicOps();
+      showToast("Operazioni in coda sincronizzate in modo atomico!", "ok");
+    } else if (window.firebaseSaveFullSnapshot) {
+      if (window.setCloudBadge) window.setCloudBadge("saving", "Salvataggio...");
+      await window.firebaseSaveFullSnapshot(collectAllData());
+      showToast("Dati salvati e sincronizzati in cloud!", "ok");
+    } else {
+      showToast("Dati salvati in locale (offline).", "info");
+    }
+  } catch (error) {
+    showToast("Errore salvataggio: " + (error?.message || error), "err");
+  }
+}
+
+function collectAllData() {
+  return {
+    version: 39, employees, employeeGroups, products, credentials, employeeRoles, orders, nextId, balances,
+    fondocassa, cassaforte, mealMovements, balanceMovements, stock,
+    dailyOrderState: localStorage.getItem(DAILY_ORDER_KEY),
+    cleanStart: "1",
+    balancesReset: "1"
+  };
+}
+
+function applyAllData(data) {
+  if (!data || typeof data !== "object") throw new Error("JSON non valido.");
+  let merged = JSON.parse(JSON.stringify(data));
+  if (Array.isArray(pendingOps) && pendingOps.length > 0) {
+    pendingOps.forEach(op => { merged = applyAtomicOpToState(merged, op); });
+  }
+  if (Array.isArray(merged.employees)) employees = merged.employees.filter(x => typeof x === "string").sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+  if (merged.employeeGroups && typeof merged.employeeGroups === "object") employeeGroups = merged.employeeGroups;
+  if (Array.isArray(merged.orders)) orders = merged.orders;
+  if (Array.isArray(merged.products) && merged.products.length > 0) products = merged.products;
+  if (Number.isFinite(Number(merged.nextId))) nextId = Number(merged.nextId);
+  if (merged.balances && typeof merged.balances === "object") balances = merged.balances;
+  if (Number.isFinite(Number(merged.fondocassa))) fondocassa = Number(merged.fondocassa);
+  if (Number.isFinite(Number(merged.cassaforte))) cassaforte = Number(merged.cassaforte);
+  if (Array.isArray(merged.mealMovements)) mealMovements = merged.mealMovements;
+  if (Array.isArray(merged.balanceMovements)) balanceMovements = merged.balanceMovements;
+  if (merged.stock && typeof merged.stock === "object") stock = merged.stock;
+  if (merged.credentials && typeof merged.credentials === "object") credentials = merged.credentials;
+  if (merged.employeeRoles && typeof merged.employeeRoles === "object") employeeRoles = merged.employeeRoles;
+  ensureAllEmployeeAccounts();
+  stockItems.forEach(n => { if (typeof stock[n] !== "number") stock[n] = 0; });
+  Object.keys(stock).forEach(n => { if (!stockItems.includes(n)) delete stock[n]; });
+  employees.forEach(n => { if (typeof balances[n] !== "number") balances[n] = 0; });
+  rebuildAccounts();
+  if (merged.dailyOrderState) localStorage.setItem(DAILY_ORDER_KEY, merged.dailyOrderState);
+  saveLocalOnly();
+
+  // Keep active user synced with latest cloud employee name & privileges
+  if (user && user.username && accounts[user.username]) {
+    user.employee = accounts[user.username].employee || user.employee;
+    saveSession();
+  }
+
+  const isTyping = document.activeElement && ["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName);
+  const modalOpen = !document.getElementById("customModal")?.classList.contains("hidden");
+  if (!role && user && !document.getElementById("roleScreen")?.classList.contains("hidden")) {
+    renderRoleChoice();
+    updateBackButton();
+  } else if (role && !document.getElementById("categoryProducts") && !isTyping && !modalOpen && typeof currentScreenFn === "function") {
+    currentScreenFn();
+  }
+}
+
+function exportJSON() {
+  try {
+    saveLocalOnly();
+    const blob = new Blob([JSON.stringify(collectAllData(), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = "spaccio-turno-a-backup-" + localDateKey() + ".json";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showToast("Backup JSON scaricato.", "ok");
+  } catch (error) {
+    showToast("Errore esportazione: " + (error?.message || error), "err");
+  }
+}
+
+function importJSON(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  showConfirmModal("Importa Backup", "I dati attuali verranno sostituiti con quelli del file selezionato. Continuare?", async () => {
+    try {
+      const data = JSON.parse(await file.text());
+      pendingOps = [];
+      savePendingOps();
+      applyAllData(data);
+      if (window.firebaseSaveFullSnapshot) {
+        if (window.setCloudBadge) window.setCloudBadge("saving", "Salvataggio...");
+        await window.firebaseSaveFullSnapshot(collectAllData());
+      }
+      showToast("Backup importato e sincronizzato!", "ok");
+    } catch (error) {
+      showToast("Errore importazione: " + (error?.message || error), "err");
+    } finally {
+      event.target.value = "";
+    }
+  }, true);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    saveLocalOnly();
+    if (pendingOps.length > 0) flushAtomicOps();
+  } else if (document.visibilityState === "visible") {
+    if (pendingOps.length > 0) flushAtomicOps();
+  }
+});
+
+// --- AUTENTICAZIONE E RUOLI (FLUSSO RAPIDO SENZA BLOCCHI) ---
+let adminUnlockedInSession = false;
+
+function getUserPrivilegeLevel(uObj = user) {
+  if (!uObj || !uObj.employee) return "admin";
+  const canonical = resolveCanonicalEmployeeName(uObj.employee) || uObj.employee;
+  return employeeRoles[canonical] || "consumer";
+}
+
+function renderRoleChoice() {
+  const box = document.getElementById("roleButtons");
+  const level = getUserPrivilegeLevel(user);
+  const displayName = user.employee || user.username;
+  const roleSub = document.querySelector("#roleScreen p.muted");
+  if (roleSub) {
+    const levelLabel = level === "admin" ? "Amministratore + Cassiere" : level === "cashier" ? "Cassiere POS" : "Consumatore (Solo Conto Personale)";
+    roleSub.innerHTML = `Ciao <b>${esc(displayName)}</b> · Livello: <b>${levelLabel}</b>`;
+  }
+
+  if (level === "admin") {
+    box.innerHTML = `
+      <button class="tile primary-tile" onclick="selectRole('Cassiere')"><div class="tile-icon-wrap">${SVG_ICONS.coffee}</div><span>Cassiere POS</span></button>
+      <button class="tile" onclick="selectRole('Amministratore')"><div class="tile-icon-wrap">${SVG_ICONS.shield}</div><span>Amministratore</span></button>
+      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto (${euro(getEmployeeBalance(user.employee))})</span></button>` : ""}
+    `;
+  } else if (level === "cashier") {
+    box.innerHTML = `
+      <button class="tile primary-tile" style="grid-column:1/-1" onclick="selectRole('Cassiere')"><div class="tile-icon-wrap">${SVG_ICONS.coffee}</div><span>Cassiere POS</span></button>
+      ${user.employee ? `<button class="tile balance-blue" style="grid-column:1/-1;min-height:86px" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo & Estratto Conto (${euro(getEmployeeBalance(user.employee))})</span></button>` : ""}
+    `;
+  } else {
+    box.innerHTML = `
+      <button class="tile primary-tile" style="grid-column:1/-1" onclick="selectRole('Dipendente')"><div class="tile-icon-wrap">${SVG_ICONS.user}</div><span>Il Mio Saldo & Estratto Conto (${euro(getEmployeeBalance(user.employee))})</span></button>
+    `;
+  }
+}
+
+async function login() {
+  const rawU = document.getElementById("username").value.trim().toLowerCase();
+  const p = document.getElementById("password").value;
+  const err = document.getElementById("loginError");
+  err.textContent = "";
+
+  // Support both "nome.cognome", "cognome.nome", "Nome Cognome" and "Cognome"
+  let matchedKey = accounts[rawU] ? rawU : null;
+  if (!matchedKey && rawU.includes(" ")) {
+    const dotVersion = rawU.split(/\s+/).join(".");
+    if (accounts[dotVersion]) matchedKey = dotVersion;
+  }
+
+  if (!matchedKey || !(await verifyPassword(p, accounts[matchedKey].password))) {
+    err.textContent = "Username o password non validi.";
+    return;
+  }
+
+  // Ensure cloud sync is flushed/fresh if online
+  if (window.flushAtomicOps) window.flushAtomicOps();
+
+  const canonicalEmp = accounts[matchedKey].employee ? (resolveCanonicalEmployeeName(accounts[matchedKey].employee) || accounts[matchedKey].employee) : null;
+  user = { username: matchedKey, employee: canonicalEmp };
+  adminUnlockedInSession = false;
+  requestWakeLock();
+  try { window.history.pushState({ spaccioNav: true }, ""); } catch (e) {}
+  document.getElementById("loginScreen").classList.add("hidden");
+
+  const level = getUserPrivilegeLevel(user);
+  if (level === "consumer") {
+    // Direct entry for normal users without intermediate role-choice screen
+    role = "Dipendente";
+    saveSession();
+    document.getElementById("roleScreen").classList.add("hidden");
+    renderHome();
+  } else {
+    role = null;
+    saveSession();
+    document.getElementById("app").classList.add("hidden");
+    document.getElementById("roleScreen").classList.remove("hidden");
+    renderRoleChoice();
+    updateBackButton();
+  }
+}
+
+function logout() {
+  user = null; role = null; adminUnlockedInSession = false; cart = []; navStack = []; currentScreenFn = null; updateBackButton(); saveSession();
+  document.getElementById("app").innerHTML = "";
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("roleScreen").classList.add("hidden");
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("loginError").textContent = "";
+}
+
+function selectRole(r) {
+  const level = getUserPrivilegeLevel(user);
+  if (r === "Amministratore" && level !== "admin") {
+    showToast("Privilegi di Amministratore non abilitati per questo utente.", "err");
+    return;
+  }
+  if (r === "Cassiere" && level !== "admin" && level !== "cashier") {
+    showToast("Privilegi di Cassiere non abilitati per questo utente.", "err");
+    return;
+  }
+  if (r === "Amministratore" && !adminUnlockedInSession) {
+    showPromptModal("Password Amministratore", "Inserisci password aggiuntiva", true, async (extra) => {
+      if (!extra || !(await verifyPassword(extra, DEFAULT_SUPERADMIN_HASH))) {
+        showToast("Password amministratore non corretta.", "err");
+        return;
+      }
+      adminUnlockedInSession = true;
+      role = r;
+      saveSession();
+      document.getElementById("roleScreen").classList.add("hidden");
+      renderHome();
+    });
+    return;
+  }
+  role = r;
+  saveSession();
+  document.getElementById("roleScreen").classList.add("hidden");
+  renderHome();
+}
+
+function goHome() {
+  if (!user) return;
+  if (!role) {
+    const level = getUserPrivilegeLevel(user);
+    if (level === "consumer") {
+      role = "Dipendente";
+      saveSession();
+      document.getElementById("roleScreen").classList.add("hidden");
+      renderHome();
+    } else {
+      backToRoleChoice();
+    }
+    return;
+  }
+  renderHome();
+  showToast("🏠 Home " + role, "info");
+}
+
+function renderHome() {
+  const app = document.getElementById("app");
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("roleScreen").classList.add("hidden");
+  app.classList.remove("hidden");
+  if (role === "Cassiere") { resetNav(cashierHome); cashierHome(); }
+  else if (role === "Dipendente") { resetNav(employeeHome); employeeHome(); }
+  else { resetNav(adminHome); adminHome(); }
+}
+
+function backToRoleChoice() {
+  const level = getUserPrivilegeLevel(user);
+  if (level === "consumer") {
+    logout();
+    return;
+  }
+  role = null; cart = []; navStack = []; currentScreenFn = null; saveSession();
+  document.getElementById("app").innerHTML = "";
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("roleScreen").classList.remove("hidden");
+  renderRoleChoice();
+  updateBackButton();
+}
+
+function shell(title, content) {
+  const level = getUserPrivilegeLevel(user);
+  const canSwitch = level === "admin" || level === "cashier";
+  let quickSwitchHtml = "";
+  if (canSwitch) {
+    quickSwitchHtml = `
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        ${role !== "Cassiere" ? `<button type="button" class="secondary" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="selectRole('Cassiere')">☕ Cassiere POS</button>` : ""}
+        ${level === "admin" && role !== "Amministratore" ? `<button type="button" class="secondary" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="selectRole('Amministratore')">🛡️ Admin</button>` : ""}
+        ${user?.employee && role !== "Dipendente" ? `<button type="button" class="secondary" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="selectRole('Dipendente')">👤 Mio Conto</button>` : ""}
+        <button type="button" class="danger" style="min-height:42px;padding:8px 12px;font-size:0.88rem" onclick="logout()">Esci</button>
+      </div>
+    `;
+  } else {
+    quickSwitchHtml = `<button type="button" class="danger" style="min-height:42px;padding:8px 14px;font-size:0.9rem" onclick="logout()">Esci</button>`;
+  }
+
+  document.getElementById("app").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h2>${title}</h2>
+        <span class="badge">Postazione: ${role}${user?.employee ? " · " + esc(user.employee) : ""}</span>
+      </div>
+      ${quickSwitchHtml}
+    </div>
+    ${content}`;
+}
+
+// --- WIDGET RIEPILOGO CONTABILE & DEBITI PER GRUPPO ---
+function buildAccountingDashboardHtml() {
+  const acc = computeAccountingSummary();
+  return `
+    <div class="kpi-grid">
+      <div class="kpi-card highlight-green">
+        <div class="kpi-title">💵 Liquido Reale Disponibile</div>
+        <div class="kpi-num" style="color:var(--ok-dark)">${euro(acc.cashAvailable)}</div>
+        <div class="kpi-sub">Cassetto: <b>${euro(acc.fondocassa)}</b> · Cassaforte: <b>${euro(acc.cassaforte)}</b></div>
+      </div>
+
+      <div class="kpi-card highlight-red">
+        <div class="kpi-title">🚒 Debiti Turno A (${acc.turnoDebtors}/${acc.turnoCount})</div>
+        <div class="kpi-num" style="color:var(--danger-dark)">${euro(acc.turnoDebit)}</div>
+        <div class="kpi-sub">Crediti a loro favore: <b>${euro(acc.turnoCredit)}</b> · Netto: <b>-${euro(acc.turnoNet)}</b></div>
+      </div>
+
+      <div class="kpi-card highlight-red">
+        <div class="kpi-title">🏢 Debiti Giornalieri (${acc.giornDebtors}/${acc.giornCount})</div>
+        <div class="kpi-num" style="color:var(--danger-dark)">${euro(acc.giornDebit)}</div>
+        <div class="kpi-sub">Crediti a loro favore: <b>${euro(acc.giornCredit)}</b> · Netto: <b>-${euro(acc.giornNet)}</b></div>
+      </div>
+
+      <div class="kpi-card highlight-blue">
+        <div class="kpi-title">📊 Totale Crediti & Valore Spaccio</div>
+        <div class="kpi-num" style="color:var(--primary-dark)">${euro(acc.totalDebit)}</div>
+        <div class="kpi-sub">Da incassare (Turno A + Giornalieri) · Patrimonio tot: <b>${euro(acc.totalPatrimonio)}</b></div>
+      </div>
+    </div>
+  `;
+}
+
+// --- AREA CASSIERE ---
+function cashierHome() {
+  shell("Cassa Spaccio", `
+    ${buildAccountingDashboardHtml()}
+    <div class="home-grid">
+      <button class="tile primary-tile" onclick="navigateTo(() => newOrder())">
+        <div class="tile-icon-wrap">${SVG_ICONS.plus}</div>
+        <span>Nuovo Ordine</span>
+      </button>
+      <button class="tile" onclick="navigateTo(() => historyView('all', 'today'))">
+        <div class="tile-icon-wrap">${SVG_ICONS.receipt}</div>
+        <span>Registro Giornaliero</span>
+      </button>
+      <button class="tile balance-blue" onclick="navigateTo(() => employeeBalancesView())">
+        <div class="tile-icon-wrap">${SVG_ICONS.wallet}</div>
+        <span>Saldi Turno A & Giornalieri</span>
+      </button>
+    </div>
+  `);
+}
+
+function newOrder(editId = null) {
+  editingOrderId = editId;
+  cart = [];
+  showCashPad = false;
+  cashInputStr = "";
+  selectedCustomerType = "employee";
+  selectedGroupFilter = "all";
+  selectedEmployeeName = (user && user.employee) ? user.employee : employees[0];
+
+  if (editId !== null) {
+    const existing = orders.find(o => o.id === editId);
+    if (!existing) { showToast("Ordine non trovato.", "err"); return; }
+    cart = existing.items.map(x => ({ ...x }));
+    selectedCustomerType = existing.customerType;
+    if (existing.customerType === "employee") selectedEmployeeName = existing.customer;
+  }
+
+  const existingOrder = editId !== null ? orders.find(o => o.id === editId) : null;
+  shell(editId !== null ? `Modifica Ordine #${existingOrder.number}` : "Punto Vendita", `
+    <div class="pos-split">
+      <div>
+        <div class="card">
+          <h3>1. Cliente</h3>
+          <div class="type-switch">
+            <button type="button" id="btnTypeEmp" class="type-btn ${selectedCustomerType === 'employee' ? 'active' : ''}" onclick="setCustomerType('employee')">👤 Dipendente</button>
+            <button type="button" id="btnTypeExt" class="type-btn ${selectedCustomerType === 'external' ? 'active' : ''}" onclick="setCustomerType('external')">🚶 Esterno (Paga Subito)</button>
+          </div>
+          <div id="customerBox"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+            <h3 style="margin:0">2. Catalogo Prodotti</h3>
+            <button type="button" class="secondary" style="min-height:42px;padding:8px 14px;font-size:0.9rem" onclick="openAddProductModal(() => showCategory(activeCategory))">➕ Prodotto</button>
+          </div>
+          <div class="cat-grid">
+            <button type="button" class="cat-btn ${activeCategory === 'Caffetteria' ? 'active' : ''}" data-cat="Caffetteria" onclick="showCategory('Caffetteria')">☕ Caffetteria</button>
+            <button type="button" class="cat-btn ${activeCategory === 'Bibite' ? 'active' : ''}" data-cat="Bibite" onclick="showCategory('Bibite')">🥤 Bibite</button>
+            <button type="button" class="cat-btn ${activeCategory === 'Merendine e snack' ? 'active' : ''}" data-cat="Merendine e snack" onclick="showCategory('Merendine e snack')">🥐 Snack</button>
+          </div>
+          <div id="categoryProducts" class="products"></div>
+        </div>
+      </div>
+      <div class="pos-receipt-col" id="cartBox"></div>
+    </div>
+  `);
+  setCustomerType(selectedCustomerType);
+  showCategory(activeCategory);
+  renderCart();
+}
+
+function setPosGroupFilter(grp) {
+  selectedGroupFilter = grp;
+  document.querySelectorAll(".pos-grp-btn").forEach(b => {
+    const active = b.getAttribute("data-grp") === grp;
+    b.style.background = active ? "var(--dark)" : "var(--surface-alt)";
+    b.style.color = active ? "#fff" : "var(--text)";
+    b.style.borderColor = active ? "var(--dark)" : "var(--border)";
+  });
+  const q = document.getElementById("empOrderSearch")?.value || "";
+  renderOrderEmpPills(q);
+}
+
+function setCustomerType(t) {
+  selectedCustomerType = t;
+  showCashPad = false;
+  document.getElementById("btnTypeEmp")?.classList.toggle("active", t === "employee");
+  document.getElementById("btnTypeExt")?.classList.toggle("active", t === "external");
+  const box = document.getElementById("customerBox");
+  const existing = editingOrderId !== null ? orders.find(o => o.id === editingOrderId) : null;
+
+  if (t === "employee") {
+    box.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
+        <button type="button" class="cat-btn pos-grp-btn" data-grp="all" style="min-height:40px;font-size:0.84rem;background:var(--dark);color:#fff;border-color:var(--dark)" onclick="setPosGroupFilter('all')">Tutti (${employees.length})</button>
+        <button type="button" class="cat-btn pos-grp-btn" data-grp="turno" style="min-height:40px;font-size:0.84rem" onclick="setPosGroupFilter('turno')">🚒 Turno A</button>
+        <button type="button" class="cat-btn pos-grp-btn" data-grp="giornaliero" style="min-height:40px;font-size:0.84rem" onclick="setPosGroupFilter('giornaliero')">🏢 Giornalieri</button>
+      </div>
+      <input type="search" id="empOrderSearch" placeholder="🔍 Filtra collega con un tocco..." style="margin-bottom:8px;min-height:46px" oninput="filterOrderEmpPills(this.value)">
+      <div id="empPillGrid" class="emp-pill-grid"></div>
+      <div id="customerBalanceInfo"></div>`;
+    renderOrderEmpPills("");
+  } else {
+    box.innerHTML = `<label>Nome cliente esterno (facoltativo · paga sempre subito)</label>
+      <input id="customerName" placeholder="Cliente esterno" value="${existing && existing.customerType === 'external' ? esc(existing.customer) : ""}" oninput="renderCart()">`;
+  }
+  renderCart();
+}
+
+function renderOrderEmpPills(filter) {
+  const grid = document.getElementById("empPillGrid");
+  if (!grid) return;
+  const q = filter.trim().toLowerCase();
+  const list = employees.filter(n => {
+    if (selectedGroupFilter !== "all" && getEmployeeGroup(n) !== selectedGroupFilter) return false;
+    if (q && !n.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  grid.innerHTML = list.map(n => {
+    const grp = getEmployeeGroup(n);
+    const tag = grp === "giornaliero" ? "G" : "A";
+    return `<button type="button" class="emp-pill ${selectedEmployeeName === n ? 'selected' : ''}" onclick='selectOrderEmployee(${JSON.stringify(n)})'>
+      <span style="opacity:0.75;font-size:0.75rem;margin-right:4px">[${tag}]</span>${esc(n)}
+    </button>`;
+  }).join("");
+  refreshAccountBalance();
+}
+
+function filterOrderEmpPills(val) {
+  renderOrderEmpPills(val);
+}
+
+function selectOrderEmployee(name) {
+  selectedEmployeeName = name;
+  const q = document.getElementById("empOrderSearch")?.value || "";
+  renderOrderEmpPills(q);
+  renderCart();
+}
+
+function refreshAccountBalance() {
+  const info = document.getElementById("customerBalanceInfo");
+  if (!info || !selectedEmployeeName) return;
+  const value = Number(balances[selectedEmployeeName] || 0);
+  const grp = getEmployeeGroup(selectedEmployeeName);
+  const badgeClass = value < 0 ? "neg" : value > 0 ? "ok" : "";
+  const state = value < 0 ? "Debito" : value > 0 ? "Credito" : "In pari";
+  info.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;flex-wrap:wrap;gap:6px">
+    <div>
+      <b>${esc(selectedEmployeeName)}</b>
+      <span class="group-pill ${grp}" style="margin-left:6px">${getGroupLabel(grp)}</span>
+    </div>
+    <span class="status ${badgeClass}">Saldo: ${euro(value)} (${state})</span>
+  </div>`;
+}
+
+function showCategory(cat) {
+  activeCategory = cat;
+  document.querySelectorAll(".cat-btn[data-cat]").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-cat") === cat);
+  });
+  const grid = document.getElementById("categoryProducts");
+  if (!grid) return;
+  grid.innerHTML = products.map((p, i) => {
+    if (p.cat !== cat) return "";
+    const inCartItem = cart.find(x => x.name === p.name);
+    const qty = inCartItem ? inCartItem.qty : 0;
+    return `<button type="button" class="product ${qty > 0 ? 'in-cart' : ''}" onclick="addCart(${i})">
+      ${qty > 0 ? `<span class="qty-badge">${qty}</span>` : ""}
+      ${getProductIllustration(p)}
+      <span class="p-name">${esc(p.name)}</span>
+      <span class="p-price">${euro(p.price)}</span>
+    </button>`;
+  }).join("");
+}
+
+function addCart(i) {
+  const p = products[i], found = cart.find(x => x.name === p.name);
+  if (found) found.qty++;
+  else cart.push({ name: p.name, price: p.price, qty: 1 });
+  showCategory(activeCategory);
+  renderCart();
+}
+
+function changeCartQty(i, delta) {
+  cart[i].qty += delta;
+  if (cart[i].qty <= 0) cart.splice(i, 1);
+  showCategory(activeCategory);
+  renderCart();
+}
+
+function renderCart() {
+  const box = document.getElementById("cartBox");
+  if (!box) return;
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const isEmp = selectedCustomerType === "employee";
+  const customerLabel = isEmp ? (selectedEmployeeName || "Dipendente") : (document.getElementById("customerName")?.value?.trim() || "Cliente esterno");
+
+  let cashSection = "";
+  if (showCashPad && cart.length > 0) {
+    const received = cashInputStr === "" ? total : Number(cashInputStr);
+    const diff = received - total;
+    cashSection = `
+      <div class="numpad-wrapper">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-weight:800;font-size:0.85rem;text-transform:uppercase;color:var(--muted)">Contanti Ricevuti</span>
+          <span style="font-weight:900;color:${diff >= 0 ? 'var(--ok-dark)' : 'var(--danger-dark)'}">
+            ${diff >= 0 ? `Resto: ${euro(diff)}` : `Mancano: ${euro(-diff)}`}
+          </span>
+        </div>
+        <div class="numpad-display">${euro(received)}</div>
+        <div class="quick-cash-grid">
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('${total.toFixed(2)}')">Esatto</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('1')">1 €</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('2')">2 €</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('5')">5 €</button>
+          <button type="button" class="quick-cash-btn" onclick="setPosCash('10')">10 €</button>
+        </div>
+        <div class="numpad-grid">
+          <button type="button" class="num-key" onclick="posPadKey('7')">7</button>
+          <button type="button" class="num-key" onclick="posPadKey('8')">8</button>
+          <button type="button" class="num-key" onclick="posPadKey('9')">9</button>
+          <button type="button" class="num-key" onclick="posPadKey('4')">4</button>
+          <button type="button" class="num-key" onclick="posPadKey('5')">5</button>
+          <button type="button" class="num-key" onclick="posPadKey('6')">6</button>
+          <button type="button" class="num-key" onclick="posPadKey('1')">1</button>
+          <button type="button" class="num-key" onclick="posPadKey('2')">2</button>
+          <button type="button" class="num-key" onclick="posPadKey('3')">3</button>
+          <button type="button" class="num-key key-fn" onclick="posPadKey('.')">,</button>
+          <button type="button" class="num-key" onclick="posPadKey('0')">0</button>
+          <button type="button" class="num-key key-fn" onclick="posPadKey('DEL')">⌫</button>
+        </div>
+        <button type="button" class="big ok-btn" style="margin-top:10px" onclick="confirmOrder('subito')">✅ CONFERMA INCASSO</button>
+      </div>`;
+  }
+
+  box.innerHTML = `<div class="receipt-card">
+    <div class="receipt-header">
+      <div>
+        <div class="muted" style="font-size:0.78rem;font-weight:800;text-transform:uppercase">Scontrino Corrente</div>
+        <b style="font-size:1.05rem">${esc(customerLabel)}</b>
+      </div>
+      ${cart.length ? `<button type="button" class="secondary" style="min-height:38px;padding:6px 10px;font-size:0.85rem" onclick="cart=[];showCashPad=false;showCategory(activeCategory);renderCart()">Svuota</button>` : ""}
+    </div>
+    <div class="cart-list">
+      ${cart.length ? cart.map((x, i) => `
+        <div class="cart-row">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.name)}</div>
+            <div class="muted">${euro(x.price)} cad.</div>
+          </div>
+          <div class="qty-controls">
+            <button type="button" class="secondary qty-btn" onclick="changeCartQty(${i}, -1)">−</button>
+            <span style="font-weight:900;min-width:24px;text-align:center">${x.qty}</span>
+            <button type="button" class="secondary qty-btn" onclick="changeCartQty(${i}, 1)">+</button>
+            <span style="font-weight:800;min-width:64px;text-align:right">${euro(x.price * x.qty)}</span>
+          </div>
+        </div>`).join("") : "<p class='muted' style='text-align:center;padding:24px 0'>Tocca i prodotti a sinistra per aggiungerli allo scontrino.</p>"}
+    </div>
+    <div class="total-bar">
+      <span>TOTALE</span>
+      <span>${euro(total)}</span>
+    </div>
+    <div class="pay-options" style="grid-template-columns:repeat(${isEmp ? 2 : 1}, 1fr)">
+      <button type="button" class="pay-btn" ${!cart.length ? "disabled" : ""} onclick="toggleCashPad()">💵 PAGA SUBITO</button>
+      ${isEmp ? `<button type="button" class="pay-btn secondary" ${!cart.length ? "disabled" : ""} onclick="confirmOrder('conto')">📒 IN CONTO</button>` : ""}
+    </div>
+    ${cashSection}
+  </div>`;
+}
+
+function toggleCashPad() {
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  showCashPad = !showCashPad;
+  cashInputStr = total.toFixed(2);
+  renderCart();
+}
+
+function setPosCash(val) {
+  cashInputStr = String(val);
+  renderCart();
+}
+
+function posPadKey(k) {
+  if (k === "DEL") {
+    cashInputStr = cashInputStr.slice(0, -1);
+  } else if (k === ".") {
+    if (!cashInputStr.includes(".")) cashInputStr = (cashInputStr === "" ? "0." : cashInputStr + ".");
+  } else {
+    if (cashInputStr.includes(".") && cashInputStr.split(".")[1].length >= 2) return;
+    cashInputStr += k;
+  }
+  renderCart();
+}
+
+function confirmOrder(mode) {
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const name = selectedCustomerType === "employee"
+    ? selectedEmployeeName
+    : (document.getElementById("customerName")?.value?.trim() || "Cliente esterno");
+
+  if (editingOrderId !== null) {
+    if (mode !== "subito") { showToast("Un ordine modificato va chiuso con PAGA SUBITO.", "err"); return; }
+    const o = orders.find(x => x.id === editingOrderId);
+    if (!o) { showToast("Ordine non trovato.", "err"); return; }
+    const cash = cashInputStr === "" ? total : Number(cashInputStr);
+    if (cash < total) { showToast("Contante ricevuto insufficiente.", "err"); return; }
+    const oldTotal = Number(o.total || 0);
+    const patch = {
+      customerType: selectedCustomerType, customer: name, items: cart.map(x => ({ ...x })),
+      total, cash, change: cash - total, paid: true, payment: "subito",
+      status: "Completato", paidAt: new Date().toISOString()
+    };
+    Object.assign(o, patch);
+    fondocassa += (total - oldTotal);
+    editingOrderId = null;
+    enqueueAtomicOp({ type: "EDIT_ORDER", orderId: o.id, patch });
+    showToast(`Ordine #${o.number} aggiornato!`, "ok");
+    renderHome();
+    return;
+  }
+
+  let paid = false, cash = null, change = null, paymentLabel = "";
+  if (mode === "subito") {
+    cash = cashInputStr === "" ? total : Number(cashInputStr);
+    if (cash < total) { showToast("Contante ricevuto insufficiente.", "err"); return; }
+    paid = true; change = cash - total; paymentLabel = "Pagato subito";
+    fondocassa += total;
+  } else if (mode === "conto") {
+    if (selectedCustomerType !== "employee") { showToast("Solo per dipendenti.", "err"); return; }
+    balances[name] = (balances[name] || 0) - total;
+    paid = true;
+    paymentLabel = "Messo in conto";
+  }
+
+  const now = new Date().toISOString();
+  const order = {
+    id: nextId++, uid: Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+    date: now, dateKey: localDateKey(new Date()), number: nextDailyOrderNumber(),
+    customerType: selectedCustomerType, customer: name,
+    customerGroup: selectedCustomerType === "employee" ? getEmployeeGroup(name) : "esterno",
+    items: cart.map(x => ({ ...x })),
+    total, cash, change, paid, payment: mode, status: "Completato",
+    createdByUsername: user?.username || "—", createdByEmployee: user?.employee || "—", createdByRole: role || "Cassiere"
+  };
+  orders.push(order);
+  enqueueAtomicOp({ type: "NEW_ORDER", order });
+  showToast(`Ordine #${order.number} registrato (${paymentLabel})`, "ok");
+  renderHome();
+}
+
+// --- SALDO DIPENDENTI CON FILTRO GRUPPO ---
+let balanceGroupFilter = "all";
+let balanceSearchText = "";
+
+function applyEmployeeBalanceChange(name, delta, customNote = null) {
+  const oldBalance = Number(balances[name] || 0);
+  const newBalance = oldBalance + delta;
+  if (oldBalance < 0 && delta > 0) fondocassa += delta;
+  if (oldBalance > 0 && delta < 0) fondocassa += delta;
+  balances[name] = newBalance;
+
+  const mov = {
+    id: Date.now() + Math.random(),
+    date: new Date().toISOString(),
+    employee: name,
+    amount: delta,
+    note: customNote || (delta > 0 ? "Versamento / Saldo conto" : "Addebito manuale"),
+    by: formatOperatorAudit(user),
+    byUsername: user?.username || "—",
+    byRole: role || "—"
+  };
+  balanceMovements.push(mov);
+  enqueueAtomicOp({ type: "BALANCE_DELTA", employee: name, delta, movement: mov });
+}
+
+function applyBalanceFilters() {
+  const q = balanceSearchText.trim().toLowerCase();
+  document.querySelectorAll(".emp-balance-card").forEach(card => {
+    const name = card.getAttribute("data-name") || "";
+    const grp = card.getAttribute("data-group") || "turno";
+    const bal = Number(card.getAttribute("data-bal") || 0);
+    let visible = true;
+    if (q && !name.includes(q)) visible = false;
+    if (balanceGroupFilter === "turno" && grp !== "turno") visible = false;
+    if (balanceGroupFilter === "giornaliero" && grp !== "giornaliero") visible = false;
+    if (balanceGroupFilter === "debtors" && bal >= 0) visible = false;
+    card.classList.toggle("hidden", !visible);
+  });
+}
+
+function setBalanceGroupFilter(grp, isAdmin = false) {
+  balanceGroupFilter = grp;
+  if (isAdmin) adminEmployeeBalancesView();
+  else employeeBalancesView();
+}
+
+function filterEmployeeCards(query) {
+  balanceSearchText = query;
+  applyBalanceFilters();
+}
+
+function openDepositNumpad(name, isAdmin = false) {
+  const cur = Number(balances[name] || 0);
+  const debt = cur < 0 ? Math.abs(cur) : 0;
+  const suggested = debt > 0 ? debt.toFixed(2) : "10";
+  const quicks = [];
+  if (debt > 0) quicks.push({ label: `Salda (${euro(debt)})`, val: debt.toFixed(2) });
+  quicks.push({ label: "5 €", val: "5" }, { label: "10 €", val: "10" }, { label: "20 €", val: "20" });
+
+  openNumpadModal(
+    `💵 Versa / Salda: ${name}`,
+    `Saldo attuale: ${euro(cur)} · Digita i soldi consegnati dal collega`,
+    suggested,
+    quicks,
+    "var(--ok)",
+    (amount) => {
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showToast("Inserisci un importo maggiore di zero.", "err");
+        return;
+      }
+      applyEmployeeBalanceChange(name, +amount, "Versamento / Saldo conto");
+      showToast(`Aggiunti ${euro(amount)} al saldo di ${name}!`, "ok");
+      if (isAdmin) adminEmployeeBalancesView();
+      else employeeBalancesView();
+    }
+  );
+}
+
+function openDebitNumpad(name, isAdmin = false) {
+  const cur = Number(balances[name] || 0);
+  const quicks = [
+    { label: "1 €", val: "1" },
+    { label: "2 €", val: "2" },
+    { label: "5 €", val: "5" },
+    { label: "10 €", val: "10" }
+  ];
+
+  openNumpadModal(
+    `➖ Addebita: ${name}`,
+    `Saldo attuale: ${euro(cur)} · Digita l'importo da scalare`,
+    "",
+    quicks,
+    "var(--danger)",
+    (amount) => {
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showToast("Inserisci un importo maggiore di zero.", "err");
+        return;
+      }
+      applyEmployeeBalanceChange(name, -amount, "Addebito manuale");
+      showToast(`Addebitati ${euro(amount)} a ${name}.`, "info");
+      if (isAdmin) adminEmployeeBalancesView();
+      else employeeBalancesView();
+    }
+  );
+}
+
+function renderBalanceFilterBar(isAdmin) {
+  const acc = computeAccountingSummary();
+  const btnStyle = (active) => active
+    ? "min-height:44px;font-size:0.86rem;padding:6px;background:var(--dark);color:#fff;border-color:var(--dark)"
+    : "min-height:44px;font-size:0.86rem;padding:6px";
+  return `
+    ${buildAccountingDashboardHtml()}
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px">
+      <button type="button" class="cat-btn" style="${btnStyle(balanceGroupFilter === 'all')}" onclick="setBalanceGroupFilter('all', ${isAdmin})">Tutti (${employees.length})</button>
+      <button type="button" class="cat-btn" style="${btnStyle(balanceGroupFilter === 'turno')}" onclick="setBalanceGroupFilter('turno', ${isAdmin})">🚒 Turno A (${acc.turnoCount})</button>
+      <button type="button" class="cat-btn" style="${btnStyle(balanceGroupFilter === 'giornaliero')}" onclick="setBalanceGroupFilter('giornaliero', ${isAdmin})">🏢 Giornalieri (${acc.giornCount})</button>
+      <button type="button" class="cat-btn" style="${btnStyle(balanceGroupFilter === 'debtors')}" onclick="setBalanceGroupFilter('debtors', ${isAdmin})">🔴 Solo Debiti (${acc.turnoDebtors + acc.giornDebtors})</button>
+    </div>
+  `;
+}
+
+function employeeBalancesView() {
+  const rows = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" })).map(name => {
+    const bal = Number(balances[name] || 0);
+    const grp = getEmployeeGroup(name);
+    return `<div class="bar-order emp-balance-card" data-name="${esc(name.toLowerCase())}" data-group="${grp}" data-bal="${bal}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <b style="font-size:1.05rem">${esc(name)}</b>
+          <span class="group-pill ${grp}">${getGroupLabel(grp)}</span>
+        </div>
+        <div class="${bal < 0 ? "balance-negative" : "balance-positive"}" style="font-size:1.25rem;font-weight:900">${euro(bal)}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="ok-btn" onclick='openDepositNumpad(${JSON.stringify(name)}, false)'>💵 VERSA / SALDA</button>
+        <button type="button" class="danger" onclick='openDebitNumpad(${JSON.stringify(name)}, false)'>➖ ADDEBITA</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  shell("Saldo Dipendenti", `
+    ${renderBalanceFilterBar(false)}
+    <div class="card">
+      <h3>Gestione Saldi Turno A & Giornalieri</h3>
+      <p class="muted" style="margin-top:0">Usa il tasto verde per registrare i soldi versati dal collega (entrano in fondocassa), oppure il tasto rosso per scalare un addebito.</p>
+      <input type="search" value="${esc(balanceSearchText)}" placeholder="🔍 Cerca dipendente per nome..." oninput="filterEmployeeCards(this.value)">
+      ${rows}
+    </div>
+  `);
+  applyBalanceFilters();
+}
+
+// --- STORICO PAGINATO ---
+function itemsText(o) { return o.items.map(x => `${x.name} × ${x.qty}`).join(", "); }
+
+let auditFilterType = "all";
+let auditFilterPeriod = "today";
+let auditSearchQuery = "";
+
+function buildAuditEntries() {
+  const entries = [];
+
+  orders.forEach(o => {
+    const isCash = o.payment === "subito";
+    entries.push({
+      id: "ord_" + o.id,
+      date: o.date || "",
+      dateKey: o.dateKey || (o.date ? localDateKey(new Date(o.date)) : ""),
+      category: "orders",
+      subType: isCash ? "order_cash" : "order_account",
+      badgeText: isCash ? "💵 Ordine Pagato Subito" : "📒 Ordine in Conto",
+      badgeClass: isCash ? "ok" : "",
+      title: `Ordine #${o.number} · ${o.customer}`,
+      detail: itemsText(o),
+      amount: Number(o.total || 0),
+      sign: isCash ? "+" : "-",
+      amountClass: isCash ? "balance-positive" : "balance-negative",
+      operator: orderAccount(o),
+      searchBlob: `${o.number} ${o.customer} ${itemsText(o)} ${orderAccount(o)}`.toLowerCase()
+    });
+  });
+
+  balanceMovements.forEach(b => {
+    const amt = Number(b.amount || 0);
+    const isDeposit = amt >= 0;
+    const op = b.by || "—";
+    entries.push({
+      id: "bal_" + b.id,
+      date: b.date || "",
+      dateKey: b.date ? localDateKey(new Date(b.date)) : "",
+      category: isDeposit ? "deposits" : "debits",
+      subType: isDeposit ? "deposit" : "manual_debit",
+      badgeText: isDeposit ? "🟢 Versamento / Saldo" : "🔴 Addebito Manuale",
+      badgeClass: isDeposit ? "ok" : "neg",
+      title: `${b.employee}`,
+      detail: b.note || (isDeposit ? "Versamento / Saldo conto" : "Addebito manuale"),
+      amount: Math.abs(amt),
+      sign: isDeposit ? "+" : "-",
+      amountClass: isDeposit ? "balance-positive" : "balance-negative",
+      operator: op,
+      searchBlob: `${b.employee} ${b.note || ""} ${op}`.toLowerCase()
+    });
+  });
+
+  mealMovements.forEach(m => {
+    const amt = Number(m.amount || 0);
+    const op = m.by || "Amministratore";
+    entries.push({
+      id: "meal_" + m.id,
+      date: m.date || "",
+      dateKey: m.date ? localDateKey(new Date(m.date)) : "",
+      category: "debits",
+      subType: "meal_debit",
+      badgeText: "🍽️ Addebito Pasto Turno",
+      badgeClass: "neg",
+      title: `${m.employee}`,
+      detail: m.type || "Pranzo/Cena con il turno",
+      amount: Math.abs(amt),
+      sign: "-",
+      amountClass: "balance-negative",
+      operator: op,
+      searchBlob: `${m.employee} pranzo cena turno ${op}`.toLowerCase()
+    });
+  });
+
+  return entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+function setAuditFilter(type) {
+  auditFilterType = type;
+  historyView(auditFilterType, auditFilterPeriod, 40);
+}
+
+function setAuditPeriod(period) {
+  auditFilterPeriod = period;
+  historyView(auditFilterType, auditFilterPeriod, 40);
+}
+
+function onAuditSearchInput(val) {
+  auditSearchQuery = val;
+  renderAuditList(40);
+}
+
+function historyView(type = auditFilterType, period = auditFilterPeriod, limit = 40) {
+  auditFilterType = type;
+  auditFilterPeriod = period;
+
+  shell("Registro & Controllo Incrociato", `
+    <div class="card" style="padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="type-switch" style="margin:0;flex:1;min-width:240px">
+          <button type="button" class="type-btn ${auditFilterPeriod === 'today' ? 'active' : ''}" style="min-height:44px;font-size:0.92rem" onclick="setAuditPeriod('today')">📅 Solo Oggi</button>
+          <button type="button" class="type-btn ${auditFilterPeriod === 'all' ? 'active' : ''}" style="min-height:44px;font-size:0.92rem" onclick="setAuditPeriod('all')">🗂️ Tutto lo Storico</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px">
+        <button type="button" class="cat-btn ${auditFilterType === 'all' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'all' ? 'background:var(--dark);color:#fff;border-color:var(--dark)' : ''}" onclick="setAuditFilter('all')">Tutti</button>
+        <button type="button" class="cat-btn ${auditFilterType === 'orders' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'orders' ? 'background:var(--primary);color:#fff;border-color:var(--primary)' : ''}" onclick="setAuditFilter('orders')">☕ Ordini</button>
+        <button type="button" class="cat-btn ${auditFilterType === 'deposits' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'deposits' ? 'background:var(--ok);color:#fff;border-color:var(--ok)' : ''}" onclick="setAuditFilter('deposits')">🟢 Versamenti</button>
+        <button type="button" class="cat-btn ${auditFilterType === 'debits' ? 'active' : ''}" style="min-height:44px;font-size:0.86rem;padding:6px;${auditFilterType === 'debits' ? 'background:var(--danger);color:#fff;border-color:var(--danger)' : ''}" onclick="setAuditFilter('debits')">🔴 Addebiti</button>
+      </div>
+
+      <input type="search" id="auditSearchBox" placeholder="🔍 Filtra per dipendente, operatore collegato o prodotto..." value="${esc(auditSearchQuery)}" style="margin-bottom:0;min-height:46px" oninput="onAuditSearchInput(this.value)">
+    </div>
+
+    <div id="auditSummaryBox"></div>
+    <div id="auditListContainer"></div>
+  `);
+
+  renderAuditList(limit);
+}
+
+function renderAuditList(limit = 40) {
+  const allEntries = buildAuditEntries();
+  const todayStr = localDateKey();
+  const q = auditSearchQuery.trim().toLowerCase();
+
+  const periodEntries = allEntries.filter(e => auditFilterPeriod === "all" || e.dateKey === todayStr);
+
+  const cashOrdersTotal = periodEntries.filter(e => e.subType === "order_cash").reduce((s, e) => s + e.amount, 0);
+  const accountOrdersTotal = periodEntries.filter(e => e.subType === "order_account").reduce((s, e) => s + e.amount, 0);
+  const depositsTotal = periodEntries.filter(e => e.subType === "deposit").reduce((s, e) => s + e.amount, 0);
+  const debitsTotal = periodEntries.filter(e => e.subType === "manual_debit" || e.subType === "meal_debit").reduce((s, e) => s + e.amount, 0);
+
+  const summaryBox = document.getElementById("auditSummaryBox");
+  if (summaryBox) {
+    const periodLabel = auditFilterPeriod === "today" ? "Riepilogo di Oggi" : "Riepilogo Globale";
+    summaryBox.innerHTML = `
+      <div class="stat-box" style="padding:14px 16px;gap:10px">
+        <div style="width:100%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #bfdbfe;padding-bottom:8px">
+          <span style="font-weight:800;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--primary-dark)">📊 ${periodLabel} · Controllo Incrociato</span>
+          <span class="badge" style="background:#fff">${periodEntries.length} operazioni</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;width:100%">
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">💵 Ordini Pagati Subito</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--ok-dark)">${euro(cashOrdersTotal)}</div>
+          </div>
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">🟢 Versamenti / Saldi</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--ok-dark)">${euro(depositsTotal)}</div>
+          </div>
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">📒 Ordini in Conto</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--dark)">${euro(accountOrdersTotal)}</div>
+          </div>
+          <div style="background:#fff;padding:10px 12px;border-radius:12px;border:1px solid #dbeafe">
+            <div class="muted" style="font-size:0.78rem;font-weight:700">🔴 Addebiti / Pasti</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--danger-dark)">${euro(debitsTotal)}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const filtered = periodEntries.filter(e => {
+    if (auditFilterType !== "all" && e.category !== auditFilterType) return false;
+    if (q && !e.searchBlob.includes(q)) return false;
+    return true;
+  });
+
+  const visible = filtered.slice(0, limit);
+  const hasMore = filtered.length > limit;
+  const listContainer = document.getElementById("auditListContainer");
+  if (!listContainer) return;
+
+  const cardsHtml = visible.length ? visible.map(e => `
+    <div class="bar-order">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+        <span class="status ${e.badgeClass}">${e.badgeText}</span>
+        <span class="muted" style="font-weight:700;font-size:0.85rem">🕒 ${e.date ? localDateTime(e.date) : "—"}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">
+        <div>
+          <b style="font-size:1.05rem">${esc(e.title)}</b>
+          <div style="margin-top:2px;color:var(--text)">${esc(e.detail)}</div>
+        </div>
+        <div class="${e.amountClass}" style="font-size:1.2rem;font-weight:900;white-space:nowrap">
+          ${e.sign}${euro(e.amount)}
+        </div>
+      </div>
+      <div style="padding-top:6px;border-top:1px dashed var(--border);font-size:0.84rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span>👤 Registrato da: <b style="color:var(--dark)">${esc(e.operator)}</b></span>
+      </div>
+    </div>`).join("") : `<div class="card"><p class="muted" style="text-align:center;margin:12px 0">Nessuna operazione trovata con i filtri selezionati.</p></div>`;
+
+  listContainer.innerHTML = `
+    ${cardsHtml}
+    ${hasMore ? `<button type="button" class="secondary" style="width:100%;margin-bottom:10px" onclick="renderAuditList(${limit + 40})">Carica altre 40 operazioni (${filtered.length - limit} rimanenti)</button>` : ""}
+  `;
+}
+
+// --- AREA DIPENDENTE ---
+function employeeHome() {
+  const name = resolveCanonicalEmployeeName(user.employee) || user.employee || "Dipendente";
+  const grp = getEmployeeGroup(name);
+  const balance = getEmployeeBalance(name);
+  const state = balance < 0 ? "Debito da saldare" : balance > 0 ? "Credito disponibile" : "Saldo in pari";
+  shell("Area Dipendente", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:800;text-transform:uppercase;font-size:0.78rem;letter-spacing:0.04em">${esc(name)} · ${getGroupLabel(grp)} · ${state}</div>
+        <div class="stat-value ${balance < 0 ? 'balance-negative' : 'balance-positive'}">${euro(balance)}</div>
+      </div>
+      <span class="badge" style="background:#fff">${balance < 0 ? '🔴 A debito' : balance > 0 ? '🟢 A credito' : '⚪ In pari'}</span>
+    </div>
+    <div class="card">
+      <h3>Ciao, ${esc(name)} <span class="group-pill ${grp}">${getGroupLabel(grp)}</span></h3>
+      <p class="muted" style="margin-top:0">Consulta il tuo saldo, l'estratto conto o cambia password.</p>
+      <div class="home-grid">
+        <button class="tile primary-tile" onclick="navigateTo(() => employeeBalanceView())"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Il Mio Saldo</span></button>
+        <button class="tile" onclick="navigateTo(() => employeeMovementsView())"><div class="tile-icon-wrap">${SVG_ICONS.receipt}</div><span>Movimenti</span></button>
+        <button class="tile" onclick="navigateTo(() => employeeCredentialsView())"><div class="tile-icon-wrap">${SVG_ICONS.lock}</div><span>Cambia Password</span></button>
+      </div>
+    </div>
+  `);
+}
+
+function employeeBalanceView() {
+  const name = resolveCanonicalEmployeeName(user.employee) || user.employee || "Dipendente";
+  const balance = getEmployeeBalance(name);
+  const state = balance < 0 ? "Debito da saldare" : balance > 0 ? "Credito disponibile" : "Saldo in pari";
+  shell("Il Mio Saldo", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">${esc(name)} · ${state}</div>
+        <div class="stat-value ${balance < 0 ? 'balance-negative' : 'balance-positive'}">${euro(balance)}</div>
+      </div>
+    </div>
+  `);
+}
+
+function employeeCredentialsView() {
+  shell("Sicurezza Account", `
+    <div class="card">
+      <h3>Modifica Password</h3>
+      <p class="muted" style="margin-top:0">Username: <b>${esc(user.username)}</b></p>
+      <label>Nuova password</label>
+      <input id="newEmpPassword" type="password" autocomplete="new-password" placeholder="Minimo 4 caratteri">
+      <label>Conferma nuova password</label>
+      <input id="confirmEmpPassword" type="password" autocomplete="new-password" placeholder="Ripeti password">
+      <button class="big" onclick="changeOwnPassword()">SALVA NUOVA PASSWORD</button>
+    </div>
+  `);
+}
+
+async function changeOwnPassword() {
+  const a = document.getElementById("newEmpPassword")?.value || "";
+  const b = document.getElementById("confirmEmpPassword")?.value || "";
+  if (a.length < 4) { showToast("La password deve avere almeno 4 caratteri.", "err"); return; }
+  if (a !== b) { showToast("Le password non coincidono.", "err"); return; }
+  if (!user.employee || !credentials[user.employee]) { showToast("Account non disponibile.", "err"); return; }
+  const hashed = await sha256(a);
+  credentials[user.employee] = [credentials[user.employee][0], hashed];
+  rebuildAccounts();
+  enqueueAtomicOp({ type: "UPDATE_CREDENTIAL", employee: user.employee, cred: credentials[user.employee] });
+  showToast("Password aggiornata con successo!", "ok");
+  renderHome();
+}
+
+function employeeMovementsView() {
+  const name = resolveCanonicalEmployeeName(user.employee) || user.employee || "Dipendente";
+  const movements = [
+    ...orders.filter(o => o.customerType === "employee" && o.customer === name && o.payment === "conto")
+      .map(o => ({
+        date: o.date || "",
+        html: `<div class="bar-order">
+          <div style="display:flex;justify-content:space-between"><b>☕ Ordine #${o.number}</b><span class="balance-negative" style="font-weight:800">${euro(-o.total)}</span></div>
+          <div class="muted">${o.date ? localDateTime(o.date) : ""}</div>
+          <div style="margin-top:4px">${esc(itemsText(o))}</div>
+        </div>`
+      })),
+    ...mealMovements.filter(m => m.employee === name)
+      .map(m => ({
+        date: m.date || "",
+        html: `<div class="bar-order">
+          <div style="display:flex;justify-content:space-between"><b>🍽️ Pranzo/Cena con il turno</b><span class="balance-negative" style="font-weight:800">${euro(-m.amount)}</span></div>
+          <div class="muted">${m.date ? localDateTime(m.date) : ""}</div>
+        </div>`
+      })),
+    ...balanceMovements.filter(b => b.employee === name)
+      .map(b => ({
+        date: b.date || "",
+        html: `<div class="bar-order">
+          <div style="display:flex;justify-content:space-between"><b>💶 ${esc(b.note)}</b><span class="${b.amount >= 0 ? 'balance-positive' : 'balance-negative'}" style="font-weight:800">${b.amount >= 0 ? "+" : ""}${euro(b.amount)}</span></div>
+          <div class="muted">${b.date ? localDateTime(b.date) : ""} · Reg. da: ${esc(b.by || "—")}</div>
+        </div>`
+      }))
+  ].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+
+  shell("Estratto Conto", `
+    <div class="card">
+      <h3>Movimenti di ${esc(name)}</h3>
+      ${movements.map(x => x.html).join("") || "<p class='muted'>Nessun movimento registrato.</p>"}
+    </div>
+  `);
+}
+
+// --- AREA AMMINISTRATORE ---
+function adminHome() {
+  shell("Pannello Amministratore", `
+    ${buildAccountingDashboardHtml()}
+    <div class="home-grid">
+      <button class="tile primary-tile" onclick="navigateTo(() => adminAccountingView())"><div class="tile-icon-wrap">${SVG_ICONS.balance}</div><span>Bilancio & Quadratura</span></button>
+      <button class="tile balance-blue" onclick="navigateTo(() => adminEmployeeBalancesView())"><div class="tile-icon-wrap">${SVG_ICONS.users}</div><span>Saldo Dipendenti</span></button>
+      <button class="tile" onclick="navigateTo(() => adminFundView())"><div class="tile-icon-wrap">${SVG_ICONS.wallet}</div><span>Fondo Cassa</span></button>
+      <button class="tile" onclick="navigateTo(() => adminSafeView())"><div class="tile-icon-wrap">${SVG_ICONS.lock}</div><span>Cassaforte</span></button>
+      <button class="tile" onclick="navigateTo(() => adminProductsView())"><div class="tile-icon-wrap">${SVG_ICONS.tag}</div><span>Listino Prodotti</span></button>
+      <button class="tile" onclick="navigateTo(() => mealTurnoView())"><div class="tile-icon-wrap">${SVG_ICONS.utensils}</div><span>Pranzo/Cena Turno</span></button>
+      <button class="tile" onclick="navigateTo(() => historyView('all', 'today'))"><div class="tile-icon-wrap">${SVG_ICONS.receipt}</div><span>Registro & Controllo</span></button>
+      <button class="tile" onclick="navigateTo(() => revenueView())"><div class="tile-icon-wrap">${SVG_ICONS.chart}</div><span>Incassi</span></button>
+      <button class="tile" onclick="navigateTo(() => adminStockView())"><div class="tile-icon-wrap">${SVG_ICONS.box}</div><span>Magazzino</span></button>
+      <button class="tile" onclick="navigateTo(() => adminEmployeesView())"><div class="tile-icon-wrap">${SVG_ICONS.user}</div><span>Anagrafica & Gruppi</span></button>
+      <button class="tile danger-tile" onclick="clearHistory()"><div class="tile-icon-wrap">${SVG_ICONS.trash}</div><span>Azzera Storico</span></button>
+    </div>
+  `);
+}
+
+// --- SCHERMATA DEDICATA: BILANCIO, QUADRATURA CASSA E CREDITI TURNO A / GIORNALIERI ---
+function adminAccountingView() {
+  const acc = computeAccountingSummary();
+  const cashOrdersAll = orders.filter(o => o.payment === "subito").reduce((s, o) => s + Number(o.total || 0), 0);
+  const accountOrdersAll = orders.filter(o => o.payment === "conto").reduce((s, o) => s + Number(o.total || 0), 0);
+  const depositsAll = balanceMovements.filter(b => Number(b.amount || 0) > 0).reduce((s, b) => s + Number(b.amount || 0), 0);
+
+  shell("Bilancio & Quadratura Cassa", `
+    ${buildAccountingDashboardHtml()}
+
+    <div class="card">
+      <h3>1. Composizione Cassa Fisica (Soldi Reali in Mano)</h3>
+      <p class="muted" style="margin-top:0">Questa è la liquidità fisica che deve essere presente materialmente tra cassetto e cassaforte.</p>
+      <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <b>💵 Fondocassa (Cassetto Operativo)</b>
+          <div class="muted">Aumenta con Paga Subito e Versamenti/Saldi dei colleghi</div>
+        </div>
+        <div style="font-size:1.3rem;font-weight:900;color:var(--ok-dark)">${euro(acc.fondocassa)}</div>
+      </div>
+      <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <b>🔒 Cassaforte Spaccio</b>
+          <div class="muted">Riserva di contante messa al sicuro fuori dal cassetto</div>
+        </div>
+        <div style="font-size:1.3rem;font-weight:900;color:var(--dark)">${euro(acc.cassaforte)}</div>
+      </div>
+      <div class="stat-box" style="margin-bottom:0">
+        <div>
+          <div class="muted" style="font-weight:800">TOTALE CONTANTE DISPONIBILE ATTESO</div>
+          <div class="stat-value" style="color:var(--ok-dark)">${euro(acc.cashAvailable)}</div>
+        </div>
+        <button type="button" class="secondary" onclick="openTransferToSafeModal()">🔄 Sposta in Cassaforte</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2. Crediti da Incassare (Debiti di Turno A e Giornalieri)</h3>
+      <p class="muted" style="margin-top:0">Soldi delle consumazioni già prese a credito dai colleghi: entreranno in cassa man mano che saldano il loro conto.</p>
+      <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <b>🚒 Turno A (${acc.turnoCount} colleghi · ${acc.turnoDebtors} con debito)</b>
+          <div class="muted">Debiti da incassare: <b style="color:var(--danger-dark)">${euro(acc.turnoDebit)}</b> · Crediti prepagati a loro favore: <b style="color:var(--ok-dark)">${euro(acc.turnoCredit)}</b></div>
+        </div>
+        <div style="text-align:right">
+          <div class="muted" style="font-size:0.78rem">Debito Lordo</div>
+          <div style="font-size:1.25rem;font-weight:900;color:var(--danger-dark)">${euro(acc.turnoDebit)}</div>
+        </div>
+      </div>
+      <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <b>🏢 Giornalieri (${acc.giornCount} colleghi · ${acc.giornDebtors} con debito)</b>
+          <div class="muted">Debiti da incassare: <b style="color:var(--danger-dark)">${euro(acc.giornDebit)}</b> · Crediti prepagati a loro favore: <b style="color:var(--ok-dark)">${euro(acc.giornCredit)}</b></div>
+        </div>
+        <div style="text-align:right">
+          <div class="muted" style="font-size:0.78rem">Debito Lordo</div>
+          <div style="font-size:1.25rem;font-weight:900;color:var(--danger-dark)">${euro(acc.giornDebit)}</div>
+        </div>
+      </div>
+      <div class="bar-order" style="background:var(--primary-soft);border-color:#93c5fd;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <b>📌 Totale Crediti Netti da Incassare</b>
+          <div class="muted">Totale debiti (${euro(acc.totalDebit)}) − Crediti prepagati (${euro(acc.totalCredit)})</div>
+        </div>
+        <div style="font-size:1.35rem;font-weight:900;color:var(--primary-dark)">${euro(acc.netReceivable)}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>3. Come leggere il Guadagno e la Quadratura</h3>
+      <div class="bar-order">
+        <b>💡 Regola d'oro per chi gestisce lo spaccio:</b>
+        <ul style="margin:8px 0 0 0;padding-left:20px;line-height:1.55">
+          <li><b>Soldi che devi avere in mano oggi:</b> <b>${euro(acc.cashAvailable)}</b> (Cassetto ${euro(acc.fondocassa)} + Cassaforte ${euro(acc.cassaforte)}).</li>
+          <li><b>Soldi che hai fuori sui libretti:</b> <b>${euro(acc.totalDebit)}</b> (${euro(acc.turnoDebit)} dal Turno A + ${euro(acc.giornDebit)} dai Giornalieri).</li>
+          <li><b>Valore complessivo dello Spaccio (Cassa + Crediti Netti):</b> <b>${euro(acc.totalPatrimonio)}</b>.</li>
+          <li><b>Guadagno effettivo:</b> è la differenza tra il <b>valore totale dello spaccio</b> (più eventuale merce già pagata in magazzino) e il <b>capitale iniziale + spese fatture fornitori</b>. Quando un collega del Turno A o un Giornaliero paga il suo debito con <i>VERSA / SALDA</i>, il valore totale dello spaccio non cambia: semplicemente il credito si trasforma in contante nel fondocassa.</li>
+        </ul>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">
+        <div class="kpi-card"><div class="kpi-title">Vendite Paga Subito</div><div class="kpi-num" style="font-size:1.15rem">${euro(cashOrdersAll)}</div></div>
+        <div class="kpi-card"><div class="kpi-title">Vendite In Conto</div><div class="kpi-num" style="font-size:1.15rem">${euro(accountOrdersAll)}</div></div>
+        <div class="kpi-card"><div class="kpi-title">Versamenti Saldi</div><div class="kpi-num" style="font-size:1.15rem">${euro(depositsAll)}</div></div>
+      </div>
+    </div>
+  `);
+}
+
+function openTransferToSafeModal() {
+  openNumpadModal(
+    "🔄 Sposta da Fondocassa a Cassaforte",
+    `Disponibile nel cassetto: ${euro(fondocassa)} · Cassaforte: ${euro(cassaforte)}`,
+    "",
+    [{ label: "50 €", val: "50" }, { label: "100 €", val: "100" }, { label: "150 €", val: "150" }],
+    "var(--primary)",
+    (val) => {
+      if (!Number.isFinite(val) || val <= 0) { showToast("Inserisci un importo valido.", "err"); return; }
+      if (val > fondocassa) { showToast("Importo superiore al fondocassa disponibile.", "err"); return; }
+      fondocassa = Math.round((fondocassa - val) * 100) / 100;
+      cassaforte = Math.round((cassaforte + val) * 100) / 100;
+      enqueueAtomicOp({ type: "SET_FUND", value: fondocassa });
+      enqueueAtomicOp({ type: "SET_SAFE", value: cassaforte });
+      showToast(`Trasferiti ${euro(val)} in Cassaforte!`, "ok");
+      adminAccountingView();
+    }
+  );
+}
+
+function adminProductsView() {
+  const rows = products.map((p, i) => `
+    <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px">
+        ${getProductIllustration(p)}
+        <div>
+          <b style="font-size:1.05rem">${esc(p.name)}</b>
+          <div class="muted">${esc(p.cat)} · <b>${euro(p.price)}</b></div>
+        </div>
+      </div>
+      <button type="button" class="danger" style="min-height:42px;padding:8px 12px" onclick="removeProduct(${i})">RIMUOVI</button>
+    </div>`).join("");
+
+  shell("Listino Prodotti", `
+    <div class="card">
+      <button class="big ok-btn" style="margin-bottom:16px" onclick="openAddProductModal(() => adminProductsView())">➕ AGGIUNGI NUOVO PRODOTTO</button>
+      ${rows}
+    </div>
+  `);
+}
+
+function removeProduct(index) {
+  const p = products[index];
+  if (!p) return;
+  showConfirmModal("Elimina Prodotto", `Rimuovere "${p.name}" dal listino dello spaccio?`, () => {
+    products.splice(index, 1);
+    enqueueAtomicOp({ type: "REMOVE_PRODUCT", name: p.name });
+    showToast(`${p.name} rimosso dal listino.`, "info");
+    adminProductsView();
+  }, true);
+}
+
+function revenueView() {
+  const now = new Date(), startWeek = new Date(now);
+  startWeek.setHours(0, 0, 0, 0);
+  const day = (startWeek.getDay() + 6) % 7;
+  startWeek.setDate(startWeek.getDate() - day);
+  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now); end.setHours(23, 59, 59, 999);
+  const incassato = o => o.payment === "subito" ? (o.paid ? o.total : 0) : 0;
+  const inConto = o => o.payment === "conto" ? o.total : 0;
+  const inPeriod = (o, start) => { const d = new Date(o.paidAt || o.date); return d >= start && d <= end; };
+  const week = orders.filter(o => inPeriod(o, startWeek));
+  const month = orders.filter(o => inPeriod(o, startMonth));
+  const sumCash = a => a.reduce((s, o) => s + incassato(o), 0);
+  const sumConto = a => a.reduce((s, o) => s + inConto(o), 0);
+  const count = a => a.length;
+
+  shell("Incassi & Venduto Spaccio", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Settimana Corrente (${count(week)} ordini)</div>
+        <div class="stat-value">${euro(sumCash(week) + sumConto(week))}</div>
+        <div class="muted">Contanti: <b>${euro(sumCash(week))}</b> · In Conto: <b>${euro(sumConto(week))}</b></div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Mese Corrente (${count(month)} ordini)</div>
+        <div class="stat-value">${euro(sumCash(month) + sumConto(month))}</div>
+        <div class="muted">Contanti: <b>${euro(sumCash(month))}</b> · In Conto: <b>${euro(sumConto(month))}</b></div>
+      </div>
+    </div>
+  `);
+}
+
+function adminEmployeeBalancesView() {
+  const rows = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" })).map(name => {
+    const bal = Number(balances[name] || 0);
+    const grp = getEmployeeGroup(name);
+    return `<div class="bar-order emp-balance-card" data-name="${esc(name.toLowerCase())}" data-group="${grp}" data-bal="${bal}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <b style="font-size:1.05rem">${esc(name)}</b>
+          <span class="group-pill ${grp}">${getGroupLabel(grp)}</span>
+        </div>
+        <div class="${bal < 0 ? "balance-negative" : "balance-positive"}" style="font-size:1.25rem;font-weight:900">${euro(bal)}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="ok-btn" onclick='openDepositNumpad(${JSON.stringify(name)}, true)'>💵 VERSA / SALDA</button>
+        <button type="button" class="danger" onclick='openDebitNumpad(${JSON.stringify(name)}, true)'>➖ ADDEBITA</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  shell("Saldo Dipendenti (Admin)", `
+    ${renderBalanceFilterBar(true)}
+    <div class="card">
+      <h3>Verifica e Modifica Saldi</h3>
+      <input type="search" value="${esc(balanceSearchText)}" placeholder="🔍 Cerca dipendente..." oninput="filterEmployeeCards(this.value)">
+      ${rows}
+    </div>
+  `);
+  applyBalanceFilters();
+}
+
+function adminFundView() {
+  shell("Fondo Cassa", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Fondocassa Attuale (Cassetto)</div>
+        <div class="stat-value">${euro(fondocassa)}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="secondary" onclick="openTransferToSafeModal()">🔄 Sposta in Cassaforte</button>
+        <button type="button" onclick="openFundNumpad()">🔢 IMPOSTA CON TASTIERINO</button>
+      </div>
+    </div>
+  `);
+}
+
+function openFundNumpad() {
+  openNumpadModal(
+    "Nuovo Fondocassa",
+    "Digita il contante presente nel cassetto",
+    fondocassa.toFixed(2),
+    [{ label: "50 €", val: "50" }, { label: "100 €", val: "100" }, { label: "150 €", val: "150" }],
+    "var(--primary)",
+    (val) => {
+      if (!Number.isFinite(val) || val < 0) { showToast("Importo non valido.", "err"); return; }
+      fondocassa = val;
+      enqueueAtomicOp({ type: "SET_FUND", value: val });
+      showToast("Fondocassa aggiornato!", "ok");
+      adminFundView();
+    }
+  );
+}
+
+function adminSafeView() {
+  shell("Cassaforte Spaccio", `
+    <div class="stat-box">
+      <div>
+        <div class="muted" style="font-weight:700">Importo in Cassaforte</div>
+        <div class="stat-value">${euro(cassaforte)}</div>
+      </div>
+      <button type="button" onclick="openSafeNumpad()">🔢 IMPOSTA CON TASTIERINO</button>
+    </div>
+  `);
+}
+
+function openSafeNumpad() {
+  openNumpadModal(
+    "Aggiorna Cassaforte",
+    "Digita il totale custodito in cassaforte",
+    cassaforte.toFixed(2),
+    [{ label: "0 €", val: "0" }, { label: "100 €", val: "100" }, { label: "200 €", val: "200" }],
+    "var(--primary)",
+    (val) => {
+      if (!Number.isFinite(val) || val < 0) { showToast("Importo non valido.", "err"); return; }
+      cassaforte = val;
+      enqueueAtomicOp({ type: "SET_SAFE", value: val });
+      showToast("Cassaforte aggiornata!", "ok");
+      adminSafeView();
+    }
+  );
+}
+
+function filterAdminEmpCards(query) {
+  const q = query.trim().toLowerCase();
+  document.querySelectorAll(".admin-emp-card").forEach(card => {
+    const blob = card.getAttribute("data-search") || "";
+    card.classList.toggle("hidden", !blob.includes(q));
+  });
+}
+
+function getPrivilegeBadgeHtml(level) {
+  if (level === "admin") return `<span class="status" style="background:#dbeafe;color:#1e40af">🛡️ Amministratore + Cassiere</span>`;
+  if (level === "cashier") return `<span class="status ok">☕ Cassiere POS</span>`;
+  return `<span class="status">👤 Solo Consumatore</span>`;
+}
+
+function adminEmployeesView() {
+  ensureAllEmployeeAccounts();
+  const list = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+  const empRows = list.map((n, i) => {
+    const cred = credentials[n] || [makeNomeCognomeUsername(n), DEFAULT_EMP_HASH];
+    const uname = cred[0];
+    const level = employeeRoles[n] || "consumer";
+    const grp = getEmployeeGroup(n);
+    const searchBlob = `${n} ${uname} ${level} ${grp} ${getGroupLabel(grp)}`.toLowerCase();
+    return `
+    <div class="bar-order admin-emp-card" data-search="${esc(searchBlob)}">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="group-pill ${grp}">${getGroupLabel(grp)}</span>
+          <span class="badge" style="background:#f1f5f9;color:var(--dark);font-family:monospace">@${esc(uname)}</span>
+          ${getPrivilegeBadgeHtml(level)}
+        </div>
+        <span class="muted">Saldo: <b class="${(balances[n] || 0) < 0 ? 'balance-negative' : 'balance-positive'}">${euro(balances[n] || 0)}</b></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="empName_${i}" value="${esc(n)}" style="margin:0;flex:1;min-width:190px">
+        <button type="button" class="secondary" data-emp="${esc(n)}" onclick="saveEmployeeFromBtn(this,${i})">SALVA NOME</button>
+        <button type="button" data-emp="${esc(n)}" onclick="openManageAccessModal(this.getAttribute('data-emp'))">🔑 ACCESSO, GRUPPO & RUOLO</button>
+        <button type="button" class="danger" data-emp="${esc(n)}" onclick="removeEmployee(this.getAttribute('data-emp'))">RIMUOVI</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  shell("Anagrafica, Gruppi & Ruoli", `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div>
+          <h3 style="margin:0">Gestione Personale (${list.length} · Turno A & Giornalieri)</h3>
+          <p class="muted" style="margin:4px 0 0 0">Ogni collega accede con <b>nome.cognome</b> (password iniziale: <b>1234</b>). Puoi assegnare il gruppo (<b>Turno A</b> o <b>Giornaliero</b>), i privilegi e la password.</p>
+        </div>
+      </div>
+      <button class="big ok-btn" style="margin-bottom:14px" onclick="addEmployee()">➕ AGGIUNGI NUOVO DIPENDENTE</button>
+      <input type="search" placeholder="🔍 Cerca per nome, gruppo (turno / giornaliero) o username..." oninput="filterAdminEmpCards(this.value)">
+      ${empRows}
+    </div>
+  `);
+}
+
+let tempRoleChoice = "consumer";
+let tempGroupChoice = "turno";
+function openManageAccessModal(empName) {
+  ensureAllEmployeeAccounts();
+  const cred = credentials[empName] || [makeNomeCognomeUsername(empName), DEFAULT_EMP_HASH];
+  const curUsername = cred[0];
+  tempRoleChoice = employeeRoles[empName] || "consumer";
+  tempGroupChoice = getEmployeeGroup(empName);
+  const modal = document.getElementById("customModal");
+
+  function renderAccessModal(keepUname = curUsername, keepPwd = "") {
+    modal.innerHTML = `<div class="modal-box">
+      <h3 style="margin-bottom:4px">🔑 Accesso, Gruppo & Privilegi</h3>
+      <p class="muted" style="margin:0 0 14px 0"><b>${esc(empName)}</b></p>
+
+      <label>Gruppo di appartenenza</label>
+      <div class="type-switch" style="margin-bottom:12px">
+        <button type="button" class="type-btn ${tempGroupChoice === 'turno' ? 'active' : ''}" style="min-height:46px" onclick="setTempEmpGroup('turno')">🚒 Turno A</button>
+        <button type="button" class="type-btn ${tempGroupChoice === 'giornaliero' ? 'active' : ''}" style="min-height:46px" onclick="setTempEmpGroup('giornaliero')">🏢 Giornaliero</button>
+      </div>
+
+      <label>Username di accesso (nome.cognome)</label>
+      <input id="editEmpUsername" value="${esc(keepUname)}" placeholder="nome.cognome" style="font-family:monospace;margin-bottom:12px">
+
+      <label>Nuova Password (lascia vuoto per non cambiarla)</label>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input id="editEmpPassword" type="text" value="${esc(keepPwd)}" placeholder="Es. 1234" style="margin:0;flex:1">
+        <button type="button" class="secondary" style="white-space:nowrap" onclick="document.getElementById('editEmpPassword').value='1234'">Reset 1234</button>
+      </div>
+
+      <label>Livello di Privilegi</label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <button type="button" class="type-btn ${tempRoleChoice === 'consumer' ? 'active' : ''}" style="justify-content:flex-start;text-align:left;padding:12px 14px;min-height:54px" onclick="setTempEmpRole('consumer')">
+          <div>
+            <div style="font-weight:800">👤 Solo Consumatore (Standard)</div>
+            <div style="font-size:0.8rem;opacity:0.85;font-weight:500">Vede solo il proprio saldo, i propri ordini e cambia password</div>
+          </div>
+        </button>
+        <button type="button" class="type-btn ${tempRoleChoice === 'cashier' ? 'active' : ''}" style="justify-content:flex-start;text-align:left;padding:12px 14px;min-height:54px" onclick="setTempEmpRole('cashier')">
+          <div>
+            <div style="font-weight:800">☕ Cassiere POS + Conto Personale</div>
+            <div style="font-size:0.8rem;opacity:0.85;font-weight:500">Può stare al tablet in cassa, registrare ordini, versamenti e addebiti</div>
+          </div>
+        </button>
+        <button type="button" class="type-btn ${tempRoleChoice === 'admin' ? 'active' : ''}" style="justify-content:flex-start;text-align:left;padding:12px 14px;min-height:54px" onclick="setTempEmpRole('admin')">
+          <div>
+            <div style="font-weight:800">🛡️ Amministratore + Cassiere POS</div>
+            <div style="font-size:0.8rem;opacity:0.85;font-weight:500">Accesso completo (richiede anche password Admin)</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary" onclick="document.getElementById('customModal').classList.add('hidden')">ANNULLA</button>
+        <button type="button" class="ok-btn" data-emp="${esc(empName)}" onclick="saveEmployeeAccess(this.getAttribute('data-emp'))">SALVA MODIFICHE</button>
+      </div>
+    </div>`;
+  }
+
+  window.setTempEmpGroup = (g) => {
+    const uVal = document.getElementById("editEmpUsername")?.value || curUsername;
+    const pVal = document.getElementById("editEmpPassword")?.value || "";
+    tempGroupChoice = g;
+    renderAccessModal(uVal, pVal);
+  };
+
+  window.setTempEmpRole = (r) => {
+    const uVal = document.getElementById("editEmpUsername")?.value || curUsername;
+    const pVal = document.getElementById("editEmpPassword")?.value || "";
+    tempRoleChoice = r;
+    renderAccessModal(uVal, pVal);
+  };
+
+  window.saveEmployeeAccess = async (targetName) => {
+    const newUname = (document.getElementById("editEmpUsername")?.value || "").trim().toLowerCase();
+    const newPwd = (document.getElementById("editEmpPassword")?.value || "").trim();
+
+    if (!newUname || newUname.length < 3) {
+      showToast("Inserisci uno username valido (minimo 3 caratteri).", "err");
+      return;
+    }
+    if (newUname === "admin") {
+      showToast("Lo username 'admin' è riservato al sistema.", "err");
+      return;
+    }
+    const conflict = Object.entries(credentials).find(([emp, [u]]) => emp !== targetName && u.toLowerCase() === newUname);
+    if (conflict) {
+      showToast(`Username già assegnato a ${conflict[0]}.`, "err");
+      return;
+    }
+    if (newPwd && newPwd.length < 4) {
+      showToast("La password deve avere almeno 4 caratteri.", "err");
+      return;
+    }
+
+    const oldHash = credentials[targetName]?.[1] || DEFAULT_EMP_HASH;
+    const finalHash = newPwd ? await sha256(newPwd) : oldHash;
+    credentials[targetName] = [newUname, finalHash];
+    employeeRoles[targetName] = tempRoleChoice;
+    employeeGroups[targetName] = tempGroupChoice;
+
+    if (user && user.employee === targetName) {
+      user.username = newUname;
+      saveSession();
+    }
+
+    rebuildAccounts();
+    enqueueAtomicOp({ type: "UPDATE_CREDENTIAL", employee: targetName, cred: credentials[targetName], roleLevel: tempRoleChoice, groupLevel: tempGroupChoice });
+    modal.classList.add("hidden");
+    showToast(`Dati aggiornati per ${targetName}!`, "ok");
+    adminEmployeesView();
+  };
+
+  modal.classList.remove("hidden");
+  renderAccessModal();
+}
+
+function saveEmployeeFromBtn(btn, i) {
+  const oldName = btn.getAttribute("data-emp");
+  saveEmployeeByName(oldName, i);
+}
+
+function saveEmployeeByName(oldName, i) {
+  const name = document.getElementById("empName_" + i)?.value.trim();
+  if (!name) { showToast("Inserisci un nome valido.", "err"); return; }
+  if (name !== oldName && employees.some(n => n.toLowerCase() === name.toLowerCase())) {
+    showToast("Nome già presente.", "err"); return;
+  }
+  const idx = employees.indexOf(oldName);
+  if (idx < 0) return;
+  employees[idx] = name;
+  employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+  if (oldName !== name) {
+    balances[name] = balances[oldName] || 0;
+    delete balances[oldName];
+    if (credentials[oldName]) {
+      credentials[name] = credentials[oldName];
+      delete credentials[oldName];
+    }
+    if (employeeRoles[oldName]) {
+      employeeRoles[name] = employeeRoles[oldName];
+      delete employeeRoles[oldName];
+    }
+    if (employeeGroups[oldName]) {
+      employeeGroups[name] = employeeGroups[oldName];
+      delete employeeGroups[oldName];
+    }
+  }
+  ensureAllEmployeeAccounts();
+  rebuildAccounts();
+  enqueueAtomicOp({ type: "RENAME_EMPLOYEE", oldName, newName: name });
+  showToast("Nominativo aggiornato!", "ok");
+  adminEmployeesView();
+}
+
+function addEmployee() {
+  showPromptModal("Nuovo Dipendente", "Cognome e Nome (es. Rossi Mario)", false, (raw) => {
+    const n = (raw || "").trim();
+    if (!n) return;
+    if (employees.some(x => x.toLowerCase() === n.toLowerCase())) {
+      showToast("Dipendente già in elenco.", "err"); return;
+    }
+    employees.push(n);
+    employees.sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+    balances[n] = 0;
+    employeeRoles[n] = "consumer";
+    employeeGroups[n] = "turno";
+    ensureAllEmployeeAccounts();
+    rebuildAccounts();
+    enqueueAtomicOp({ type: "ADD_EMPLOYEE", name: n, cred: credentials[n], roleLevel: "consumer", groupLevel: "turno" });
+    const generatedUname = credentials[n]?.[0] || makeNomeCognomeUsername(n);
+    showToast(`${n} aggiunto (Turno A)! Login: ${generatedUname} / 1234`, "ok");
+    adminEmployeesView();
+  });
+}
+
+function removeEmployee(name, source = "employees") {
+  showConfirmModal("Rimuovi Dipendente", `Eliminare definitivamente ${name}, le sue credenziali e il relativo saldo?`, () => {
+    employees = employees.filter(n => n !== name).sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" }));
+    delete balances[name];
+    delete credentials[name];
+    delete employeeRoles[name];
+    delete employeeGroups[name];
+    rebuildAccounts();
+    enqueueAtomicOp({ type: "REMOVE_EMPLOYEE", name });
+    showToast(`${name} rimosso.`, "info");
+    if (source === "adminBalance") adminEmployeeBalancesView();
+    else adminEmployeesView();
+  }, true);
+}
+
+function clearHistory() {
+  if (!orders.length && !balanceMovements.length && !mealMovements.length) {
+    showToast("Il registro è già vuoto.", "info");
+    return;
+  }
+  showConfirmModal("Azzera Registro e Storico", "Cancellare tutto lo storico di ordini, versamenti e addebiti? I saldi attuali dei dipendenti non verranno toccati.", () => {
+    orders = [];
+    balanceMovements = [];
+    mealMovements = [];
+    enqueueAtomicOp({ type: "CLEAR_HISTORY" });
+    showToast("Registro e storico azzerati.", "ok");
+    renderHome();
+  }, true);
+}
+
+let mealQuotaVal = 10;
+function mealTurnoView() {
+  const rows = employees.slice().sort((a, b) => a.localeCompare(b, "it", { sensitivity: "base" })).map(e => {
+    const grp = getEmployeeGroup(e);
+    return `
+    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;margin:0;color:var(--text);text-transform:none;letter-spacing:0">
+      <input type="checkbox" class="mealEmployeeCheck" value="${esc(e)}" style="width:24px;height:24px;min-height:24px;margin:0">
+      <span style="font-size:1.02rem;font-weight:600">${esc(e)}</span>
+      <span class="group-pill ${grp}">${getGroupLabel(grp)}</span>
+    </label>`;
+  }).join("");
+
+  shell("Pranzo / Cena Turno", `
+    <div class="card">
+      <h3>Addebito Pasto Collettivo</h3>
+      <p class="muted" style="margin-top:0">Spunta i partecipanti e imposta la quota col tastierino.</p>
+      <div style="border:2px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;max-height:330px;overflow-y:auto">${rows}</div>
+      <div class="stat-box" style="padding:12px 16px">
+        <div>
+          <div class="muted" style="font-weight:700">Quota Individuale</div>
+          <div style="font-size:1.5rem;font-weight:900" id="mealQuotaDisplay">${euro(mealQuotaVal)}</div>
+        </div>
+        <button type="button" class="secondary" onclick="openMealQuotaNumpad()">🔢 CAMBIA QUOTA</button>
+      </div>
+      <button class="big" onclick="confirmMealTurno()">CONFERMA ADDEBITO PASTO</button>
+    </div>
+  `);
+}
+
+function openMealQuotaNumpad() {
+  openNumpadModal(
+    "Quota Pasto",
+    "Inserisci la quota per singolo partecipante",
+    String(mealQuotaVal),
+    [{ label: "5 €", val: "5" }, { label: "10 €", val: "10" }, { label: "15 €", val: "15" }],
+    "var(--primary)",
+    (val) => {
+      if (!Number.isFinite(val) || val <= 0) { showToast("Inserisci un importo valido.", "err"); return; }
+      mealQuotaVal = val;
+      const disp = document.getElementById("mealQuotaDisplay");
+      if (disp) disp.textContent = euro(mealQuotaVal);
+    }
+  );
+}
+
+function confirmMealTurno() {
+  const selected = [...document.querySelectorAll(".mealEmployeeCheck:checked")].map(x => x.value);
+  const amount = Number(mealQuotaVal || 0);
+  if (!selected.length) { showToast("Seleziona almeno un dipendente.", "err"); return; }
+  if (!Number.isFinite(amount) || amount <= 0) { showToast("Inserisci un importo valido.", "err"); return; }
+  const total = selected.length * amount;
+
+  showConfirmModal("Conferma Addebito", `Addebitare ${euro(amount)} a ${selected.length} dipendenti (Totale: ${euro(total)})?`, () => {
+    const now = new Date().toISOString();
+    const entries = [];
+    selected.forEach(name => {
+      balances[name] = (balances[name] || 0) - amount;
+      const ent = {
+        id: Date.now() + Math.random(),
+        date: now,
+        employee: name,
+        amount,
+        type: "Pranzo/Cena con il turno",
+        by: formatOperatorAudit(user),
+        byUsername: user?.username || "—",
+        byRole: role || "Amministratore"
+      };
+      mealMovements.push(ent);
+      entries.push(ent);
+    });
+    enqueueAtomicOp({ type: "MEAL_DEBIT", date: now, entries });
+    showToast(`Addebitati ${euro(total)} a ${selected.length} dipendenti!`, "ok");
+    renderHome();
+  });
+}
+
+function adminStockView() {
+  const rows = stockItems.map((n, i) => `
+    <div class="bar-order" style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <b style="font-size:1.05rem">${esc(n)}</b>
+      <div class="qty-controls">
+        <button type="button" class="secondary qty-btn" onclick="stepStock(${i}, -1)">−</button>
+        <span id="stockVal_${i}" style="font-weight:900;font-size:1.2rem;min-width:44px;text-align:center">${Number(stock[n] || 0)}</span>
+        <button type="button" class="secondary qty-btn" onclick="stepStock(${i}, 1)">+</button>
+      </div>
+    </div>`).join("");
+
+  shell("Giacenze Magazzino", `
+    <div class="card">
+      <h3>Inventario Spaccio</h3>
+      ${rows}
+      <button class="big" style="margin-top:8px" onclick="saveStock()">SALVA GIACENZE</button>
+    </div>
+  `);
+}
+
+function stepStock(i, delta) {
+  const n = stockItems[i];
+  stock[n] = Math.max(0, Number(stock[n] || 0) + delta);
+  const el = document.getElementById("stockVal_" + i);
+  if (el) el.textContent = stock[n];
+}
+
+function saveStock() {
+  enqueueAtomicOp({ type: "SET_STOCK", stock: { ...stock } });
+  showToast("Giacenze aggiornate!", "ok");
+  renderHome();
+}
+</script>
+
+<script>
+restoreSession();
+window.spaccioCollectAllData = collectAllData;
+window.spaccioApplyAllData = applyAllData;
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { initializeFirestore, persistentLocalCache, doc, getDoc, setDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBxPFBq-YKSu-je6RBRqudyei7-EsjWm4Y",
+  authDomain: "spaccio-turno-a.firebaseapp.com",
+  projectId: "spaccio-turno-a",
+  storageBucket: "spaccio-turno-a.firebasestorage.app",
+  messagingSenderId: "43990223549",
+  appId: "1:43990223549:web:1b5c14b90178451da645d4"
+};
+
+const statusEl = document.getElementById("cloudStatus");
+function setStatus(state, label) {
+  if (!statusEl) return;
+  if (state === "ok" || state === true) {
+    statusEl.textContent = "🟢 " + (label || "Sincronizzato");
+    statusEl.style.color = "#166534";
+    statusEl.style.background = "#dcfce7";
+  } else if (state === "saving") {
+    statusEl.textContent = "🟡 " + (label || "Salvataggio...");
+    statusEl.style.color = "#854d0e";
+    statusEl.style.background = "#fef9c3";
+  } else {
+    statusEl.textContent = "🔴 " + (label || "Offline (in coda)");
+    statusEl.style.color = "#b91c1c";
+    statusEl.style.background = "#fee2e2";
+  }
+}
+window.setCloudBadge = setStatus;
+window.isApplyingRemoteData = false;
+
+try {
+  const app = initializeApp(firebaseConfig);
+  const db = initializeFirestore(app, { localCache: persistentLocalCache() });
+  const dataRef = doc(db, "gestionale", "dati_spaccio");
+
+  window.firebaseSaveFullSnapshot = async (data) => {
+    await setDoc(dataRef, { ...data, updatedAt: new Date().toISOString() });
+    if (navigator.onLine) setStatus("ok", "Sincronizzato");
+    else setStatus("err", "Offline (in coda)");
+  };
+
+  window.firebaseRunAtomicBatch = async (opsBatch) => {
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(dataRef);
+      let baseState = snap.exists() ? snap.data() : window.spaccioCollectAllData();
+      opsBatch.forEach(op => {
+        baseState = window.spaccioApplyAtomicOpToState(baseState, op);
+      });
+      tx.set(dataRef, { ...baseState, updatedAt: new Date().toISOString() });
+    });
+  };
+
+  window.addEventListener("online", () => {
+    setStatus("ok", "Sincronizzato");
+    if (window.flushAtomicOps) window.flushAtomicOps();
+  });
+  window.addEventListener("offline", () => setStatus("err", "Offline (in coda)"));
+
+  const initial = await getDoc(dataRef);
+  if (!initial.exists()) {
+    await setDoc(dataRef, { ...window.spaccioCollectAllData(), updatedAt: new Date().toISOString() });
+    setStatus("ok", "Sincronizzato");
+  } else if (window.flushAtomicOps) {
+    window.flushAtomicOps();
+  }
+
+  onSnapshot(dataRef, (snap) => {
+    if (!snap.exists()) return;
+    const remote = snap.data();
+    if (window.isApplyingRemoteData) return;
+    window.isApplyingRemoteData = true;
+    try {
+      const { updatedAt, ...payload } = remote;
+      window.spaccioApplyAllData(payload);
+      setStatus(navigator.onLine ? "ok" : "err", navigator.onLine ? "Sincronizzato" : "Offline (in coda)");
+    } catch (err) {
+      console.error("Errore dati Firestore:", err);
+      setStatus("err", "Errore dati");
+    } finally {
+      window.isApplyingRemoteData = false;
+    }
+  }, (error) => {
+    console.error("Firestore onSnapshot:", error);
+    setStatus("err", "Offline / errore rete");
+  });
+} catch (err) {
+  console.error("Inizializzazione Firebase:", err);
+  setStatus("err", "Modalità Locale");
+}
+</script>
+</body>
+</html>
